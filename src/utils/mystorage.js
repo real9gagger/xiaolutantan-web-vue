@@ -1,12 +1,12 @@
-function myStore(){
+function myStorage(){
 	this.NAME_PREFIX = ("xlttweb_");
 }
 
-myStore.prototype.get = function(name, defval){
+myStorage.prototype.get = function(name, defval){
 	return localStorage.getItem(this.NAME_PREFIX + name) || defval;
 }
 
-myStore.prototype.getObject = function(name, remove){
+myStorage.prototype.getObject = function(name, remove){
 	let keyname = this.NAME_PREFIX + name;
 	let jsonStr = localStorage.getItem(keyname);
 	
@@ -25,30 +25,30 @@ myStore.prototype.getObject = function(name, remove){
 	return null;
 }
 
-myStore.prototype.pick = function(name, defval){
+myStorage.prototype.pick = function(name, defval){
 	let keyname = this.NAME_PREFIX + name;
 	let value = localStorage.getItem(keyname);
 	localStorage.removeItem(keyname);
 	return (value || defval);
 }
 
-myStore.prototype.set = function(name, value){
+myStorage.prototype.set = function(name, value){
 	localStorage.setItem(this.NAME_PREFIX + name, value);
 }
 
-myStore.prototype.setObject = function(name, obj){
+myStorage.prototype.setObject = function(name, obj){
 	localStorage.setItem(this.NAME_PREFIX + name, JSON.stringify(obj));
 }
 
-myStore.prototype.remove = function(name){
+myStorage.prototype.remove = function(name){
 	localStorage.removeItem(this.NAME_PREFIX + name);
 }
 
-myStore.prototype.clear = function(){
+myStorage.prototype.clear = function(){
 	localStorage.clear();
 }
 
-myStore.prototype.onceObject = function(name, obj){
+myStorage.prototype.onceObject = function(name, obj){
 	if(obj === undefined){
 		let jsonStr = sessionStorage.getItem(this.NAME_PREFIX + name);
 		if(jsonStr){
@@ -62,7 +62,7 @@ myStore.prototype.onceObject = function(name, obj){
 	return null;
 }
 
-myStore.prototype.onceString = function(name, obj){
+myStorage.prototype.onceString = function(name, obj){
 	if(obj === undefined){
 		return sessionStorage.getItem(this.NAME_PREFIX + name);
 	} else if (obj === null){
@@ -73,4 +73,4 @@ myStore.prototype.onceString = function(name, obj){
 	return null;
 }
 
-export default (new myStore());
+export default (new myStorage());

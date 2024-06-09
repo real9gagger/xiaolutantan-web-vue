@@ -15,32 +15,24 @@ export default [
     	path: "/e404",
     	name: "找不到页面",
     	component: () => import("@/views/error/http404"),
-    	meta: {
-    		keepAlive: false
-    	}
+    	meta: {}
     },
     {
     	path: "/test",
     	name: "测试中心",
     	component: () => import("@/views/test/index"),
-    	meta: {
-    		keepAlive: false
-    	}
+    	meta: {}
     },
     {
     	path: "/testmapdev",
     	name: "测试地图开发专用",
     	component: () => import("@/views/test/mapDev"),
-    	meta: {
-    		keepAlive: false
-    	}
+    	meta: {}
     },
 	{
 		path: "/index",
 		name: "主页",
 		component: () => import("@/views/index/index"),
-		meta: {
-			keepAlive: true
-		}
+		meta: {}
 	}
 ];

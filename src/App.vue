@@ -1,37 +1,27 @@
 <template>
-    <router-view v-slot="{ Component }">
-        <transition v-if="$route.meta.keepAlive"
+    <router-view v-slot="$scope">
+        <transition
             @before-enter="onPageBeforeEnter" 
             @enter="onPageEnter" 
             @after-enter="onPageAfterEnter" 
             @leave="onPageLeave" :css="false">
-            <keep-alive :exclude="keepAliveExclude" :max="20">
-                <component :is="Component" />
+            <keep-alive :include="keepAliveIncludes" :max="32">
+                <component :is="$scope.Component" />
             </keep-alive>
-        </transition>
-        <transition v-else
-            @before-enter="onPageBeforeEnter" 
-            @enter="onPageEnter" 
-            @after-enter="onPageAfterEnter" 
-            @leave="onPageLeave" :css="false">
-            <component :is="Component" />
         </transition>
     </router-view>
 </template>
 
 <script setup name="XlttApp">
-    import { ref, getCurrentInstance, onMounted } from "vue";
-    import { useRoute } from "vue-router";
-    
-    const { proxy: $proxy } = getCurrentInstance();
-    const $route = useRoute();
-    
-    const keepAliveExclude = ref([]);
-    const isRouterBack = ref(false);
-    
+    import { onMounted, computed } from "vue";
+    import { useStore } from "vuex";
+
+    const $store = useStore();
+    const keepAliveIncludes = computed(() => $store.getters.keepAliveIncludes);
+
     function onPageBeforeEnter(elem){//进入页面时要固定定位
     	//等于null表示首次加载，此时不需要页面切换动画
-    	const transX = (isRouterBack.value ? -100 : (isRouterBack.value===false ? 100 : 0));
+    	const transX = ($store.getters.isRouterBack ? -100 : ($store.getters.isRouterBack===false ? 100 : 0));
     	$(elem).css({
     		position: "fixed",
     		top: "0",
@@ -65,7 +55,7 @@
     	
     	setTimeout(function(transX){
     		elem.style.transform = `translate(${transX}%, 0)`;
-    	}, 10, (isRouterBack.value ? 100 : -100));//如果是返回则，往右移动，打开新页面时才往左移动
+    	}, 10, ($store.getters.isRouterBack ? 100 : -100));//如果是返回则，往右移动，打开新页面时才往左移动
     }
     
     onMounted(() => {

@@ -7,7 +7,7 @@ const myModules = {
 
 const myGetters = {
     isRouterBack: (state) => state.routeController.isRouterBack,
-    keepAliveExclude: (state) => state.routeController.keepAliveExclude,
+    keepAliveIncludes: (state) => state.routeController.keepAliveIncludes,
 };
 
 const vuexStore = createStore({

@@ -1,9 +1,7 @@
 <template>
-<div>
-  <div id="testMapDevMapBox" class="map-dev-box">
-    
-  </div>
-</div>
+    <div class="wh-s bg-mc">
+        <div id="testMapDevMapBox" class="map-dev-box"></div>
+    </div>
 </template>
 
 <script setup name="TestMapDev">
@@ -11,7 +9,7 @@
     import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canal_geo.js";
     import axios from "axios";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
-    
+
     let mapInstance = null; //地图实例。单独放在外面，避免被 vue 响应化处理（避免添加太多 getter/setter 造成卡顿）。
     
     function toBMapPoints(arr){
