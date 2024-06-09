@@ -1,26 +1,98 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <router-view v-slot="{ Component }">
+        <transition v-if="$route.meta.keepAlive"
+            @before-enter="onPageBeforeEnter" 
+            @enter="onPageEnter" 
+            @after-enter="onPageAfterEnter" 
+            @leave="onPageLeave" :css="false">
+            <keep-alive :exclude="keepAliveExclude" :max="20">
+                <component :is="Component" />
+            </keep-alive>
+        </transition>
+        <transition v-else
+            @before-enter="onPageBeforeEnter" 
+            @enter="onPageEnter" 
+            @after-enter="onPageAfterEnter" 
+            @leave="onPageLeave" :css="false">
+            <component :is="Component" />
+        </transition>
+    </router-view>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+<script setup name="XlttApp">
+    import { ref, getCurrentInstance, onMounted } from "vue";
+    import { useRoute } from "vue-router";
+    
+    const { proxy: $proxy } = getCurrentInstance();
+    const $route = useRoute();
+    
+    const keepAliveExclude = ref([]);
+    const isRouterBack = ref(false);
+    
+    function onPageBeforeEnter(elem){//进入页面时要固定定位
+    	//等于null表示首次加载，此时不需要页面切换动画
+    	const transX = (isRouterBack.value ? -100 : (isRouterBack.value===false ? 100 : 0));
+    	$(elem).css({
+    		position: "fixed",
+    		top: "0",
+    		left: "0",
+    		right: "0",
+    		bottom: "0",
+    		zIndex: "99",
+    		transform: `translate(${transX}%,0)`, //如果是返回则，往右移动，打开新页面时才往左移动
+    		transition: "transform 0.4s"
+    	});
+    }
+    function onPageEnter(elem, done){//页面进入
+    	$(elem).one("transitionend", done);
+    	setTimeout(function(){ elem.style.transform = "translate(0,0)" }, 10);
+    }
+    function onPageAfterEnter(elem){//进入动画执行完，重置	
+    	elem.style.position = null;
+    	elem.style.top = null;
+    	elem.style.left = null;
+    	elem.style.right = null;
+    	elem.style.bottom = null;
+    	elem.style.zIndex = null;
+    	elem.style.transform = null;
+    	elem.style.transition = null;
+    }
+    function onPageLeave(elem, done){//页面离开
+    	$(elem).css({
+    		transform: "translate(0, 0)",
+    		transition: "transform 0.4s"
+    	}).one("transitionend", done);
+    	
+    	setTimeout(function(transX){
+    		elem.style.transform = `translate(${transX}%, 0)`;
+    	}, 10, (isRouterBack.value ? 100 : -100));//如果是返回则，往右移动，打开新页面时才往左移动
+    }
+    
+    onMounted(() => {
+        if(!window.onresize){
+        	window.onresize = function(){
+        		//【手机端】以屏幕 360x640 的字体 20 像素为基准，【电脑端】以 1366x768 为基准
+        		let fs_px1 = 0;
+        		if (navigator.userAgent.lastIndexOf("Mobile") >= 0){
+        			fs_px1 = (window.innerWidth / 360) * 10;
+        		} else {
+        			fs_px1 = (window.innerWidth / 1366) * 20;
+        		}
+        		let fs_px2 = Math.floor(fs_px1 / 10) * 10;//让它是 10 的倍数：
+        		if(fs_px2 < 20){
+        			fs_px2 = 20;
+        		}
+        	    document.documentElement.style.fontSize = (fs_px2 + "px");
+        		document.getElementById("xlttapp").style.minHeight = (window.innerHeight + "px");
+        	}
+        }
+        window.onresize();
+    });
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+#xlttapp {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

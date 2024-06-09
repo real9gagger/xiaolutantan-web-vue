@@ -1,4 +1,9 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import MyRouter from './router';
 
-createApp(App).mount('#app')
+const myApp = createApp(App);
+
+myApp.use(MyRouter);
+
+myApp.mount('#xlttapp');

@@ -1,0 +1,111 @@
+{"styleJson": [
+    {
+        "featureType": "background",
+        "elementType": "geometry",
+        "stylers": {
+            "visibility": "on"
+        }
+    }, {
+        "featureType": "road",
+        "elementType": "geometry",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "road",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "poilabel",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "poilabel",
+        "elementType": "labels.icon",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "districtlabel",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "districtlabel",
+        "elementType": "labels.icon",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "boundary",
+        "elementType": "geometry",
+        "stylers": {
+            "visibility": "on"
+        }
+    }, {
+        "featureType": "country",
+        "elementType": "geometry",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "continent",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "on"
+        }
+    }, {
+        "featureType": "nationalwaysign",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "on"
+        }
+    }, {
+        "featureType": "highwaysign",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "provincialwaysign",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "on"
+        }
+    }, {
+        "featureType": "tertiarywaysign",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "on"
+        }
+    }, {
+        "featureType": "highway",
+        "elementType": "geometry",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "highwaysign",
+        "elementType": "labels.icon",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "nationalway",
+        "elementType": "geometry",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
+        "featureType": "nationalway",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    }
+]}
