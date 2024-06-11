@@ -9,12 +9,12 @@ const myRouter = createRouter({
 });
 
 //添加导航守卫，用的是 vue-router4
-myRouter.beforeEach((to, from, next) => {
-	next();
+myRouter.beforeEach((to, from) => {
+	return true;
 });
 
 myRouter.afterEach((to, from) => {
-    console.log(to, from, typeof to.matched[0].components.default)
+    console.log(from, to)
     vuexStore.dispatch("updateKeepAliveIncludes", {
         toComponentName: (to.matched.length ? to.matched[0].components.default.name : null),
         fromComponentName: (from.matched.length ? from.matched[0].components.default.name : null)

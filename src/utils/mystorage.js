@@ -2,7 +2,7 @@ function myStorage(){
 	this.NAME_PREFIX = ("xlttweb_");
 }
 
-myStorage.prototype.get = function(name, defval){
+myStorage.prototype.getValue = function(name, defval){
 	return localStorage.getItem(this.NAME_PREFIX + name) || defval;
 }
 
@@ -25,14 +25,14 @@ myStorage.prototype.getObject = function(name, remove){
 	return null;
 }
 
-myStorage.prototype.pick = function(name, defval){
+myStorage.prototype.pickValue = function(name, defval){
 	let keyname = this.NAME_PREFIX + name;
 	let value = localStorage.getItem(keyname);
 	localStorage.removeItem(keyname);
 	return (value || defval);
 }
 
-myStorage.prototype.set = function(name, value){
+myStorage.prototype.setValue = function(name, value){
 	localStorage.setItem(this.NAME_PREFIX + name, value);
 }
 
@@ -40,11 +40,11 @@ myStorage.prototype.setObject = function(name, obj){
 	localStorage.setItem(this.NAME_PREFIX + name, JSON.stringify(obj));
 }
 
-myStorage.prototype.remove = function(name){
+myStorage.prototype.removeItem = function(name){
 	localStorage.removeItem(this.NAME_PREFIX + name);
 }
 
-myStorage.prototype.clear = function(){
+myStorage.prototype.clearAll = function(){
 	localStorage.clear();
 }
 
@@ -62,7 +62,7 @@ myStorage.prototype.onceObject = function(name, obj){
 	return null;
 }
 
-myStorage.prototype.onceString = function(name, obj){
+myStorage.prototype.onceValue = function(name, obj){
 	if(obj === undefined){
 		return sessionStorage.getItem(this.NAME_PREFIX + name);
 	} else if (obj === null){

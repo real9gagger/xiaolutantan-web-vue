@@ -5,7 +5,7 @@
 </template>
 
 <script setup name="TestMapDev">
-    import { onBeforeUnmount, onMounted, getCurrentInstance } from "vue";
+    import { onMounted, onUnmounted, getCurrentInstance } from "vue";
     import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canal_geo.js";
     import axios from "axios";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
@@ -46,7 +46,7 @@
     onMounted(() => {
         buildBaiduMap();
         
-        /* axios.get("/geojson/zhen_geojson_simplify.json").then(res => {
+        /* axios.get("/geojson/zhen_geojson.json").then(res => {
             console.log(res.data);
             const geolayer = new BMapGL.FillLayer({
                 crs: "GCJ02", //设置默认坐标系，避免产生偏移
@@ -101,7 +101,7 @@
         }));
     });
     
-    onBeforeUnmount(() => {
+    onUnmounted(() => {
         try {
             mapInstance && mapInstance.clearOverlays();
         } catch (ex){

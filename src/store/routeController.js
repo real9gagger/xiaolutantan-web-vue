@@ -18,8 +18,8 @@ export default {
             if(payload && payload.toComponentName){
                 //如果 payload.fromComponentName 为 null，可能是刷新或首次进来，因此尝试取最后的项的索引
                 //如果是刷新：state.keepAliveIncludes.length 大于 0，否则是首次进来！！！
-                const idxF = (payload.fromComponentName ? state.keepAliveIncludes.indexOf(payload.fromComponentName) : (state.keepAliveIncludes.length - 1));
-                const idxT = state.keepAliveIncludes.indexOf(payload.toComponentName);
+                const idxF = (payload.fromComponentName ? state.keepAliveIncludes.lastIndexOf(payload.fromComponentName) : (state.keepAliveIncludes.length - 1));
+                const idxT = state.keepAliveIncludes.lastIndexOf(payload.toComponentName);
                 if(idxF < 0){
                     if(!payload.fromComponentName){//首次进来
                         state.keepAliveIncludes.push("/", payload.toComponentName);
@@ -36,16 +36,16 @@ export default {
                         state.keepAliveIncludes.push(payload.toComponentName);
                         state.isRouterBack = false;
                     } else if(idxF === (idxT + 1)){//页面后退
-                        state.keepAliveIncludes.splice(idxF, 1);
+                        state.keepAliveIncludes.splice(idxF);
                         state.isRouterBack = true;
                     } else if(idxF === idxT){//页面刷新
                         state.isRouterBack = null;
                     } else {//可能是前进
-                        state.keepAliveIncludes.push(payload.toComponentName);
+                        //state.keepAliveIncludes.push(payload.toComponentName);
                         state.isRouterBack = false;
                     }
                 }
-                //console.log(idxF, idxT, state.keepAliveIncludes);
+                console.log(idxF, idxT);
                 //临时保存起来防止刷新后切换效果失效！
                 myStorage.onceObject(KAI_KEY_NAME, state.keepAliveIncludes);
             }
