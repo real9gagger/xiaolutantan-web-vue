@@ -52,7 +52,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .tp-dim:active{background-image:linear-gradient(0deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.1) 100%)}
 .tp-f0:active{background-color: #f0f0f0}
 
-/***************************************************** HTML基准字体大小 100px **************************************************************/
+/***************************************************** HTML基准字体大小 20 像素 **************************************************************/
 .fs-0{font-size:0}
 .fs-rem5{font-size:0.5rem}
 .fs-rem6{font-size:0.6rem}
@@ -200,6 +200,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .hi-h{height:50%}/* height half */
 .hi-a{height:auto}
 .hi-s{height:100vh}/* height stretch */
+.hi-cwh{height:var(--current-window-height)}
 .hi-min-a{min-height:auto}
 .hi-min-f{min-height:100%}
 .hi-min-s{min-height:100vh}
@@ -207,11 +208,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .hi-max-0{max-height:0;overflow:hidden}
 .hi-max-s{max-height:100vh} /* stretch */
 .hi-1rem{height:1rem}
-.hi-1rem2{height:1.2rem}
-.hi-1rem5{height:1.5rem}
 .hi-2rem{height:2rem}
-.hi-2rem5{height:2.5rem}
-.hi-2rem8{height:2.8rem}
 .hi-3rem{height:3rem}
 .hi-4rem{height:4rem}
 .hi-5rem{height:5rem}
@@ -223,7 +220,6 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 
 .wi-0{width:0;overflow:hidden}
 .wi-f{width:100%}/* width full */
-.wi-fx{width:100% !important}/* width full */
 .wi-h{width:50%}/* width half */
 .wi-a{width:auto}
 .wi-s{width:100vw}/* width stretch */
@@ -234,11 +230,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .wi-max-0{max-width:0;overflow:hidden}
 .wi-max-s{max-width:100vw} /* stretch */
 .wi-1rem{width:1rem}
-.wi-1rem2{width:1.2rem}
-.wi-1rem5{width:1.5rem}
 .wi-2rem{width:2rem}
-.wi-2rem5{width:2.5rem}
-.wi-2rem8{width:2.8rem}
 .wi-3rem{width:3rem}
 .wi-4rem{width:4rem}
 .wi-5rem{width:5rem}
@@ -262,13 +254,11 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 
 .wh-a{width:auto;height:auto}
 .wh-f{width:100%;height:100%}
+.wh-s{width:100vw;height:100vh}
 .wh-same-wi{position:relative}/*让盒子的高度等于宽度，【注：不是让宽度等于高度，而是让高度等于宽度】*/
 .wh-same-wi:before{content:"";display:block;width:100%;padding-top:100%;}
 .wh-1em{width:1em;height:1em}
-.wh-rem8{width:0.8rem;height:0.8rem}
 .wh-1rem{width:1rem;height:1rem}
-.wh-1rem2{width:1.2rem;height:1.2rem}
-.wh-1rem5{width:1.5rem;height:1.5rem}
 .wh-2rem{width:2rem;height:2rem}
 .wh-3rem{width:3rem;height:3rem}
 .wh-4rem{width:4rem;height:4rem}
@@ -451,7 +441,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .zi-x9{z-index:10000000000}
 .zi-xx{z-index:100000000000}
 
-/***************************************************** HTML基准字体大小 100px **************************************************************/
+/***************************************************** HTML基准字体大小 20 像素 **************************************************************/
 /* 快速生产CSS代码，下同 */
 /* var fastcss=[];for(let i=0;i<=100;i+=2){fastcss.push(`.pd-${i}{padding:${i/100}rem}`)}console.log(fastcss.join("\n")) */
 .pd-0{padding:0}

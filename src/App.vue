@@ -21,28 +21,26 @@
 
     function onPageBeforeEnter(elem){//进入页面时要固定定位
     	//等于null表示首次加载，此时不需要页面切换动画
-    	const transX = ($store.getters.isRouterBack ? -100 : ($store.getters.isRouterBack===false ? 100 : 0));
+    	const transX = ($store.getters.isRouterBack ? -100 : ($store.getters.isRouterBack===false ? 100 : 0));        
     	$(elem).css({
     		position: "fixed",
-    		top: "0",
-    		left: "0",
-    		right: "0",
-    		bottom: "0",
+    		inset: "0",
     		zIndex: "99",
     		transform: `translate(${transX}%,0)`, //如果是返回则，往右移动，打开新页面时才往左移动
     		transition: "transform 0.4s"
     	});
     }
     function onPageEnter(elem, done){//页面进入
-    	$(elem).one("transitionend", done);
-    	setTimeout(function(){ elem.style.transform = "translate(0,0)" }, 10);
+        if($store.getters.isRouterBack === null){
+            done();
+        } else {
+            $(elem).on("transitionend", function(){ done() });
+            setTimeout(function(){ elem.style.transform = "translate(0,0)" }, 10);
+        }
     }
-    function onPageAfterEnter(elem){//进入动画执行完，重置	
+    function onPageAfterEnter(elem){//进入动画执行完，重置
     	elem.style.position = null;
-    	elem.style.top = null;
-    	elem.style.left = null;
-    	elem.style.right = null;
-    	elem.style.bottom = null;
+    	elem.style.inset = null;
     	elem.style.zIndex = null;
     	elem.style.transform = null;
     	elem.style.transition = null;
@@ -51,7 +49,7 @@
     	$(elem).css({
     		transform: "translate(0, 0)",
     		transition: "transform 0.4s"
-    	}).one("transitionend", done);
+    	}).one("transitionend", function(){ done() });
     	
     	setTimeout(function(transX){
     		elem.style.transform = `translate(${transX}%, 0)`;
@@ -73,6 +71,7 @@
         			fs_px2 = 20;
         		}
         	    document.documentElement.style.fontSize = (fs_px2 + "px");
+                document.documentElement.style.setProperty("--current-window-height", window.innerHeight + "px");
         		document.getElementById("xlttapp").style.minHeight = (window.innerHeight + "px");
         	}
         }

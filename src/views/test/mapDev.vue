@@ -7,15 +7,12 @@
 <script setup name="TestMapDev">
     import { onMounted, onUnmounted, getCurrentInstance } from "vue";
     import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canal_geo.js";
+    import { toBMapPoints } from "@/utils/maphelper.js";
     import axios from "axios";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
 
     let mapInstance = null; //地图实例。单独放在外面，避免被 vue 响应化处理（避免添加太多 getter/setter 造成卡顿）。
     
-    function toBMapPoints(arr){
-        return arr.map(vx => new BMapGL.Point(vx[0], vx[1]));
-    }
-
     function buildBaiduMap(){//创建百度地图
         //请确保已在 /piblic/index.html 中引入百度地图 JS API 脚本！
         mapInstance = new BMapGL.Map(document.getElementById("testMapDevMapBox"), {
@@ -122,5 +119,5 @@
         width: 100vw;
         height: 100vw;
     }
-    ::v-deep .anchorBL{display:none !important;}
+    :deep(.anchorBL){display:none !important;}
 </style>
