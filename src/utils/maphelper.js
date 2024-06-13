@@ -1,5 +1,7 @@
 /* Map Helper */
 
+const MAP_X_PI = (Math.PI * 3000 / 180); //角度转弧度后 乘以 三千
+
 //确保颜色的值在 0-255 之间
 function ensureColor(val) {
     return (val < 0 ? 0 : (val > 255 ? 255 : val));
@@ -11,6 +13,28 @@ export function toBMapPoints(arr){
     } else {
         return arr.map(vx => new BMapGL.Point(vx[0], vx[1]));
     }
+}
+
+//百度坐标系 (BD-09) 转 火星坐标系 (GCJ-02)
+export function bd09ToGCJ02(pt) {  
+    let xx = pt.lng - 0.0065;
+    let yy = pt.lat - 0.0060;
+    let zz = Math.sqrt(xx * xx + yy * yy) - 0.00002 * Math.sin(yy * MAP_X_PI);
+    let theta = Math.atan2(yy, xx) - 0.000003 * Math.cos(xx * MAP_X_PI);
+    let g2_lnn = zz * Math.cos(theta);
+    let g2_lat = zz * Math.sin(theta);
+    return [g2_lnn, g2_lat];
+}
+
+//火星坐标系 (GCJ-02) 与百度坐标系 (BD-09) 的转换算法 将 GCJ-02 坐标转换成 BD-09 坐标
+export function gcj02ToBD09(lnglat){
+    let xx = lnglat[0];
+    let yy = lnglat[1];
+    let zz = Math.sqrt(xx * xx + yy * yy) + 0.00002 * Math.sin(yy * MAP_X_PI);
+    let theta = Math.atan2(yy, xx) + 0.000003 * Math.cos(xx * MAP_X_PI);
+    let tempLng = zz * Math.cos(theta) + 0.0065;
+    let tempLat = zz * Math.sin(theta) + 0.0060;
+    return [tempLng, tempLat];
 }
 
 //获取路线的渐变色

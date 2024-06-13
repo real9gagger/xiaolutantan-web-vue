@@ -5,16 +5,16 @@
 </template>
 
 <script setup name="IndexMap3D">
-    import { onMounted, onUnmounted, getCurrentInstance } from "vue";
+    import { onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
     import { combineCanalGeoJSON } from "@/assets/data/canal_geo.js";
-    import { getPolylineColorList } from "@/utils/maphelper.js";
+    import { toBMapPoints, getPolylineColorList, gcj02ToBD09 } from "@/utils/maphelper.js";
     
     import bdMapStyle from "@/assets/json/bdMapStyleFor3D.json";
     
     /* mapVGL教程：https://mapv.baidu.com/gl/docs/index.html */
     
     let mapInstance = null; //非响应式变量
-    
+
     function buildBaiduMap(){//创建百度地图
         //请确保已在 /piblic/index.html 中引入百度地图 JS API 脚本！
         mapInstance = new BMapGL.Map(document.getElementById("IndexMap3DBox"), {
@@ -44,30 +44,92 @@
         if(mapInstance.logoCtrl){ /* 隐藏百度地图 LOGO */
             $(mapInstance.logoCtrl._container).hide().addClass("bdMapLogo");
         }
-        
-        const vglView = new mapvgl.View({
+    }
+    
+    //绘制运河线段：渐变的，带白色边框的
+    function buildCanalLines(){
+        /* 2024年6月12日，这种方式可实现渐变，但带有灰色边框，弃用 const vglView = new mapvgl.View({
             map: mapInstance
         });
         const lrLayer = new mapvgl.LineRainbowLayer({
             style: "normal", // road, arrow, normal
-            width: 8,
+            width: 6,
             color: getPolylineColorList(0x00dddd, 0x1296db, 32),
             lineCap: "round",
             lineJoin: "round",
             antialias: true,
             data: [{
+                type:"Feature",
                 geometry: {
                     type: "LineString",
-                    coordinates: combineCanalGeoJSON(),
+                    coordinates: combineCanalGeoJSON().map(gcj02ToBD09),
                 }
-            }]
+            }],
+            renderOrder: 1
+        });
+        vglView.addLayer(lrLayer); */
+        
+        /* 2024年6月12日 这种方式无法实现渐变，弃用。 const lineLayer = new BMapGL.LineLayer({
+            crs: "GCJ02",
+            enablePicked: false,
+            autoSelect: false,
+            popEvent: false, //事件是否冒泡，默认true
+            style: {
+                borderColor: "#fff",
+                borderWeight: 2,
+                strokeWeight: 6,
+                strokeStyle: "solid",
+                strokeColor: "#fff", //["match", ["get", "name"], "运河地理线段", "linear-gradient(0deg, #f00, #00f)", "#0ff"],
+                strokeOpacity: 1,
+                strokeLineCap: "round",
+                strokeLineJoin: "round",
+            },
+            zIndex: 10
+        });
+        lineLayer.setData({
+            type: "Feature",
+            properties: {
+                name: "运河地理线段"
+            },
+            geometry: {
+                type: "LineString",
+                coordinates: combineCanalGeoJSON(),
+            }
+        });
+        mapInstance.addNormalLayer(lineLayer); */
+        
+        const canalPoints = toBMapPoints(combineCanalGeoJSON().map(gcj02ToBD09));
+        
+        const lineWidth = 6;
+        const bgPolyline = new BMapGL.Polyline(canalPoints, {
+            strokeStyle: "solid",
+            strokeColor: "#fff",
+            strokeWeight: lineWidth + 4,
+            strokeOpacity: 1,
+            enableClicking: false
         });
         
-        vglView.addLayer(lrLayer);
+        const lgColors = getPolylineColorList(0x00dddd, 0x1296db, canalPoints.length - 1); //渐变色列表
+        
+        mapInstance.addOverlay(bgPolyline); //用作边框覆盖物！！！
+        
+        //绘制渐变运河线段
+        for(let k = 0; k < lgColors.length; k++){
+            mapInstance.addOverlay(new BMapGL.Polyline([canalPoints[k], canalPoints[k + 1]], {
+                strokeStyle: "solid",
+                strokeColor: lgColors[k],
+                strokeWeight: lineWidth,
+                strokeOpacity: 1,
+                enableClicking: false
+            }));
+        }
     }
     
     onMounted(() => {
-        buildBaiduMap();
+        nextTick(() => {
+            buildBaiduMap();
+            buildCanalLines();
+        });
     });
     
     onUnmounted(() => {

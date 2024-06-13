@@ -1,6 +1,6 @@
 /* 平陆运河路线 geoJSON，分为上段（沙坪河段）、中段（开挖地段）、下段（钦江段） */
 const canalGeoJSON = {
-    "upperSection": [
+    upperSection: [
         [109.07464281,22.64335071],
         [109.05075873,22.62001744],
         [109.03633529,22.61787001],
@@ -8,7 +8,7 @@ const canalGeoJSON = {
         [108.98209610,22.54288687],
         [108.95063983,22.50294400]
     ],
-    "middleSection": [
+    middleSection: [
         [108.95063983,22.50294400],
         [108.93345224,22.43935823],
         [108.92290263,22.41097202],
@@ -20,9 +20,9 @@ const canalGeoJSON = {
         [108.93959482,22.30728273],
         [108.93639611,22.29497105],
         [108.94761115,22.27907217],
-        [108.95229065,22.27233445],
+        [108.95229065,22.27233445]
     ],
-    "lowerSection": [
+    lowerSection: [
         [108.95229065,22.27233445],
         [108.89381516,22.24323675],
         [108.81084999,22.16454407],
@@ -41,7 +41,7 @@ const canalGeoJSON = {
         [108.60343048,21.85945598],
         [108.54551054,21.76789685],
         [108.56933276,21.73510775],
-        [108.59311676,21.74120365]
+        [108.58000469,21.73413780]
     ]
 };
 
@@ -61,12 +61,12 @@ export function combineCanalGeoJSON(){
         }
         
         //索引从 1 开始！！！
-        for(let idx = 0; idx < canalGeoJSON.middleSection.length; idx++){
+        for(let idx = 1; idx < canalGeoJSON.middleSection.length; idx++){
             canalSingleLine.push(canalGeoJSON.middleSection[idx]);
         }
         
         //索引从 1 开始！！！
-        for(let idx = 0; idx < canalGeoJSON.lowerSection.length; idx++){
+        for(let idx = 1; idx < canalGeoJSON.lowerSection.length; idx++){
             canalSingleLine.push(canalGeoJSON.lowerSection[idx]);
         }
     }

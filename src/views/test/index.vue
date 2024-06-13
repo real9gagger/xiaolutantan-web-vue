@@ -15,8 +15,8 @@
     const aliveTimes = ref(90);
     
     function gotoMapDev(){
-        $router.push("/testmapdev");
         aliveTimes.value += 10;
+        $router.push("/testmapdev");
     }
 </script>
 

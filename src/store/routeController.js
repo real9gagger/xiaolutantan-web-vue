@@ -21,8 +21,8 @@ export default {
                 const idxF = (payload.fromComponentName ? state.keepAliveIncludes.lastIndexOf(payload.fromComponentName) : (state.keepAliveIncludes.length - 1));
                 const idxT = state.keepAliveIncludes.lastIndexOf(payload.toComponentName);
                 if(idxF < 0){
-                    if(!payload.fromComponentName){//首次进来
-                        state.keepAliveIncludes.push("/", payload.toComponentName);
+                    if(!payload.fromComponentName){//首次进来，先清空再添加！
+                        state.keepAliveIncludes.splice(0, state.keepAliveIncludes.length, payload.toComponentName);
                         state.isRouterBack = null;
                     } else if(idxT < 0){//页面前进
                         state.keepAliveIncludes.push(payload.fromComponentName, payload.toComponentName);
@@ -30,22 +30,23 @@ export default {
                     } else {//可能是前进
                         state.keepAliveIncludes.splice(idxT, 0, payload.fromComponentName);
                         state.isRouterBack = false;
+                        console.warn(`检测到路由堆栈异常：源路由（${payload.fromComponentName}）在堆栈中缺失，可能会造成视图切换动画错乱！`);
                     }
                 } else {
                     if(idxT < 0){//页面前进
                         state.keepAliveIncludes.push(payload.toComponentName);
                         state.isRouterBack = false;
-                    } else if(idxF === (idxT + 1)){//页面后退
-                        state.keepAliveIncludes.splice(idxF);
+                    } else if(idxF > idxT){//页面后退
+                        state.keepAliveIncludes.splice(idxT + 1);
                         state.isRouterBack = true;
                     } else if(idxF === idxT){//页面刷新
                         state.isRouterBack = null;
                     } else {//可能是前进
-                        //state.keepAliveIncludes.push(payload.toComponentName);
                         state.isRouterBack = false;
+                        console.warn(`检测到路由堆栈异常：目标路由（${payload.toComponentName}）已在访问历史中，可能会造成视图切换动画错乱！`);
                     }
                 }
-                console.log(idxF, idxT);
+                //console.log(idxF, idxT);
                 //临时保存起来防止刷新后切换效果失效！
                 myStorage.onceObject(KAI_KEY_NAME, state.keepAliveIncludes);
             }

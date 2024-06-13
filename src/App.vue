@@ -27,7 +27,7 @@
     		inset: "0",
     		zIndex: "99",
     		transform: `translate(${transX}%,0)`, //如果是返回则，往右移动，打开新页面时才往左移动
-    		transition: "transform 0.4s"
+    		transition: "transform 300ms"
     	});
     }
     function onPageEnter(elem, done){//页面进入
@@ -45,15 +45,19 @@
     	elem.style.transform = null;
     	elem.style.transition = null;
     }
-    function onPageLeave(elem, done){//页面离开
-    	$(elem).css({
-    		transform: "translate(0, 0)",
-    		transition: "transform 0.4s"
-    	}).one("transitionend", function(){ done() });
-    	
-    	setTimeout(function(transX){
-    		elem.style.transform = `translate(${transX}%, 0)`;
-    	}, 10, ($store.getters.isRouterBack ? 100 : -100));//如果是返回则，往右移动，打开新页面时才往左移动
+    function onPageLeave(elem, done){//页面离开    
+        if($store.getters.isRouterBack === null){
+            done();
+        } else {
+            $(elem).css({
+            	transform: "translate(0, 0)",
+            	transition: "transform 300ms"
+            }).one("transitionend", function(){ done() });
+            
+            setTimeout(function(transX){
+            	elem.style.transform = `translate(${transX}%, 0)`;
+            }, 10, ($store.getters.isRouterBack ? 100 : -100));//如果是返回则，往右移动，打开新页面时才往左移动
+        }
     }
     
     onMounted(() => {

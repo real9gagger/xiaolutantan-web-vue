@@ -2,18 +2,18 @@
   <div class="error404">
     <div class="error404-body-con">
 		<div class="tc-mc ta-c fs-1rem5 fw-b">ERROR</div>
-		<div class="fw-b ta-c mg-t-rem25">页面 {{theUrl}} 不存在</div>
+		<div class="fw-b ta-c mg-t-rem25">页面 “{{theUrl}}” 不存在</div>
         <div class="error404-body-con-title">4<span>0</span>4</div>
         <div class="error404-body-con-message">
 			<p>找不到此页面</p>
-			<p style="margin-top:0.5rem;">YOU&nbsp;LOOK&nbsp;LOST</p>
+			<p class="mg-t-rem5">YOU&nbsp;LOOK&nbsp;LOST</p>
 		</div>
         <div class="error404-body-con-btns">
           <a @click="goHome" class="tc-mc">返回主页</a>
-          <a @click="backPage" class="tc-mc" style="margin-left:2rem;">返回上一页</a>
+          <a @click="backPage" class="tc-mc mg-l-2rem">返回上一页</a>
         </div>
     </div>
-	<div class="error404-copy-right">小鹿坦坦</div>
+	<div class="error404-copy-right">小鹿坦坦@2024</div>
   </div>
 </template>
 
@@ -23,7 +23,7 @@
     
     const $route = useRoute();
     const $router = useRouter();
-    const theUrl = ref("");
+    const theUrl = ref("/unkownpage");
 
     function backPage() {
         $router.go(-1);
@@ -33,7 +33,7 @@
     }
     
     onMounted(() => {
-        if($route.redirectedFrom){
+        if($route.redirectedFrom && $route.redirectedFrom.fullPath){
             theUrl.value = ($route.redirectedFrom.fullPath);
         }
     });
@@ -89,7 +89,6 @@
                 text-align: center;
                 font-size: 0.8rem;
                 color: #999;
-                margin-top: 1rem;
             }
             &-btns {
                 text-align: center;

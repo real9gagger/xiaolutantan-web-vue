@@ -14,7 +14,6 @@ myRouter.beforeEach((to, from) => {
 });
 
 myRouter.afterEach((to, from) => {
-    console.log(from, to)
     vuexStore.dispatch("updateKeepAliveIncludes", {
         toComponentName: (to.matched.length ? to.matched[0].components.default.name : null),
         fromComponentName: (from.matched.length ? from.matched[0].components.default.name : null)

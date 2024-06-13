@@ -40,7 +40,7 @@ input:-webkit-autofill {transition: background-color 3600s ease-in-out 0s}
 input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 
 :root{
-	--main-color:#fd5749;	/* 主色 */
+	--main-color:#43BA62;	/* 主色 */
 }
 
 .hv-mc:hover{color:var(--main-color)}
