@@ -6,16 +6,17 @@
 
 <script setup name="IndexMap3D">
     import { onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
-    import { combineCanalGeoJSON } from "@/assets/data/canal_geo.js";
-    import { toBMapPoints, getPolylineColorList, gcj02ToBD09 } from "@/utils/maphelper.js";
+    import { combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canal_geo.js";
+    import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint } from "@/utils/maphelper.js";
     
     import bdMapStyle from "@/assets/json/bdMapStyleFor3D.json";
     
     /* mapVGL教程：https://mapv.baidu.com/gl/docs/index.html */
     
     let mapInstance = null; //非响应式变量
-
-    function buildBaiduMap(){//创建百度地图
+    
+    //创建百度地图
+    function buildBaiduMap(){
         //请确保已在 /piblic/index.html 中引入百度地图 JS API 脚本！
         mapInstance = new BMapGL.Map(document.getElementById("IndexMap3DBox"), {
             mapType: BMAP_NORMAL_MAP, //切换到地图 BMAP_SATELLITE_MAP（没有路网），BMAP_EARTH_MAP（有路网）
@@ -35,7 +36,7 @@
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
         mapInstance.enableRotateGestures(); //是否允许通过手势倾斜地图
         //mapInstance.setHeading(180);
-        //mapInstance.setTilt(75);
+        mapInstance.setTilt(75);
         mapInstance.setMapStyleV2(bdMapStyle);
         mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT, offset: new BMapGL.Size(15,20) })); //添加比例尺控件
         mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加缩放控件
@@ -98,7 +99,7 @@
         });
         mapInstance.addNormalLayer(lineLayer); */
         
-        const canalPoints = toBMapPoints(combineCanalGeoJSON().map(gcj02ToBD09));
+        const canalPoints = combineCanalGeoJSON().map(gcj02ToMapPoint);
         
         const lineWidth = 6;
         const bgPolyline = new BMapGL.Polyline(canalPoints, {
@@ -125,10 +126,27 @@
         }
     }
     
+    //绘制运河周边兴趣点
+    function buildCanalPOI(){
+        const poiList = getCanalPOIList();
+        const iconSize = new BMapGL.Size(90, 30);
+        
+        for(const vx of poiList){
+            mapInstance.addOverlay(new BMapGL.Marker(gcj02ToMapPoint(vx.lngLat), {
+                enableClicking: false,
+                title: vx.title,
+                icon: new BMapGL.Icon(vx.iconPath, iconSize, {
+                    anchor: new BMapGL.Size(iconSize.width * vx.iconAnchor.x, iconSize.height * vx.iconAnchor.y)
+                })
+            }));
+        }
+    }
+    
     onMounted(() => {
         nextTick(() => {
             buildBaiduMap();
             buildCanalLines();
+            buildCanalPOI();
         });
     });
     

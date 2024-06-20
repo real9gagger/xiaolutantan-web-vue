@@ -37,6 +37,12 @@ export function gcj02ToBD09(lnglat){
     return [tempLng, tempLat];
 }
 
+//火星坐标系 (GCJ-02) 转百度地图经纬度点
+export function gcj02ToMapPoint(lnglat){
+    const ll = gcj02ToBD09(lnglat);
+    return (new BMapGL.Point(ll[0], ll[1]));
+}
+
 //获取路线的渐变色
 export function getPolylineColorList(startColor, endColor, ...pointLength) {
     //颜色的十六进制整数，如颜色 “#ff7656” 则十六进制整数为 0xff7656

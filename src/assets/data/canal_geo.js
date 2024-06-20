@@ -6,9 +6,6 @@ const canalGeoJSON = {
         [109.03633529,22.61787001],
         [109.00720160,22.57299663],
         [108.98209610,22.54288687],
-        [108.95063983,22.50294400]
-    ],
-    middleSection: [
         [108.95063983,22.50294400],
         [108.93345224,22.43935823],
         [108.92290263,22.41097202],
@@ -45,9 +42,50 @@ const canalGeoJSON = {
     ]
 };
 
-//不分段的运河单段 geoJSON
+//不分段的运河单段数据
 const canalSingleLine = [];
 
+//运河沿途兴趣点
+const canalPOIList = [
+    {
+        lngLat: [109.074643,22.643351],
+        title: "平塘江入口",
+        iconPath: "/icons/pingtangjiang_entrance.png",
+        iconAnchor: {x:0.866667,y:1.0}
+    },
+    {
+        lngLat: [108.943913,22.449880],
+        title: "马道枢纽",
+        iconPath: "/icons/madao_hub.png",
+        iconAnchor: {x:0.166667,y:0.5}
+    },
+    {
+        lngLat: [108.944580,22.323528],
+        title: "企石枢纽",
+        iconPath: "/icons/qishi_hub.png",
+        iconAnchor: {x:0.833333,y:0.5}
+    },
+    {
+        lngLat: [108.950503,22.280155],
+        title: "陆屋镇",
+        iconPath: "/icons/luwu_town.png",
+        iconAnchor: {x:0.166667,y:0.5}
+    },
+    {
+        lngLat: [108.656038,22.002234],
+        title: "青年枢纽",
+        iconPath: "/icons/qingnian_hub.png",
+        iconAnchor: {x:0.166667,y:0.5}
+    },
+    {
+        lngLat: [108.588925,21.732311],
+        title: "钦州港",
+        iconPath: "/icons/qinzhou_port.png",
+        iconAnchor: {x:0.133333,y:1.0}
+    }
+];
+
+//获取运河的分段数据
 export function getCanalGeoJSON(){
     return canalGeoJSON;
 }
@@ -59,16 +97,21 @@ export function combineCanalGeoJSON(){
         for(let idx = 0; idx < canalGeoJSON.upperSection.length; idx++){
             canalSingleLine.push(canalGeoJSON.upperSection[idx]);
         }
-        
-        //索引从 1 开始！！！
-        for(let idx = 1; idx < canalGeoJSON.middleSection.length; idx++){
-            canalSingleLine.push(canalGeoJSON.middleSection[idx]);
-        }
-        
         //索引从 1 开始！！！
         for(let idx = 1; idx < canalGeoJSON.lowerSection.length; idx++){
             canalSingleLine.push(canalGeoJSON.lowerSection[idx]);
         }
     }
     return canalSingleLine;
+}
+
+//获取运河沿途兴趣点
+export function getCanalPOIList(){
+    if(!canalPOIList[0].isInited){//是否已被初始化过了~
+        for(const vx of canalPOIList){
+            vx.iconPath = (process.env.BASE_URL + vx.iconPath);
+        }
+        canalPOIList[0].isInited = true;
+    }
+    return canalPOIList;
 }

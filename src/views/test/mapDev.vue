@@ -43,7 +43,7 @@
     onMounted(() => {
         buildBaiduMap();
         
-        /* axios.get("/geojson/zhen_geojson.json").then(res => {
+        /* axios.get(process.env.BASE_URL + "/geojson/zhen_geojson.json").then(res => {
             console.log(res.data);
             const geolayer = new BMapGL.FillLayer({
                 crs: "GCJ02", //设置默认坐标系，避免产生偏移
@@ -84,12 +84,6 @@
             strokeWeight: 8,
             strokeOpacity: 1
         }));
-        mapInstance.addOverlay(new BMapGL.Polyline(toBMapPoints(dddd.middleSection), {
-            strokeStyle: 'solid',
-            strokeColor: "#00aaff",
-            strokeWeight: 8,
-            strokeOpacity: 1
-        }));
         mapInstance.addOverlay(new BMapGL.Polyline(toBMapPoints(dddd.lowerSection), {
             strokeStyle: 'solid',
             strokeColor: "#0088db",
@@ -116,8 +110,8 @@
 
 <style scoped="scoped">
     .map-dev-box{
-        width: 100vw;
-        height: 100vw;
+        width: 15rem;
+        height: 15rem;
     }
     :deep(.anchorBL){display:none !important;}
 </style>

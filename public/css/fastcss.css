@@ -361,12 +361,12 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .bg-lg-l1{background-image:linear-gradient(90deg,rgba(255,255,255,0.2) 0%,rgba(255,255,255,0.0) 100%)} /* linear gradient left light 1*/
 
 .bd-0{border:0 solid transparent}
-.bd-dd{border:1px solid #ddd}
-.bd-sc{border:1px solid currentColor}
-.bd-mc{border:1px solid var(--main-color)}
-.bd-t-dd{border-top:1px solid #ddd}.bd-b-dd{border-bottom:1px solid #ddd}
-.bd-l-dd{border-left:1px solid #ddd}
-.bd-r-dd{border-right:1px solid #ddd}
+.bd-dd{border:0.05rem solid #ddd}
+.bd-sc{border:0.05rem solid currentColor}
+.bd-mc{border:0.05rem solid var(--main-color)}
+.bd-t-dd{border-top:0.05rem solid #ddd}.bd-b-dd{border-bottom:0.05rem solid #ddd}
+.bd-l-dd{border-left:0.05rem solid #ddd}
+.bd-r-dd{border-right:0.05rem solid #ddd}
 
 .dp-hx{display:none !important}
 .dp-hd{display:none} /* hide */

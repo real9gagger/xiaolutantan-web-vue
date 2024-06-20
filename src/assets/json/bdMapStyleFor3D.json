@@ -3,14 +3,14 @@
         "featureType": "road",
         "elementType": "geometry.fill",
         "stylers": {
-            "color": "#ffffffff"
+            "color": "#d0d0d0ff"
         }
     }, {
         "featureType": "road",
         "elementType": "geometry.stroke",
         "stylers": {
             "opacity": "ff",
-            "color": "#ffffffff"
+            "color": "#d0d0d0ff"
         }
     }, {
         "featureType": "road",
