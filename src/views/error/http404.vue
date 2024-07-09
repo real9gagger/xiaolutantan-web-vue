@@ -38,7 +38,7 @@
         }
     });
 </script>
-<style lang="scss" scoped>
+<style lang="scss" scoped="scoped">
     @keyframes error404animation {
     0% {
         transform: rotateZ(0deg);

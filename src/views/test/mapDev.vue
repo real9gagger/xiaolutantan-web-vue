@@ -6,10 +6,11 @@
 
 <script setup name="TestMapDev">
     import { onMounted, onUnmounted, getCurrentInstance } from "vue";
-    import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canal_geo.js";
+    import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canalGeo.js";
     import { toBMapPoints } from "@/utils/maphelper.js";
     import axios from "axios";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
+    import publicAssets from "@/assets/data/publicAssets.js";
 
     let mapInstance = null; //地图实例。单独放在外面，避免被 vue 响应化处理（避免添加太多 getter/setter 造成卡顿）。
     
@@ -43,7 +44,7 @@
     onMounted(() => {
         buildBaiduMap();
         
-        /* axios.get(process.env.BASE_URL + "/geojson/zhen_geojson.json").then(res => {
+        /* axios.get(publicAssets.geojsonZhen).then(res => {
             console.log(res.data);
             const geolayer = new BMapGL.FillLayer({
                 crs: "GCJ02", //设置默认坐标系，避免产生偏移

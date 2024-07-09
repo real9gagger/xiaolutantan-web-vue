@@ -1,15 +1,18 @@
 <template>
     <div class="hi-cwh of-h">
         <div id="IndexMap3DBox" class="wh-f"></div>
+        <map3d-control-vertical />
     </div>
 </template>
 
 <script setup name="IndexMap3D">
     import { onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
-    import { combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canal_geo.js";
+    import { combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint } from "@/utils/maphelper.js";
     
-    import bdMapStyle from "@/assets/json/bdMapStyleFor3D.json";
+    import map3dControlVertical from "@/components/map3dControlVertical.vue";
+    import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
+    import publicAssets from "@/assets/data/publicAssets.js";
     
     /* mapVGL教程：https://mapv.baidu.com/gl/docs/index.html */
     
@@ -35,12 +38,12 @@
         mapInstance.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
         mapInstance.enableRotateGestures(); //是否允许通过手势倾斜地图
-        //mapInstance.setHeading(180);
-        mapInstance.setTilt(75);
-        mapInstance.setMapStyleV2(bdMapStyle);
+        mapInstance.setHeading(0); //旋转角度
+        mapInstance.setTilt(0); //倾斜角度
+        mapInstance.setMapStyleV2(bdMapStyleFor3D);
         mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT, offset: new BMapGL.Size(15,20) })); //添加比例尺控件
-        mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加缩放控件
-        mapInstance.addControl(new BMapGL.NavigationControl3D({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加导航控件
+        //2024年7月9日 弃用，改成自定义导航控件 mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加缩放控件
+        //2024年7月9日 弃用，改成自定义导航控件 mapInstance.addControl(new BMapGL.NavigationControl3D({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加导航控件
         
         if(mapInstance.logoCtrl){ /* 隐藏百度地图 LOGO */
             $(mapInstance.logoCtrl._container).hide().addClass("bdMapLogo");
@@ -49,6 +52,7 @@
     
     //绘制运河线段：渐变的，带白色边框的
     function buildCanalLines(){
+        
         /* 2024年6月12日，这种方式可实现渐变，但带有灰色边框，弃用 const vglView = new mapvgl.View({
             map: mapInstance
         });
@@ -135,7 +139,7 @@
             mapInstance.addOverlay(new BMapGL.Marker(gcj02ToMapPoint(vx.lngLat), {
                 enableClicking: false,
                 title: vx.title,
-                icon: new BMapGL.Icon(vx.iconPath, iconSize, {
+                icon: new BMapGL.Icon(publicAssets[vx.iconName], iconSize, {
                     anchor: new BMapGL.Size(iconSize.width * vx.iconAnchor.x, iconSize.height * vx.iconAnchor.y)
                 })
             }));

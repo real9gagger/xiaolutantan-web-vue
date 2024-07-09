@@ -50,37 +50,37 @@ const canalPOIList = [
     {
         lngLat: [109.074643,22.643351],
         title: "平塘江入口",
-        iconPath: "/icons/pingtangjiang_entrance.png",
+        iconName: "iconPingtangjiangEntrance",
         iconAnchor: {x:0.866667,y:1.0}
     },
     {
         lngLat: [108.943913,22.449880],
         title: "马道枢纽",
-        iconPath: "/icons/madao_hub.png",
+        iconName: "iconMadaoHub",
         iconAnchor: {x:0.166667,y:0.5}
     },
     {
         lngLat: [108.944580,22.323528],
         title: "企石枢纽",
-        iconPath: "/icons/qishi_hub.png",
+        iconName: "iconQishiHub",
         iconAnchor: {x:0.833333,y:0.5}
     },
     {
         lngLat: [108.950503,22.280155],
         title: "陆屋镇",
-        iconPath: "/icons/luwu_town.png",
+        iconName: "iconLuwuTown",
         iconAnchor: {x:0.166667,y:0.5}
     },
     {
         lngLat: [108.656038,22.002234],
         title: "青年枢纽",
-        iconPath: "/icons/qingnian_hub.png",
+        iconName: "iconQingnianHub",
         iconAnchor: {x:0.166667,y:0.5}
     },
     {
         lngLat: [108.588925,21.732311],
         title: "钦州港",
-        iconPath: "/icons/qinzhou_port.png",
+        iconName: "iconQinzhouPort",
         iconAnchor: {x:0.133333,y:1.0}
     }
 ];
@@ -107,11 +107,5 @@ export function combineCanalGeoJSON(){
 
 //获取运河沿途兴趣点
 export function getCanalPOIList(){
-    if(!canalPOIList[0].isInited){//是否已被初始化过了~
-        for(const vx of canalPOIList){
-            vx.iconPath = (process.env.BASE_URL + vx.iconPath);
-        }
-        canalPOIList[0].isInited = true;
-    }
     return canalPOIList;
 }
