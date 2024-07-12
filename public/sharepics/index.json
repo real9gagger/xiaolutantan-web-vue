@@ -1,0 +1,115 @@
+/* 2024年7月10日，用户分享的照片 */
+[
+	{
+		"id": 10000,
+		"title": "马道枢纽",
+		"createTime": "2024/07/10 14:55:00",
+		"authorNickname": "平平",
+		"authorAvatarUrl": "",
+		"longitude": 108.944385,
+		"latitude": 22.378856,
+		"locationAddress": "广西壮族自治区钦州市灵山县旧州镇马道头村",
+		"pictureList": [
+			{
+                "id": 1,
+				"description": "正在建设中的马道枢纽", /*描述文本*/
+				"path": "sharepics/madao_hinge_1.jpg", /*文件路径，相对路径*/
+                "width": 2647,
+				"height": 1080,
+				"size": 1875910,
+				"sort": 0,
+				"longitude": 108.944385,
+				"latitude": 22.378856,
+				"shootingTime": "2024/07/10 14:52:00" /*拍摄时间*/
+			}
+		],
+		"likesCount": 0, /*点赞次数*/
+		"commentCount": 0, /*评论次数*/
+		"shareCount": 0, /*分享次数*/
+		"viewCount": 0 /*查看次数*/
+	},
+    {
+    	"id": 20000,
+    	"title": "平塘江入口",
+    	"createTime": "2024/07/10 17:48:00",
+    	"authorNickname": "平平",
+    	"authorAvatarUrl": "",
+    	"longitude": 109.073873,
+    	"latitude": 22.642090,
+    	"locationAddress": "广西壮族自治区南宁市横州市新福镇平塘村",
+    	"pictureList": [
+    		{
+                "id": 1,
+    			"description": "平塘江入口鸟瞰图",
+    			"path": "sharepics/pingtangjiang_entrance_1.jpg",
+                "width": 1920,
+    			"height": 800,
+    			"size": 753957,
+    			"sort": 0,
+    			"longitude": 109.073873,
+    			"latitude": 22.642090,
+    			"shootingTime": "2024/07/10 14:52:00"
+    		}
+    	],
+    	"likesCount": 0,
+    	"commentCount": 0,
+    	"shareCount": 0,
+    	"viewCount": 0
+    },
+    {
+    	"id": 30000,
+    	"title": "青年枢纽",
+    	"createTime": "2024/07/10 18:02:00",
+    	"authorNickname": "平平",
+    	"authorAvatarUrl": "",
+    	"longitude": 108.654629,
+    	"latitude": 22.005420,
+    	"locationAddress": "广西壮族自治区钦州市钦北区泥桥路",
+    	"pictureList": [
+    		{
+                "id": 1,
+    			"description": "正在建设中的青年枢纽",
+    			"path": "sharepics/qingnian_hinge_1.jpg",
+                "width": 2741,
+    			"height": 1080,
+    			"size": 2170453,
+    			"sort": 0,
+    			"longitude": 108.654629,
+    			"latitude": 22.005420,
+    			"shootingTime": "2024/07/10 14:52:00"
+    		}
+    	],
+    	"likesCount": 0,
+    	"commentCount": 0,
+    	"shareCount": 0,
+    	"viewCount": 0
+    },
+    {
+    	"id": 40000,
+    	"title": "企石枢纽",
+    	"createTime": "2024/07/10 18:07:00",
+    	"authorNickname": "平平",
+    	"authorAvatarUrl": "",
+    	"longitude": 108.942663,
+    	"latitude": 22.322861,
+    	"locationAddress": "广西壮族自治区钦州市灵山县陆屋镇企石村",
+    	"pictureList": [
+    		{
+                "id": 1,
+    			"description": "正在建设中的企石枢纽",
+    			"path": "sharepics/qishi_hinge_1.jpg",
+                "width": 2663,
+    			"height": 1080,
+    			"size": 2086058,
+    			"sort": 0,
+    			"longitude": 108.942663,
+    			"latitude": 22.322861,
+    			"shootingTime": "2024/07/10 14:52:00"
+    		}
+    	],
+    	"likesCount": 0,
+    	"commentCount": 0,
+    	"shareCount": 0,
+    	"viewCount": 0
+    }
+]

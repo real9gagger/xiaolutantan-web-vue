@@ -50,37 +50,43 @@ const canalPOIList = [
     {
         lngLat: [109.074643,22.643351],
         title: "平塘江入口",
-        iconName: "iconPingtangjiangEntrance",
+        iconName1: "iconPingtangjiangEntrance",
+        iconName2: "iconPingtangjiangEntranceWhite",
         iconAnchor: {x:0.866667,y:1.0}
     },
     {
         lngLat: [108.943913,22.449880],
         title: "马道枢纽",
-        iconName: "iconMadaoHub",
+        iconName1: "iconMadaoHub",
+        iconName2: "iconMadaoHubWhite",
         iconAnchor: {x:0.166667,y:0.5}
     },
     {
         lngLat: [108.944580,22.323528],
         title: "企石枢纽",
-        iconName: "iconQishiHub",
+        iconName1: "iconQishiHub",
+        iconName2: "iconQishiHubWhite",
         iconAnchor: {x:0.833333,y:0.5}
     },
     {
         lngLat: [108.950503,22.280155],
         title: "陆屋镇",
-        iconName: "iconLuwuTown",
+        iconName1: "iconLuwuTown",
+        iconName2: "iconLuwuTownWhite",
         iconAnchor: {x:0.166667,y:0.5}
     },
     {
         lngLat: [108.656038,22.002234],
         title: "青年枢纽",
-        iconName: "iconQingnianHub",
+        iconName1: "iconQingnianHub",
+        iconName2: "iconQingnianHubWhite",
         iconAnchor: {x:0.166667,y:0.5}
     },
     {
         lngLat: [108.588925,21.732311],
         title: "钦州港",
-        iconName: "iconQinzhouPort",
+        iconName1: "iconQinzhouPort",
+        iconName2: "iconQinzhouPortWhite",
         iconAnchor: {x:0.133333,y:1.0}
     }
 ];

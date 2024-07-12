@@ -1,22 +1,116 @@
 <template>
     <div class="hi-cwh of-h">
         <div id="IndexMap3DBox" class="wh-f"></div>
-        <map3d-control-vertical />
+        <map3d-control-vertical
+            @positionlocation="onPositionSuccess"
+            @restoreperspective="onRestorePerspective"
+            @togglemaptype="onToggleMapType"
+        />
+        <map3d-info-window :show="iwShow" :title="iwTitle" />
+        <div class="map3d-zoom-level-box">缩放&nbsp;{{mapZoomLevel}}级</div>
     </div>
 </template>
 
 <script setup name="IndexMap3D">
-    import { onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
+    import { ref, onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
     import { combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint } from "@/utils/maphelper.js";
     
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
+    import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
+    import bdMapStyleForSatellite from "@/assets/json/bdMapStyleForSatellite.json";
+    
     import publicAssets from "@/assets/data/publicAssets.js";
     
     /* mapVGL教程：https://mapv.baidu.com/gl/docs/index.html */
     
     let mapInstance = null; //非响应式变量
+    let mapWmtsLayer = null; //第三方卫星地图图层
+    
+    //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
+    const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
+    //默认视图
+    const defaultViewPoints = [
+        new BMapGL.Point(108.415365, 22.817497),
+        new BMapGL.Point(109.375871, 21.592572)
+    ];
+    //当前地图缩放级别
+    const mapZoomLevel = ref(8);
+    const iwShow = ref(false);
+    const iwTitle = ref("");
+    
+    //还原默认视图
+    function onRestorePerspective(){
+        mapInstance.setViewport(defaultViewPoints);
+    }
+    
+    //定位我的位置成功后
+    function onPositionSuccess(res) {
+        const iconSize = new BMapGL.Size(40, 40);
+        const iconOptions = {
+            anchor: new BMapGL.Size(iconSize.width / 2, iconSize.height)
+        };
+        const locMarker = new BMapGL.Marker(res.locationPoint, {
+            title: res.locationAddress,
+            icon: new BMapGL.Icon(publicAssets.iconMyLocation, iconSize, iconOptions),
+            isLocMarker: true
+        });
+        
+        clearMapOverlays("isLocMarker");
+        
+        locMarker.addEventListener("click", onMyLocationMarkerClicked);
+        mapInstance.addOverlay(locMarker);
+        mapInstance.panTo(res.locationPoint);
+        
+        iwTitle.value = res.locationAddress;
+        iwShow.value = true;
+    }
+    
+    //接换成卫星地图或普通地图
+    function onToggleMapType(isSatelliteMapType){
+        if(isSatelliteMapType){
+            mapWmtsLayer = new BMapGL.XYZLayer({
+                useThumbData: true,
+                tileUrlTemplate: TIAN_DITU_TILE_URL,
+                zIndex: 0,
+                maxZoom: 23,
+                minZoom: 3
+            });
+            mapInstance.addTileLayer(mapWmtsLayer);
+            mapInstance.setMaxZoom(18);
+            mapInstance.setMapStyleV2(bdMapStyleForSatellite);
+        } else {
+            if(mapWmtsLayer){
+                mapInstance.removeTileLayer(mapWmtsLayer);
+                mapInstance.setMaxZoom(23);
+                mapInstance.setMapStyleV2(bdMapStyleFor3D);
+                mapWmtsLayer = null;
+            }
+        }
+        
+        buildCanalPOI(isSatelliteMapType);
+    }
+    
+    //监听地图缩放
+    function onMapZoomInOut(evt){
+        const bdmap = (evt?.target || mapInstance);
+        mapZoomLevel.value = Math.floor(bdmap.getZoom());
+    }
+    
+    //监听地图点击
+    function onMapClicked(evt){        
+        //如果仅仅只是点击我的位置标记，则不隐藏
+        if(!evt.overlay || !evt.overlay._config.isLocMarker){
+            iwShow.value = false;
+        }
+    }
+    
+    //监听标记点击事件
+    function onMyLocationMarkerClicked(evt){
+        iwTitle.value = evt.target._config.title;
+        iwShow.value = true;
+    }
     
     //创建百度地图
     function buildBaiduMap(){
@@ -31,19 +125,18 @@
         //使用手册：https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_webgl_1_0.html
         //百度地图JSAPI WebGL v1.0类参考 https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_webgl_1_0.html
         
-        mapInstance.setViewport([ //默认视图款
-            (new BMapGL.Point(108.415365, 22.817497)),
-            (new BMapGL.Point(109.375871, 21.592572))
-        ]);
+        mapInstance.setViewport(defaultViewPoints);
         mapInstance.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
         mapInstance.enableRotateGestures(); //是否允许通过手势倾斜地图
         mapInstance.setHeading(0); //旋转角度
         mapInstance.setTilt(0); //倾斜角度
         mapInstance.setMapStyleV2(bdMapStyleFor3D);
-        mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT, offset: new BMapGL.Size(15,20) })); //添加比例尺控件
+        mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT, offset: new BMapGL.Size(15,25) })); //添加比例尺控件
         //2024年7月9日 弃用，改成自定义导航控件 mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加缩放控件
         //2024年7月9日 弃用，改成自定义导航控件 mapInstance.addControl(new BMapGL.NavigationControl3D({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加导航控件
+        mapInstance.addEventListener("zoomend", onMapZoomInOut);
+        mapInstance.addEventListener("click", onMapClicked);
         
         if(mapInstance.logoCtrl){ /* 隐藏百度地图 LOGO */
             $(mapInstance.logoCtrl._container).hide().addClass("bdMapLogo");
@@ -131,18 +224,35 @@
     }
     
     //绘制运河周边兴趣点
-    function buildCanalPOI(){
+    function buildCanalPOI(isSatelliteMapType){
         const poiList = getCanalPOIList();
         const iconSize = new BMapGL.Size(90, 30);
         
+        //先删除
+        clearMapOverlays("isPlyhPOI");
+        
+        //再添加
         for(const vx of poiList){
             mapInstance.addOverlay(new BMapGL.Marker(gcj02ToMapPoint(vx.lngLat), {
                 enableClicking: false,
                 title: vx.title,
-                icon: new BMapGL.Icon(publicAssets[vx.iconName], iconSize, {
+                icon: new BMapGL.Icon(publicAssets[!isSatelliteMapType ? vx.iconName1 : vx.iconName2], iconSize, {
                     anchor: new BMapGL.Size(iconSize.width * vx.iconAnchor.x, iconSize.height * vx.iconAnchor.y)
-                })
+                }),
+                isPlyhPOI: true
             }));
+        }
+    }
+    
+    //删除具有某个标识的一组覆盖物
+    function clearMapOverlays(key, num){
+        const olList = mapInstance.getOverlays();
+        const groupKey = (key || "").toString();
+        
+        for(let idx = olList.length - 1; idx >= 0; idx--){
+            if(olList[idx]._config[groupKey]){
+               mapInstance.removeOverlay(olList[idx]);
+            }
         }
     }
     
@@ -151,6 +261,7 @@
             buildBaiduMap();
             buildCanalLines();
             buildCanalPOI();
+            onMapZoomInOut();
         });
     });
     
@@ -166,8 +277,19 @@
             console.log("销毁百度地图出错：", ex);
         }
         mapInstance = null;
+        mapWmtsLayer = null;
     });
 </script>
 
 <style scoped="scoped">
+    .map3d-zoom-level-box{
+        position: fixed;
+        left: 0.75rem;
+        bottom: 0.35rem;
+        z-index: 88;
+        font-size: 0.55rem;
+        text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+        color: #000;
+        text-align: center;
+    }
 </style>

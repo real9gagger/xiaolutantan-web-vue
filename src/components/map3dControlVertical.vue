@@ -1,6 +1,6 @@
 <template>
     <div class="mcv-box-container">
-        <div @click="onPositionMyLocation" class="mcv-action-box" title="定位到我的位置">
+        <div @click="onPositionMyLocation" class="mcv-action-box" :class="{'mcv-positionning-ani': isPositionning}" title="定位到我的位置">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapLocationPosition" />
         </div>
         <div @click="onRestorePerspective" class="mcv-action-box" title="还原视图">
@@ -26,10 +26,11 @@
 <script setup name="Map3DControlVertical">
     import { ref, defineEmits } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
-    
+
     const isCalloutShowing = ref(true);
     const isSatelliteMap = ref(false);
-    
+    const isPositionning = ref(false); //是否正在定位
+
     const emits = defineEmits([
         "positionlocation",
         "restoreperspective",
@@ -38,38 +39,103 @@
         "toggleregion",
         "gotoaccount",
     ]);
-    
-    function onPositionMyLocation(){
-        emits("positionlocation", true);
+
+    function onPositionMyLocation() {
+        if (isPositionning.value) {
+            return;
+        } else {
+            isPositionning.value = true;
+        }
+
+        const geolocation = new BMapGL.Geolocation();
+        geolocation.getCurrentPosition(function(res) {
+            const statusCode = geolocation.getStatus();
+            if (statusCode === BMAP_STATUS_SUCCESS) {
+                //console.log(res)
+                if(res.point){
+                    emits("positionlocation", {
+                        locationAddress: getMyAddress(res.address),
+                        locationPoint: res.point
+                    });
+                } else {
+                    appToast("定位失败：BMAP_STATUS_NULL_POINT");
+                }
+            } else if (statusCode === BMAP_STATUS_PERMISSION_DENIED) {
+                appToast("定位失败：BMAP_STATUS_PERMISSION_DENIED");
+            } else if (statusCode === BMAP_STATUS_TIMEOUT) {
+                appToast("定位失败：BMAP_STATUS_TIMEOUT");
+            } else {
+                appToast("定位失败：BMAP_STATUS_UNKNOWN_LOCATION");
+            }
+            isPositionning.value = false;
+        }, {
+            enableHighAccuracy: true, //是否要求浏览器获取最佳效果，同浏览器定位接口参数。默认为false
+            timeout: 15, //超时时间，单位为毫秒。默认为10秒
+        });
     }
-    function onRestorePerspective(){
+
+    function onRestorePerspective() {
         emits("restoreperspective", true);
     }
-    function onShowOrHideCallout(){
+
+    function onShowOrHideCallout() {
         isCalloutShowing.value = !isCalloutShowing.value;
         emits("togglecallout", isCalloutShowing.value);
     }
-    function onToggleMapType(){
+
+    function onToggleMapType() {
         isSatelliteMap.value = !isSatelliteMap.value;
         emits("togglemaptype", isSatelliteMap.value);
     }
-    function onShowOrHideRegion(){
+
+    function onShowOrHideRegion() {
         emits("toggleregion", null);
     }
-    function onGotoMyAccount(){
+
+    function onGotoMyAccount() {
         emits("gotoaccount", true);
+    }
+
+    function getMyAddress(addr) {
+        let output = "";
+
+        /* if (addr.country) {
+            output += addr.country;
+        } */
+        if (addr.province) {
+            output += addr.province;
+        }
+        if (addr.city) {
+            output += addr.city;
+        }
+        if (addr.district) {
+            output += addr.district;
+        }
+        if (addr.street) {
+            output += addr.street;
+        }
+        if (addr.street_number) {
+            output += addr.street_number;
+        }
+
+        return output;
     }
 </script>
 
 <style>
-    .mcv-box-container{
+    @keyframes mcv-location-positionning-kf {/* 正在定位动画 */
+        from { transform: rotate(0deg) }
+        to { transform: rotate(360deg) }
+    }
+
+    .mcv-box-container {
         position: fixed;
         bottom: 0.5rem;
         right: 0.5rem;
-        z-index: 88888888;
+        z-index: 8888;
     }
-    
-    .mcv-action-box{
+
+    .mcv-action-box {
         width: 2rem;
         height: 2rem;
         border-radius: 50%;
@@ -81,11 +147,17 @@
         overflow: hidden;
         cursor: pointer;
     }
-    .mcv-action-box:active{
+
+    .mcv-action-box:active {
         background-color: #d9f1df;
     }
-    .mcv-action-box.user-avatar{
+
+    .mcv-action-box.user-avatar {
         padding: 0;
         background-color: var(--main-color);
+    }
+
+    .mcv-positionning-ani {
+        animation: mcv-location-positionning-kf 1s ease infinite;
     }
 </style>

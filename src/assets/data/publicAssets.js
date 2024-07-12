@@ -12,10 +12,15 @@ const AssetsPathMap = {
     geojsonZhen: "geojson/zhen_geojson.json",
     geojsonZhenUnsimplify: "geojson/zhen_geojson_unsimplify.json", //未压缩的文件
     
+    //用户分享的照片数据
+    sharePicsData: "sharepics/index.json",
+    
     //图标
     iconDefaultUserAvatar: "icons/default_user_avatar.png",
     iconLuwuTown: "icons/luwu_town.png",
+    iconLuwuTownWhite: "icons/luwu_town_white.png",
     iconMadaoHub: "icons/madao_hub.png",
+    iconMadaoHubWhite: "icons/madao_hub_white.png",
     iconMapAdministrativeRegion: "icons/map_administrative_region.png",
     iconMapCalloutHiding: "icons/map_callout_hiding.png",
     iconMapCalloutShowing: "icons/map_callout_showing.png",
@@ -24,9 +29,16 @@ const AssetsPathMap = {
     iconMapSatelliteFill: "icons/map_satellite_fill.png",
     iconMapToggleLayers: "icons/map_toggle_layers.png",
     iconPingtangjiangEntrance: "icons/pingtangjiang_entrance.png",
+    iconPingtangjiangEntranceWhite: "icons/pingtangjiang_entrance_white.png",
     iconQingnianHub: "icons/qingnian_hub.png",
+    iconQingnianHubWhite: "icons/qingnian_hub_white.png",
     iconQinzhouPort: "icons/qinzhou_port.png",
+    iconQinzhouPortWhite: "icons/qinzhou_port_white.png",
     iconQishiHub: "icons/qishi_hub.png",
+    iconQishiHubWhite: "icons/qishi_hub_white.png",
+    iconMyLocation: "icons/my_location.png",
+    iconCurrentPositionCity: "icons/current_position_city.png",
+    iconMapPinFill: "icons/map_pin_fill.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",
