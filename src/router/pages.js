@@ -40,5 +40,11 @@ export default [
     	name: "3D视图",
     	component: () => import("@/views/index/map3d"),
     	meta: {}
+    },
+    {
+    	path: "/login",
+    	name: "登录",
+    	component: () => import("@/views/login/index"),
+    	meta: {}
     }
 ];

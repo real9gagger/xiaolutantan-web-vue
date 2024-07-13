@@ -11,9 +11,9 @@
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const props = defineProps({
-        show: {
-            type: Boolean,
-            default: false
+        lnglats: {
+            type: Array,
+            default: () => []
         },
         title: {
             type: String,
@@ -23,10 +23,10 @@
     
     const isShowing = ref(false);
     const isAnimating = ref(false);
-    const emits = defineEmits(["map3dpin"]);
+    const emits = defineEmits(["placepins"]);
     
-    watch(() => props.show, function(newVal){
-        if(newVal){
+    watch(() => props.lnglats, function(newVal){
+        if(newVal && newVal.length){
             if(!isShowing.value){
                 isShowing.value = true;
                 setTimeout(startBubbling, 50);
@@ -55,7 +55,7 @@
     }
     
     function onPinBtnTap(){
-        emits("map3dpin", 1);
+        emits("placepins", props.lnglats);
     }
 </script>
 
@@ -91,5 +91,6 @@
         flex: 1;
         font-size: 0.8rem;
         padding: 0 0.5rem;
+        min-height: 1.1rem;
     }
 </style>

@@ -5,14 +5,16 @@
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
             @togglemaptype="onToggleMapType"
+            @gotoaccount="onGotoMyAccount"
         />
-        <map3d-info-window :show="iwShow" :title="iwTitle" />
+        <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="OnMapPlacePins" />
         <div class="map3d-zoom-level-box">缩放&nbsp;{{mapZoomLevel}}级</div>
     </div>
 </template>
 
 <script setup name="IndexMap3D">
     import { ref, onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
+    import { useRouter } from "vue-router";
     import { combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint } from "@/utils/maphelper.js";
     
@@ -31,18 +33,19 @@
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
     //默认视图
-    const defaultViewPoints = [
+    const DEFAULT_VIEW_POINTS = [
         new BMapGL.Point(108.415365, 22.817497),
         new BMapGL.Point(109.375871, 21.592572)
     ];
-    //当前地图缩放级别
-    const mapZoomLevel = ref(8);
-    const iwShow = ref(false);
+    
+    const $router = useRouter();
+    const mapZoomLevel = ref(8); //当前地图缩放级别
+    const iwLnglats = ref([]);
     const iwTitle = ref("");
     
     //还原默认视图
     function onRestorePerspective(){
-        mapInstance.setViewport(defaultViewPoints);
+        mapInstance.setViewport(DEFAULT_VIEW_POINTS);
     }
     
     //定位我的位置成功后
@@ -59,12 +62,11 @@
         
         clearMapOverlays("isLocMarker");
         
-        locMarker.addEventListener("click", onMyLocationMarkerClicked);
         mapInstance.addOverlay(locMarker);
         mapInstance.panTo(res.locationPoint);
         
         iwTitle.value = res.locationAddress;
-        iwShow.value = true;
+        iwLnglats.value = [res.locationPoint];
     }
     
     //接换成卫星地图或普通地图
@@ -92,6 +94,14 @@
         buildCanalPOI(isSatelliteMapType);
     }
     
+    //转到我的账户
+    function onGotoMyAccount(){
+        const isLogin = false;
+        if(!isLogin){
+            $router.push("/login");
+        }
+    }
+    
     //监听地图缩放
     function onMapZoomInOut(evt){
         const bdmap = (evt?.target || mapInstance);
@@ -101,15 +111,20 @@
     //监听地图点击
     function onMapClicked(evt){        
         //如果仅仅只是点击我的位置标记，则不隐藏
-        if(!evt.overlay || !evt.overlay._config.isLocMarker){
-            iwShow.value = false;
+        if(!evt.overlay){
+            iwTitle.value = null;
+            iwLnglats.value = null;
+        } else if(evt.overlay._config.isLocMarker || evt.overlay._config.isPlyhPOI){
+            iwTitle.value = evt.overlay._config.title;
+            iwLnglats.value = [evt.overlay.latLng];
         }
     }
     
-    //监听标记点击事件
-    function onMyLocationMarkerClicked(evt){
-        iwTitle.value = evt.target._config.title;
-        iwShow.value = true;
+    //定位到某个地点获取某个地区
+    function OnMapPlacePins(arg){
+        if(arg.length === 1){
+            mapInstance.flyTo(arg[0], 17);
+        }
     }
     
     //创建百度地图
@@ -125,7 +140,7 @@
         //使用手册：https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_webgl_1_0.html
         //百度地图JSAPI WebGL v1.0类参考 https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_webgl_1_0.html
         
-        mapInstance.setViewport(defaultViewPoints);
+        mapInstance.setViewport(DEFAULT_VIEW_POINTS);
         mapInstance.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
         mapInstance.enableRotateGestures(); //是否允许通过手势倾斜地图
