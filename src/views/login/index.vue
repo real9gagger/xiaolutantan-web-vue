@@ -53,7 +53,7 @@
     
     function onPnFocus(evt){
         isPnFocus.value = (evt.type === "focus");
-        //evt.target.value = (isPnFocus.value ? phoneNumber.value : ""); //让光标总是保持在最后一个字符的后面
+        evt.target.value = (isPnFocus.value ? phoneNumber.value : ""); //让光标总是保持在最后一个字符的后面
     }
     function onPnInput(evt){        
         const txt = evt.target.value.toString();
@@ -67,7 +67,7 @@
     }
     function onVcFocus(evt){
         isVcFocus.value = (evt.type === "focus");
-        //evt.target.value = (isVcFocus.value ? verifyCode.value : ""); //让光标总是保持在最后一个字符的后面
+        evt.target.value = (isVcFocus.value ? verifyCode.value : ""); //让光标总是保持在最后一个字符的后面
     }
     function onVcInput(evt){
         const txt = evt.target.value.toString();
