@@ -5,6 +5,8 @@ import VuexStore from './store';
 
 const myApp = createApp(App);
 
+myApp.config.globalProperties.$appName = '小鹿坦坦';
+
 myApp.use(MyRouter);
 myApp.use(VuexStore);
 

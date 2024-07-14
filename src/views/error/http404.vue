@@ -13,7 +13,7 @@
           <a @click="backPage" class="tc-mc mg-l-2rem">返回上一页</a>
         </div>
     </div>
-	<div class="error404-copy-right">小鹿坦坦@2024</div>
+	<div class="error404-copy-right">{{$appName}}@2024</div>
   </div>
 </template>
 
