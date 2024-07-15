@@ -100,3 +100,29 @@ export function getPolylineColorList(startColor, endColor, ...pointLength) {
         return outputColors;
     }
 }
+
+
+//获取一组经纬度中的西南角和东北角经纬度
+export function getLnglatViewPort(lnglats){
+    if(!lnglats || !lnglats.length){
+        return [];
+    }
+    
+    let minlng = 360;
+    let minlat = 360;
+    let maxlng = -360;
+    let maxlat = -360;
+    
+    for(const pp of lnglats){
+    	if(pp[0] < minlng) minlng = pp[0];
+    	else if(pp[0] > maxlng) maxlng = pp[0];
+        
+        if(pp[1] < minlat) minlat = pp[1];
+    	else if(pp[1] > maxlat) maxlat = pp[1];
+    }
+    
+    return [
+        [minlng, minlat],
+        [maxlng, maxlat]
+    ];
+}

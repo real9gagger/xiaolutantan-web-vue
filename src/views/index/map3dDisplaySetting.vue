@@ -1,5 +1,5 @@
 <template>
-    <div class="pd-1rem">
+    <div class="pd-1rem hi-cwh of-a">
         <h4 class="mds-row-title">行政区域</h4>
         <div class="fx-r fx-wp">
             <div v-for="item in arList" class="mds-row-item" 
@@ -107,6 +107,7 @@
     .mds-row-item{
         width: auto;
         margin: 0.5rem 0.4rem 0 0 ;
+        cursor: pointer;
     }
     .mds-row-item.lastone{
         margin-right: 0 !important;
@@ -135,6 +136,6 @@
         left: 1rem;
         right: 1rem;
         bottom: 1rem;
-        z-index: 9999;
+        z-index: 8;
     }
 </style>

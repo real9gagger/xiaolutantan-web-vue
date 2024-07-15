@@ -18,7 +18,7 @@
     import { useStore } from "vuex";
     import { useRouter } from "vue-router";
     import { getUpperSectionLength, combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
-    import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint } from "@/utils/maphelper.js";
+    import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort } from "@/utils/maphelper.js";
     import { administrativeRegion, canalDisplayMode, appMainColor } from "@/assets/data/constants.js";
     
     import axios from "axios";
@@ -34,6 +34,7 @@
     let mapInstance = null; //非响应式变量
     let mapWmtsLayer = null; //第三方卫星地图图层
     let mapAreaLayer = null; //地图周边城市图层
+    let mapIgnoreClicked = false; //是否忽略地图点击
     
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
@@ -51,6 +52,7 @@
     
     //还原默认视图
     function onRestorePerspective(){
+        clearMapOverlays("isLocMarker"); //顺便清理我的位置
         mapInstance.setViewport(DEFAULT_VIEW_POINTS);
     }
     
@@ -121,13 +123,26 @@
     
     //监听地图点击
     function onMapClicked(evt){
-        //如果仅仅只是点击我的位置标记，则不隐藏        
-        if(!evt.overlay){
-            iwTitle.value = null;
-            iwLnglats.value = null;
-        } else if(evt.overlay._config.isLocMarker || evt.overlay._config.isPlyhPOI){
-            iwTitle.value = evt.overlay._config.title;
-            iwLnglats.value = [evt.overlay.latLng];
+        //如果仅仅只是点击我的位置标记，则不隐藏
+        if(!mapIgnoreClicked){
+            if(!evt.overlay){
+                iwTitle.value = null;
+                iwLnglats.value = null;
+            } else if(evt.overlay._config.isLocMarker || evt.overlay._config.isPlyhPOI){
+                iwTitle.value = evt.overlay._config.title;
+                iwLnglats.value = [evt.overlay.latLng];
+            }
+        }
+        mapIgnoreClicked = false;
+    }
+    
+    //点击运河周边区域时触发事件（该事件执行后会继续支持地图点击事件）
+    function onSurroundingAreaClick(evt){
+        const theItem = evt.value?.dataItem;
+        if(theItem){
+            iwTitle.value = theItem.properties.name;
+            iwLnglats.value = getLnglatViewPort(theItem.geometry.coordinates[0]);
+            mapIgnoreClicked = true;
         }
     }
     
@@ -135,6 +150,8 @@
     function OnMapPlacePins(arg){
         if(arg.length === 1){
             mapInstance.flyTo(arg[0], 17);
+        } else if(arg.length >= 2){//缩放视野到对应的周边区域
+            mapInstance.setViewport(arg.map(gcj02ToMapPoint));
         }
     }
     
@@ -165,7 +182,7 @@
         mapInstance.addEventListener("click", onMapClicked);
         
         if(mapInstance.logoCtrl){ /* 隐藏百度地图 LOGO */
-            $(mapInstance.logoCtrl._container).hide().addClass("bdMapLogo");
+            $(mapInstance.logoCtrl._container).addClass("bdMapLogo");
         }
     }
     
@@ -340,6 +357,7 @@
                     maxZoom: 23, // 设置图层显示的地图最大等级
                     data: res.data //GeoJSON 数据
                 });
+                mapAreaLayer.addEventListener("click", onSurroundingAreaClick);
                 mapInstance.addNormalLayer(mapAreaLayer);
                 mapInstance.setViewport(res.data.viewport.map(gcj02ToMapPoint));
             }).catch(err => {
@@ -365,11 +383,15 @@
     //更新地图展示设置时，重新绘制地图某些东西
     watch(() => $store.getters.mapAdministrativeType, function(newVal){
         buildMapSurroundingArea();
+        iwTitle.value = null;
+        iwLnglats.value = null;
     });
     //更新地图展示设置时，重新绘制地图某些东西
     watch(() => $store.getters.canalDisplayType, function(){
         buildCanalLines();
         buildCanalPOI();
+        iwTitle.value = null;
+        iwLnglats.value = null;
     });
     
     onMounted(() => {
@@ -408,5 +430,8 @@
         text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
         color: #000;
         text-align: center;
+    }
+    :deep(.bdMapLogo){
+        display: none !important;
     }
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="bg-f0 of-h us-n">
         <!-- 两个隐藏的输入框 -->
-        <input id="pnInputBox" type="tel" class="ps-f po-tl-0 op-0"
+        <input id="pnInputBox" type="tel" class="ps-f po-tl-0 op-0 zi-10"
             :maxlength="pnMaxLength" 
             @focus="onPnFocus" 
             @blur="onPnFocus"
@@ -12,9 +12,9 @@
             @blur="onVcFocus"
             @input="onVcInput" />
         <div class="hi-cwh pd-1rem bg-ff fs-rem8" style="max-width:500px;margin:0 auto;">
-            <!-- <div class="ta-r">
-                <a class="tc-b0" @click="onChangeRegion">中国大陆&nbsp;(+86)</a>
-            </div> -->
+            <div class="ta-r">
+                <a class="tc-99" @click="onChangeRegion">中国大陆&nbsp;(+86)</a>
+            </div>
             <div class="tc-66" :class="{'tc-mc': isPnFocus}">手机号码</div>
             <div class="login-input-box" :class="{'actived': isPnFocus}" @click="onPnBoxClick">
                 <span class="login-input-digit" v-for="idx in pnMaxLength" :key="idx">{{phoneNumber[idx - 1]}}</span>
@@ -122,6 +122,7 @@
     }
     function onChangeRegion(){
         //待完成
+        //$router.push("/test");
     }
     
     onUnmounted(() => {
