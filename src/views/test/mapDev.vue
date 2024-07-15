@@ -8,6 +8,8 @@
     import { onMounted, onUnmounted, getCurrentInstance } from "vue";
     import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canalGeo.js";
     import { toBMapPoints } from "@/utils/maphelper.js";
+    import { appMainColor } from "@/assets/data/constants.js";
+    
     import axios from "axios";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -56,9 +58,9 @@
                 pickHeight: 10,
                 selectedColor: "#0cf",
                 style: {
-                    fillColor: "#43BA62",
+                    fillColor: appMainColor,
                     fillOpacity: 0.3,
-                    strokeColor: "#43BA62",
+                    strokeColor: appMainColor,
                     strokeWeight: 2, //border 必须为 true
                     strokeOpacity: 1
                 },

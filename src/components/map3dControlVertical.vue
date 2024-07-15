@@ -99,9 +99,9 @@
     function getMyAddress(addr) {
         let output = "";
 
-        /* if (addr.country) {
+        if (addr.country && addr.country !== "中国") {
             output += addr.country;
-        } */
+        }
         if (addr.province) {
             output += addr.province;
         }

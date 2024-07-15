@@ -1,8 +1,8 @@
 <template>
   <div class="error404">
     <div class="error404-body-con">
-		<div class="tc-mc ta-c fs-1rem5 fw-b">ERROR</div>
-		<div class="fw-b ta-c mg-t-rem25">页面 “{{theUrl}}” 不存在</div>
+		<div class="tc-red ta-c fs-1rem5 fw-b">ERROR</div>
+		<div class="fw-b ta-c tc-red mg-t-rem25">页面 “{{theUrl}}” 不存在</div>
         <div class="error404-body-con-title">4<span>0</span>4</div>
         <div class="error404-body-con-message">
 			<p>找不到此页面</p>

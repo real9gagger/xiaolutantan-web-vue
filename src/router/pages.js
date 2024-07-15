@@ -42,9 +42,19 @@ export default [
     	meta: {}
     },
     {
+    	path: "/map3dsettings",
+    	name: "地图展示设置",
+    	component: () => import("@/views/index/map3dDisplaySetting"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/login",
-    	name: "登录",
+    	name: "用户登录",
     	component: () => import("@/views/login/index"),
-    	meta: {}
+    	meta: {
+            showPageTitle: true
+        }
     }
 ];

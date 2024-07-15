@@ -1,4 +1,4 @@
-/* 平陆运河路线 geoJSON，分为上段（沙坪河段）、中段（开挖地段）、下段（钦江段） */
+/* 平陆运河路线 geoJSON，分为上段（沙坪河段）、下段（钦江段） */
 const canalGeoJSON = {
     upperSection: [
         [109.07464281,22.64335071],
@@ -103,12 +103,18 @@ export function combineCanalGeoJSON(){
         for(let idx = 0; idx < canalGeoJSON.upperSection.length; idx++){
             canalSingleLine.push(canalGeoJSON.upperSection[idx]);
         }
+        
         //索引从 1 开始！！！
         for(let idx = 1; idx < canalGeoJSON.lowerSection.length; idx++){
             canalSingleLine.push(canalGeoJSON.lowerSection[idx]);
         }
     }
     return canalSingleLine;
+}
+
+//上段的经纬度数量
+export function getUpperSectionLength(){
+    return canalGeoJSON.upperSection.length;
 }
 
 //获取运河沿途兴趣点

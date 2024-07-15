@@ -18,6 +18,10 @@ myRouter.afterEach((to, from) => {
         toComponentName: (to.matched.length ? to.matched[0].components.default.name : null),
         fromComponentName: (from.matched.length ? from.matched[0].components.default.name : null)
     });
+    
+    if(to.meta.showPageTitle){
+        document.title = to.name;
+    }
 });
 
 export default myRouter;

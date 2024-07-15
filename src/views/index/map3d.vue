@@ -5,6 +5,7 @@
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
             @togglemaptype="onToggleMapType"
+            @toggleregion="onShowOrHideRegion"
             @gotoaccount="onGotoMyAccount"
         />
         <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="OnMapPlacePins" />
@@ -13,11 +14,14 @@
 </template>
 
 <script setup name="IndexMap3D">
-    import { ref, onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
+    import { ref, watch, onMounted, onUnmounted, getCurrentInstance, nextTick } from "vue";
+    import { useStore } from "vuex";
     import { useRouter } from "vue-router";
-    import { combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
+    import { getUpperSectionLength, combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint } from "@/utils/maphelper.js";
+    import { administrativeRegion, canalDisplayMode, appMainColor } from "@/assets/data/constants.js";
     
+    import axios from "axios";
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
@@ -29,6 +33,7 @@
     
     let mapInstance = null; //非响应式变量
     let mapWmtsLayer = null; //第三方卫星地图图层
+    let mapAreaLayer = null; //地图周边城市图层
     
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
@@ -38,6 +43,7 @@
         new BMapGL.Point(109.375871, 21.592572)
     ];
     
+    const $store = useStore();
     const $router = useRouter();
     const mapZoomLevel = ref(8); //当前地图缩放级别
     const iwLnglats = ref([]);
@@ -94,6 +100,11 @@
         buildCanalPOI(isSatelliteMapType);
     }
     
+    //地图展示设置
+    function onShowOrHideRegion() {
+        $router.push("/map3dsettings");
+    }
+    
     //转到我的账户
     function onGotoMyAccount(){
         const isLogin = false;
@@ -109,8 +120,8 @@
     }
     
     //监听地图点击
-    function onMapClicked(evt){        
-        //如果仅仅只是点击我的位置标记，则不隐藏
+    function onMapClicked(evt){
+        //如果仅仅只是点击我的位置标记，则不隐藏        
         if(!evt.overlay){
             iwTitle.value = null;
             iwLnglats.value = null;
@@ -181,7 +192,6 @@
             renderOrder: 1
         });
         vglView.addLayer(lrLayer); */
-        
         /* 2024年6月12日 这种方式无法实现渐变，弃用。 const lineLayer = new BMapGL.LineLayer({
             crs: "GCJ02",
             enablePicked: false,
@@ -211,41 +221,75 @@
         });
         mapInstance.addNormalLayer(lineLayer); */
         
-        const canalPoints = combineCanalGeoJSON().map(gcj02ToMapPoint);
+        //先清空
+        clearMapOverlays("isPlyhLine");
         
+        const cdt = $store.getters.canalDisplayType;
+        if(cdt === canalDisplayMode.NOT_DISPLAY){ //不显示运河
+            return;
+        }
+        
+        const canalPoints = combineCanalGeoJSON().map(gcj02ToMapPoint);
         const lineWidth = 6;
-        const bgPolyline = new BMapGL.Polyline(canalPoints, {
+        
+        //用作边框覆盖物！！！
+        mapInstance.addOverlay(new BMapGL.Polyline(canalPoints, {
             strokeStyle: "solid",
             strokeColor: "#fff",
             strokeWeight: lineWidth + 4,
             strokeOpacity: 1,
-            enableClicking: false
-        });
+            enableClicking: false,
+            isPlyhLine: true
+        }));
         
-        const lgColors = getPolylineColorList(0x00dddd, 0x1296db, canalPoints.length - 1); //渐变色列表
-        
-        mapInstance.addOverlay(bgPolyline); //用作边框覆盖物！！！
-        
-        //绘制渐变运河线段
-        for(let k = 0; k < lgColors.length; k++){
-            mapInstance.addOverlay(new BMapGL.Polyline([canalPoints[k], canalPoints[k + 1]], {
+        if(cdt === canalDisplayMode.NORMAL_DISPLAY){//单段显示
+            const lgColors = getPolylineColorList(0x00dddd, 0x1296db, canalPoints.length - 1); //渐变色列表
+            //绘制渐变运河线段
+            for(let k = 0; k < lgColors.length; k++){
+                mapInstance.addOverlay(new BMapGL.Polyline([canalPoints[k], canalPoints[k + 1]], {
+                    strokeStyle: "solid",
+                    strokeColor: lgColors[k],
+                    strokeWeight: lineWidth,
+                    strokeOpacity: 1,
+                    enableClicking: false,
+                    isPlyhLine: true
+                }));
+            }
+        } else {//分两段显示：上段为平陆运河，下段为钦江
+            const usLength = getUpperSectionLength();
+            mapInstance.addOverlay(new BMapGL.Polyline(canalPoints.slice(0, usLength), {
                 strokeStyle: "solid",
-                strokeColor: lgColors[k],
+                strokeColor: "#00dddd",
                 strokeWeight: lineWidth,
                 strokeOpacity: 1,
-                enableClicking: false
+                enableClicking: false,
+                isPlyhLine: true
+            }));
+            mapInstance.addOverlay(new BMapGL.Polyline(canalPoints.slice(usLength - 1), {
+                strokeStyle: "solid",
+                strokeColor: "#1296db",
+                strokeWeight: lineWidth,
+                strokeOpacity: 1,
+                enableClicking: false,
+                isPlyhLine: true
             }));
         }
     }
     
     //绘制运河周边兴趣点
     function buildCanalPOI(isSatelliteMapType){
-        const poiList = getCanalPOIList();
-        const iconSize = new BMapGL.Size(90, 30);
         
         //先删除
         clearMapOverlays("isPlyhPOI");
         
+        //如果不显示运河，运河周边兴趣点也不必显示
+        if($store.getters.canalDisplayType === canalDisplayMode.NOT_DISPLAY){
+            return;
+        }
+        
+        const poiList = getCanalPOIList();
+        const iconSize = new BMapGL.Size(90, 30);
+
         //再添加
         for(const vx of poiList){
             mapInstance.addOverlay(new BMapGL.Marker(gcj02ToMapPoint(vx.lngLat), {
@@ -259,8 +303,55 @@
         }
     }
     
+    //绘制地图周边区域
+    function buildMapSurroundingArea(){
+        const mat = $store.getters.mapAdministrativeType;
+        const assetsUrl = 
+            (mat === administrativeRegion.REGION_SHI ? publicAssets.geojsonShi : 
+            (mat === administrativeRegion.REGION_XIAN ? publicAssets.geojsonXian : 
+            (mat === administrativeRegion.REGION_ZHEN ? publicAssets.geojsonZhen : null
+        )));
+        
+        if(mapAreaLayer){
+            mapInstance.removeNormalLayer(mapAreaLayer);
+            mapAreaLayer = null;
+        }
+        
+        if(assetsUrl){
+            axios.get(assetsUrl).then(res => {
+                mapAreaLayer = new BMapGL.FillLayer({
+                    crs: "GCJ02", //设置默认坐标系，避免产生偏移
+                    enablePicked: true,
+                    autoSelect: false,
+                    border: true, //是否描边
+                    popEvent: false, //事件是否冒泡，默认true
+                    pickWidth: 20,
+                    pickHeight: 20,
+                    selectedColor: "#f00",
+                    style: {
+                        fillColor: appMainColor,
+                        fillOpacity: 0.15,
+                        strokeColor: appMainColor,
+                        strokeWeight: 2, //border 必须为 true
+                        strokeOpacity: 1
+                    },
+                    zIndex: 1000,
+                    minZoom: 3, // 设置图层显示的地图最小等级
+                    maxZoom: 23, // 设置图层显示的地图最大等级
+                    data: res.data //GeoJSON 数据
+                });
+                mapInstance.addNormalLayer(mapAreaLayer);
+                mapInstance.setViewport(res.data.viewport.map(gcj02ToMapPoint));
+            }).catch(err => {
+                appToast(err.message);
+            });
+        } else {
+            mapInstance.setViewport(DEFAULT_VIEW_POINTS);
+        }
+    }
+    
     //删除具有某个标识的一组覆盖物
-    function clearMapOverlays(key, num){
+    function clearMapOverlays(key){
         const olList = mapInstance.getOverlays();
         const groupKey = (key || "").toString();
         
@@ -270,6 +361,16 @@
             }
         }
     }
+    
+    //更新地图展示设置时，重新绘制地图某些东西
+    watch(() => $store.getters.mapAdministrativeType, function(newVal){
+        buildMapSurroundingArea();
+    });
+    //更新地图展示设置时，重新绘制地图某些东西
+    watch(() => $store.getters.canalDisplayType, function(){
+        buildCanalLines();
+        buildCanalPOI();
+    });
     
     onMounted(() => {
         nextTick(() => {
@@ -293,6 +394,7 @@
         }
         mapInstance = null;
         mapWmtsLayer = null;
+        mapAreaLayer = null;
     });
 </script>
 
