@@ -1,4 +1,3 @@
-/* 2024年7月10日，用户分享的照片 */
 [
 	{
 		"id": 10000,
@@ -12,21 +11,21 @@
 		"pictureList": [
 			{
                 "id": 1,
-				"description": "正在建设中的马道枢纽", /*描述文本*/
-				"path": "sharepics/madao_hinge_1.jpg", /*文件路径，相对路径*/
+				"description": "正在建设中的马道枢纽",
+				"path": "sharepics/madao_hinge_1.jpg",
                 "width": 2647,
 				"height": 1080,
 				"size": 1875910,
 				"sort": 0,
 				"longitude": 108.944385,
 				"latitude": 22.378856,
-				"shootingTime": "2024/07/10 14:52:00" /*拍摄时间*/
+				"shootingTime": "2024/07/10 14:52:00"
 			}
 		],
-		"likesCount": 0, /*点赞次数*/
-		"commentCount": 0, /*评论次数*/
-		"shareCount": 0, /*分享次数*/
-		"viewCount": 0 /*查看次数*/
+		"likesCount": 0,
+		"commentCount": 0,
+		"shareCount": 0,
+		"viewCount": 0
 	},
     {
     	"id": 20000,

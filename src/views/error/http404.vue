@@ -40,24 +40,24 @@
 </script>
 <style lang="scss" scoped="scoped">
     @keyframes error404animation {
-    0% {
-        transform: rotateZ(0deg);
-    }
-    20% {
-        transform: rotateZ(-60deg);
-    }
-    40% {
-        transform: rotateZ(-10deg);
-    }
-    60% {
-        transform: rotateZ(50deg);
-    }
-    80% {
-        transform: rotateZ(-20deg);
-    }
-    100% {
-        transform: rotateZ(0deg);
-    }
+        0% {
+            transform: rotateZ(0deg);
+        }
+        20% {
+            transform: rotateZ(-60deg);
+        }
+        40% {
+            transform: rotateZ(-10deg);
+        }
+        60% {
+            transform: rotateZ(50deg);
+        }
+        80% {
+            transform: rotateZ(-20deg);
+        }
+        100% {
+            transform: rotateZ(0deg);
+        }
     }
     .error404 {
         width: 100vw;

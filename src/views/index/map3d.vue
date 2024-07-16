@@ -1,15 +1,17 @@
 <template>
     <div class="hi-cwh of-h">
         <div id="IndexMap3DBox" class="wh-f"></div>
+        <div class="map3d-zoom-level-box">缩放&nbsp;{{mapZoomLevel}}级</div>
         <map3d-control-vertical
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
             @togglemaptype="onToggleMapType"
             @toggleregion="onShowOrHideRegion"
             @gotoaccount="onGotoMyAccount"
+            @togglecallout="buildSharePicture"
         />
         <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="OnMapPlacePins" />
-        <div class="map3d-zoom-level-box">缩放&nbsp;{{mapZoomLevel}}级</div>
+        <map3d-share-picture-callout ref="mspcBox" />
     </div>
 </template>
 
@@ -24,6 +26,7 @@
     import axios from "axios";
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
+    import map3dSharePictureCallout from "@/components/map3dSharePictureCallout.vue";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
     import bdMapStyleForSatellite from "@/assets/json/bdMapStyleForSatellite.json";
     
@@ -35,6 +38,7 @@
     let mapWmtsLayer = null; //第三方卫星地图图层
     let mapAreaLayer = null; //地图周边城市图层
     let mapIgnoreClicked = false; //是否忽略地图点击
+    let isSatelliteMapType = false; //是否是卫星地图
     
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
@@ -46,6 +50,8 @@
     
     const $store = useStore();
     const $router = useRouter();
+    const $instance = getCurrentInstance();
+    
     const mapZoomLevel = ref(8); //当前地图缩放级别
     const iwLnglats = ref([]);
     const iwTitle = ref("");
@@ -78,8 +84,8 @@
     }
     
     //接换成卫星地图或普通地图
-    function onToggleMapType(isSatelliteMapType){
-        if(isSatelliteMapType){
+    function onToggleMapType(arg0){
+        if(arg0){
             mapWmtsLayer = new BMapGL.XYZLayer({
                 useThumbData: true,
                 tileUrlTemplate: TIAN_DITU_TILE_URL,
@@ -98,8 +104,9 @@
                 mapWmtsLayer = null;
             }
         }
+        isSatelliteMapType = !!arg0;
         
-        buildCanalPOI(isSatelliteMapType);
+        buildCanalPOI();
     }
     
     //地图展示设置
@@ -124,6 +131,7 @@
     //监听地图点击
     function onMapClicked(evt){
         //如果仅仅只是点击我的位置标记，则不隐藏
+        console.log(evt);
         if(!mapIgnoreClicked){
             if(!evt.overlay){
                 iwTitle.value = null;
@@ -294,7 +302,7 @@
     }
     
     //绘制运河周边兴趣点
-    function buildCanalPOI(isSatelliteMapType){
+    function buildCanalPOI(){
         
         //先删除
         clearMapOverlays("isPlyhPOI");
@@ -368,11 +376,35 @@
         }
     }
     
+    //绘制用户分享的图片
+    function buildSharePicture(isShow){
+        if(!isShow){
+            return !clearMapOverlays("isSharePicture");
+        }
+        
+        //2024年7月16日，获取用户分享的照片
+        axios.get(publicAssets.sharePicsData).then(res1 => {
+            for(const item of res1.data){
+                const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
+                    point: gcj02ToMapPoint([item.longitude, item.latitude]),
+                    properties: {
+                        coverUrl: item.pictureList[0].path,
+                    },
+                    zIndex: 99,
+                });
+                customOverlay._config = { isSharePicture: true };
+                //customOverlay.addEventListener("click", );
+                mapInstance.addOverlay(customOverlay);
+            }
+        }).catch(err => {
+            appToast(err.message);
+        });
+    }
+    
     //删除具有某个标识的一组覆盖物
     function clearMapOverlays(key){
         const olList = mapInstance.getOverlays();
         const groupKey = (key || "").toString();
-        
         for(let idx = olList.length - 1; idx >= 0; idx--){
             if(olList[idx]._config[groupKey]){
                mapInstance.removeOverlay(olList[idx]);
@@ -400,6 +432,7 @@
             buildCanalLines();
             buildCanalPOI();
             onMapZoomInOut();
+            buildSharePicture(true);
         });
     });
     
