@@ -50,6 +50,14 @@ export default [
         }
     },
     {
+    	path: "/map3ddetails",
+    	name: "照片详情",
+    	component: () => import("@/views/index/map3dShareDetails"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/login",
     	name: "用户登录",
     	component: () => import("@/views/login/index"),

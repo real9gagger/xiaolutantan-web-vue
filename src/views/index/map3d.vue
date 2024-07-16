@@ -22,6 +22,7 @@
     import { getUpperSectionLength, combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort } from "@/utils/maphelper.js";
     import { administrativeRegion, canalDisplayMode, appMainColor } from "@/assets/data/constants.js";
+    import { needDebounce } from "@/utils/cocohelper.js";
     
     import axios from "axios";
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
@@ -131,7 +132,7 @@
     //监听地图点击
     function onMapClicked(evt){
         //如果仅仅只是点击我的位置标记，则不隐藏
-        console.log(evt);
+        //console.log(evt);
         if(!mapIgnoreClicked){
             if(!evt.overlay){
                 iwTitle.value = null;
@@ -141,17 +142,30 @@
                 iwLnglats.value = [evt.overlay.latLng];
             }
         }
-        mapIgnoreClicked = false;
     }
     
     //点击运河周边区域时触发事件（该事件执行后会继续支持地图点击事件）
-    function onSurroundingAreaClick(evt){
+    function onSurroundingAreaClicked(evt){
         const theItem = evt.value?.dataItem;
         if(theItem){
             iwTitle.value = theItem.properties.name;
             iwLnglats.value = getLnglatViewPort(theItem.geometry.coordinates[0]);
             mapIgnoreClicked = true;
+            needDebounce(resetSomeData, 100);
         }
+    }
+    
+    //点击用户分享的照片时触发
+    function onSharePictureClicked(evt){
+        console.log(evt);
+        mapIgnoreClicked = true;
+        needDebounce(resetSomeData, 100);
+        $router.push("/map3ddetails");
+    }
+    
+    //重置一些数据
+    function resetSomeData(){
+        mapIgnoreClicked = false;
     }
     
     //定位到某个地点获取某个地区
@@ -365,7 +379,7 @@
                     maxZoom: 23, // 设置图层显示的地图最大等级
                     data: res.data //GeoJSON 数据
                 });
-                mapAreaLayer.addEventListener("click", onSurroundingAreaClick);
+                mapAreaLayer.addEventListener("click", onSurroundingAreaClicked);
                 mapInstance.addNormalLayer(mapAreaLayer);
                 mapInstance.setViewport(res.data.viewport.map(gcj02ToMapPoint));
             }).catch(err => {
@@ -384,17 +398,19 @@
         
         //2024年7月16日，获取用户分享的照片
         axios.get(publicAssets.sharePicsData).then(res1 => {
+            let idx = 0;
             for(const item of res1.data){
                 const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
                     point: gcj02ToMapPoint([item.longitude, item.latitude]),
                     properties: {
                         coverUrl: item.pictureList[0].path,
+                        picIndex: idx++
                     },
                     zIndex: 99,
                 });
-                customOverlay._config = { isSharePicture: true };
-                //customOverlay.addEventListener("click", );
                 mapInstance.addOverlay(customOverlay);
+                customOverlay._config = { isSharePicture: true };
+                customOverlay.addEventListener("click", onSharePictureClicked);
             }
         }).catch(err => {
             appToast(err.message);
