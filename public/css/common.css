@@ -31,3 +31,20 @@
 	font-size: 0.8rem;
     word-break: break-all;
 }
+.page-limit-width{
+    background-color: #eee;
+}
+.page-limit-width > .content-cage{
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 1rem;
+    height: var(--current-window-height);
+    overflow: auto;
+}
+.fixed-limit-width{
+    position: fixed;
+    z-index: 8;
+    max-width: 600px;
+    left: max(calc(50vw - 300px), 0px);
+}

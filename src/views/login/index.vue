@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-f0 of-h us-n">
+    <div class="page-limit-width">
         <!-- 两个隐藏的输入框 -->
         <input id="pnInputBox" type="tel" class="ps-f po-tl-0 op-0 zi-10"
             :maxlength="pnMaxLength" 
@@ -11,7 +11,7 @@
             @focus="onVcFocus" 
             @blur="onVcFocus"
             @input="onVcInput" />
-        <div class="hi-cwh pd-1rem bg-ff fs-rem8" style="max-width:500px;margin:0 auto;">
+        <div class="content-cage us-n">
             <div class="ta-r">
                 <a class="tc-99" @click="onChangeRegion">中国大陆&nbsp;(+86)</a>
             </div>
@@ -32,7 +32,7 @@
                 <button class="btn-box" @click="onSubmit">登 录</button>
             </div>
         </div>
-        <div class="ps-f po-blr-0 pd-rem5 ta-c fs-rem7">
+        <div class="fixed-limit-width po-br-0 pd-rem5 ta-c fs-rem7">
             <p><a class="tc-b0" @click="$router.back">返回上一页</a></p>
             <p class="mg-t-rem5"><a class="tc-b0">《法律条款和隐私政策》</a></p>
         </div>

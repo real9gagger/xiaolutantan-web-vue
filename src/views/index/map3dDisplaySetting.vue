@@ -1,29 +1,30 @@
 <template>
-    <div class="pd-1rem hi-cwh of-a">
-        <h4 class="mds-row-title">行政区域</h4>
-        <div class="fx-r fx-wp">
-            <div v-for="item in arList" class="mds-row-item" 
-                :key="item.typeCode"
-                :class="{'selected': maType===item.typeCode, 'lastone': item.isLastOne}" 
-                @click="toggleRegion(item.typeCode)">
-                <img class="mds-row-pic" :src="item.iconPath" />
-                <span class="mds-row-desc">{{item.title}}</span>
+    <div class="page-limit-width">
+        <div class="content-cage">
+            <h4 class="mds-row-title">行政区域</h4>
+            <div class="fx-r fx-wp">
+                <div v-for="item in arList" class="mds-row-item" 
+                    :key="item.typeCode"
+                    :class="{'selected': maType===item.typeCode, 'lastone': item.isLastOne}" 
+                    @click="toggleRegion(item.typeCode)">
+                    <img class="mds-row-pic" :src="item.iconPath" />
+                    <span class="mds-row-desc">{{item.title}}</span>
+                </div>
+            </div>
+            
+            <h4 class="mds-row-title mg-t-1rem">运河</h4>
+            <div class="fx-r fx-wp">
+                <div v-for="item in canalTypes" class="mds-row-item"
+                    :key="item.typeCode"
+                    :class="{'selected': cdType===item.typeCode, 'lastone': item.isLastOne}" 
+                    @click="toggleDisplayMode(item.typeCode)">
+                    <img class="mds-row-pic" :src="item.iconPath" />
+                    <span class="mds-row-desc">{{item.title}}</span>
+                </div>
             </div>
         </div>
-        
-        <h4 class="mds-row-title mg-t-1rem">运河</h4>
-        <div class="fx-r fx-wp">
-            <div v-for="item in canalTypes" class="mds-row-item"
-                :key="item.typeCode"
-                :class="{'selected': cdType===item.typeCode, 'lastone': item.isLastOne}" 
-                @click="toggleDisplayMode(item.typeCode)">
-                <img class="mds-row-pic" :src="item.iconPath" />
-                <span class="mds-row-desc">{{item.title}}</span>
-            </div>
-        </div>
-        
-        <div class="mds-btn-container">
-            <button class="btn-box" @click="onConfirm">完成</button>
+        <div class="fixed-limit-width po-br-0 pd-1rem">
+            <button class="btn-box" @click="onConfirm">完 成</button>
         </div>
     </div>
 </template>
@@ -130,12 +131,5 @@
         width: 100%;
         padding: 0.2rem 0;
         font-size: 0.7rem;
-    }
-    .mds-btn-container{
-        position: fixed;
-        left: 1rem;
-        right: 1rem;
-        bottom: 1rem;
-        z-index: 8;
     }
 </style>

@@ -27,7 +27,8 @@
     		inset: "0",
     		zIndex: "99",
     		transform: `translate(${transX}%,0)`, //如果是返回则，往右移动，打开新页面时才往左移动
-    		transition: "transform 300ms"
+    		transition: "transform 300ms",
+            overflow: "hidden"
     	});
     }
     function onPageEnter(elem, done){//页面进入
@@ -44,6 +45,7 @@
     	elem.style.zIndex = null;
     	elem.style.transform = null;
     	elem.style.transition = null;
+        elem.style.overflow = null;
     }
     function onPageLeave(elem, done){//页面离开    
         if($store.getters.isRouterBack === null){
@@ -88,5 +90,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #fff;
+  font-size: 0.8rem;
 }
 </style>
