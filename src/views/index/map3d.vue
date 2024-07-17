@@ -61,6 +61,8 @@
     //还原默认视图
     function onRestorePerspective(){
         clearMapOverlays("isLocMarker"); //顺便清理我的位置
+        iwTitle.value = null;
+        iwLnglats.value = null;
         mapInstance.setViewport(DEFAULT_VIEW_POINTS);
     }
     
