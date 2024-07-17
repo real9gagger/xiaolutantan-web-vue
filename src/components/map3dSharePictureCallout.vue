@@ -47,10 +47,11 @@
         const theImg = document.createElement("img");
         
         theImg.classList.add("msp-callout-pic");
-        theImg.src = properties.coverUrl
+        theImg.src = properties.pictureList[0].path;
         Object.assign(theImg.style, picStyle.value);
         
         theDiv.classList.add("msp-callout-container");
+        theDiv.onanimationend = window.onceAnimationOnly;
         theDiv.appendChild(theImg);
         Object.assign(theDiv.style, boxStyle.value);
         

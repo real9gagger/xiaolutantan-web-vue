@@ -51,6 +51,11 @@ function formatDate(dateObj, formatStr) {
     return formatStr;
 }
 
+//动画结束后自动移除相关动画的CSS样式，防止页面返回时重新运行动画
+function onceAnimationOnly(evt){
+    evt.target.style.animation = "none";
+}
+
 //吐司提示
 function appToast(msg, duration){
 	if(msg){

@@ -25,12 +25,12 @@
     import { needDebounce } from "@/utils/cocohelper.js";
     
     import axios from "axios";
+    import myStorage from "@/utils/mystorage.js";
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
     import map3dSharePictureCallout from "@/components/map3dSharePictureCallout.vue";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
     import bdMapStyleForSatellite from "@/assets/json/bdMapStyleForSatellite.json";
-    
     import publicAssets from "@/assets/data/publicAssets.js";
     
     /* mapVGL教程：https://mapv.baidu.com/gl/docs/index.html */
@@ -157,10 +157,11 @@
     
     //点击用户分享的照片时触发
     function onSharePictureClicked(evt){
-        console.log(evt);
         mapIgnoreClicked = true;
         needDebounce(resetSomeData, 100);
-        $router.push("/map3ddetails");
+        //数据量有点大，保存在临时存储里
+        myStorage.onceObject("user_sharepic_infos", evt.target.properties);
+        $router.push("/map3ddetails?sid=" + evt.target.properties.id);
     }
     
     //重置一些数据
@@ -398,14 +399,10 @@
         
         //2024年7月16日，获取用户分享的照片
         axios.get(publicAssets.sharePicsData).then(res1 => {
-            let idx = 0;
             for(const item of res1.data){
                 const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
                     point: gcj02ToMapPoint([item.longitude, item.latitude]),
-                    properties: {
-                        coverUrl: item.pictureList[0].path,
-                        picIndex: idx++
-                    },
+                    properties: item,
                     zIndex: 99,
                 });
                 mapInstance.addOverlay(customOverlay);
