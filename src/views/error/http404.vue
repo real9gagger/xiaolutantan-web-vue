@@ -13,13 +13,14 @@
           <a @click="backPage" class="tc-mc mg-l-2rem">返回上一页</a>
         </div>
     </div>
-	<div class="error404-copy-right">{{$appName}}@2024</div>
+	<div class="error404-copy-right">{{appWebName}}@2024</div>
   </div>
 </template>
 
 <script setup name="ErrorHttp404">
     import { onMounted, ref } from "vue";
     import { useRoute, useRouter } from "vue-router";
+    import { appWebName } from "@/assets/data/constants.js";
     
     const $route = useRoute();
     const $router = useRouter();

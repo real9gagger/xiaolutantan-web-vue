@@ -15,3 +15,6 @@ export const canalDisplayMode = {
 
 //小程序主色
 export const appMainColor = "#43BA62";
+
+//小程序网页版名称
+export const appWebName = "小鹿坦坦";

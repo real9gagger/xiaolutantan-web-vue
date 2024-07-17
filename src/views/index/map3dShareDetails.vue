@@ -4,8 +4,7 @@
             <img class="msd-user-avatar" :src="publicAssets.iconDefaultUserAvatar" />
             <div class="mg-l-rem5 fx-g1">
                 <span class="dp-bk fw-b" title="分享这张照片的用户的名称">{{shareInfos.authorNickname}}</span>
-                <span class="dp-bk fs-rem6 tc-33" title="分享这张照片的时间">{{shareInfos.createTime}}</span>
-                <span class="dp-bk fs-rem6 tc-33" title="拍摄这张照片的地点">拍摄于{{shareInfos.locationAddress}}附近</span>
+                <span class="dp-bk fs-rem6 tc-33" title="分享这张照片的时间和地点">{{shareInfos.createTime}}&nbsp;•&nbsp;拍摄于{{shareInfos.locationAddress}}附近</span>
             </div>
         </div>
         <swiper-container
@@ -54,7 +53,7 @@
         display: flex;
         flex-direction: row;
         position: fixed;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem;
         top: 0;
         left: 0;
         right: 0;
@@ -75,7 +74,7 @@
     }
     .msd-bottom-box{
         position: fixed;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem;
         bottom: 0;
         left: 0;
         right: 0;

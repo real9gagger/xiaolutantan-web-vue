@@ -64,7 +64,7 @@
         }
         
         if(!isActiviting){
-            elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureMarker + ")";
+            elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureVisited + ")";
             return null;
         } else {
             elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureActiviting + ")";

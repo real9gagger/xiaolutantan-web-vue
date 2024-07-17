@@ -37,9 +37,11 @@ export default [
 	},
     {
     	path: "/map3d",
-    	name: "3D视图",
+    	name: "平陆运河3D视图",
     	component: () => import("@/views/index/map3d"),
-    	meta: {}
+    	meta: {
+            showPageTitle: true
+        }
     },
     {
     	path: "/map3dsettings",
