@@ -40,6 +40,7 @@ const AssetsPathMap = {
     iconCurrentPositionCity: "icons/current_position_city.png",
     iconMapPinFill: "icons/map_pin_fill.png",
     iconSharePictureMarker: "icons/share_picture_marker.png",
+    iconSharePictureActiviting: "icons/share_picture_activiting.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

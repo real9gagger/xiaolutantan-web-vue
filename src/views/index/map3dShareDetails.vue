@@ -1,13 +1,24 @@
 <template>
-    <div v-if="shareInfos && shareInfos.id===shareID">
+    <div v-if="shareInfos && shareInfos.id===shareID" class="hi-cwh">
         <div class="msd-userinfo-box">
             <img class="msd-user-avatar" :src="publicAssets.iconDefaultUserAvatar" />
             <div class="mg-l-rem5 fx-g1">
                 <span class="dp-bk fw-b" title="分享这张照片的用户的名称">{{shareInfos.authorNickname}}</span>
                 <span class="dp-bk fs-rem6 tc-33" title="分享这张照片的时间">{{shareInfos.createTime}}</span>
-                <span class="dp-bk fs-rem6 tc-33" title="拍摄这张照片的地点">拍摄于 {{shareInfos.locationAddress}} 附近</span>
+                <span class="dp-bk fs-rem6 tc-33" title="拍摄这张照片的地点">拍摄于{{shareInfos.locationAddress}}附近</span>
             </div>
         </div>
+        <swiper-container
+            :slides-per-view="1"
+            :auto-height="false"
+            :watch-overflow="false"
+            @swiperslidechange="onSlideChange"
+            effect="slide"
+            style="height:100%">
+            <swiper-slide v-for="item in shareInfos.pictureList" :key="item.id" class="fx-vm">
+                <img :alt="item.description" :src="item.path" class="wi-f" />
+            </swiper-slide>
+        </swiper-container>
         <div class="msd-bottom-box fx-c fx-je">
             <span class="dp-bk">{{shareInfos.pictureList[picIndex].description || shareInfos.title}}</span>
         </div>
@@ -24,6 +35,10 @@
     const shareInfos = myStorage.onceObject("user_sharepic_infos");
     const shareID = (+$route.query.sid || 0);
     const picIndex = ref(0);
+
+    function onSlideChange(evt){
+        picIndex.value = evt.target.swiper.realIndex;
+    }
 </script>
 
 <style scoped="scoped">

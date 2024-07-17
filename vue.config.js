@@ -30,6 +30,16 @@ module.exports = {
       })
       return definitions;
     });
+    
+    config.module
+    .rule('vue')
+    .use('vue-loader')
+    .tap(options => {
+        options.compilerOptions = {
+            isCustomElement: tag => ['swiper-container','swiper-slide'].includes(tag)
+        };
+        return options;
+    });
   },
   configureWebpack: {
     plugins: [

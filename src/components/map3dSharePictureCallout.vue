@@ -58,8 +58,23 @@
         return theDiv;
     }
     
+    function setCalloutActiviting(elem, isActiviting){
+        if(!elem){
+            return null;
+        }
+        
+        if(!isActiviting){
+            elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureMarker + ")";
+            return null;
+        } else {
+            elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureActiviting + ")";
+            return elem;
+        }
+    }
+    
     defineExpose({
-        buildCalloutHTML
+        buildCalloutHTML,
+        setCalloutActiviting
     });
 </script>
 
@@ -77,7 +92,6 @@
     
     .msp-callout-container{
         display: block;
-        
         overflow: hidden;
         transform-origin: 40.5% 100% 0;
         background-position: 0% 0%;

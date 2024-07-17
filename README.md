@@ -1,4 +1,5 @@
 # xiaolutantan-web-vue
+NodeJS版本：14.17.6
 
 ## Project setup
 ```

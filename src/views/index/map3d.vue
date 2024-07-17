@@ -38,6 +38,7 @@
     let mapInstance = null; //非响应式变量
     let mapWmtsLayer = null; //第三方卫星地图图层
     let mapAreaLayer = null; //地图周边城市图层
+    let mapActivitingCallout = null; //当前被点击的气泡
     let mapIgnoreClicked = false; //是否忽略地图点击
     let isSatelliteMapType = false; //是否是卫星地图
     
@@ -141,6 +142,9 @@
                 iwTitle.value = evt.overlay._config.title;
                 iwLnglats.value = [evt.overlay.latLng];
             }
+            
+            //点击地图其他地方时重置！！！
+            mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(mapActivitingCallout, false);
         }
     }
     
@@ -159,9 +163,13 @@
     function onSharePictureClicked(evt){
         mapIgnoreClicked = true;
         needDebounce(resetSomeData, 100);
+        
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos", evt.target.properties);
         $router.push("/map3ddetails?sid=" + evt.target.properties.id);
+
+        mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(mapActivitingCallout, false);
+        mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(evt.target.div.firstChild, true);
     }
     
     //重置一些数据
@@ -400,14 +408,16 @@
         //2024年7月16日，获取用户分享的照片
         axios.get(publicAssets.sharePicsData).then(res1 => {
             for(const item of res1.data){
-                const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
-                    point: gcj02ToMapPoint([item.longitude, item.latitude]),
-                    properties: item,
-                    zIndex: 99,
-                });
-                mapInstance.addOverlay(customOverlay);
-                customOverlay._config = { isSharePicture: true };
-                customOverlay.addEventListener("click", onSharePictureClicked);
+                if(item.pictureList?.length){//有图片的才显示
+                    const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
+                        point: gcj02ToMapPoint([item.longitude, item.latitude]),
+                        properties: item,
+                        zIndex: 99,
+                    });
+                    mapInstance.addOverlay(customOverlay);
+                    customOverlay._config = { isSharePicture: true };
+                    customOverlay.addEventListener("click", onSharePictureClicked);
+                }
             }
         }).catch(err => {
             appToast(err.message);
@@ -463,6 +473,7 @@
         mapInstance = null;
         mapWmtsLayer = null;
         mapAreaLayer = null;
+        mapActivitingCallout = null;
     });
 </script>
 
