@@ -31,10 +31,11 @@
     const MIN_SCALE_FINAL = 1; //手指离开屏幕时最终允许的最小缩小倍数
     const DOUBLE_CLICK_SPAN = 300; //双击时的时间间隔
     const IMAGE_WIDTH = Math.min(window.innerWidth, 600); //图片宽度
-    const IMAGE_HEIGHT = Math.round(window.innerHeight * 0.8); //图片高度
+    const IMAGE_HEIGHT = 236;//Math.round(window.innerHeight * 0.8); //图片高度
     const ORIGIN_X = 0.0; //[0 - 1] 之间的数
     const ORIGIN_Y = 0.0; //[0 - 1] 之间的数
     const MOUSE_WHEEL_SCALE_RATIO = 0.05; //鼠标滚动时放大缩小的比例
+    const VELOCITY_THRESHOLD = 1; //移到时超过这个数据会启动惯性继续移到一段距离
     
     const props = defineProps({
         alt: {
@@ -46,14 +47,18 @@
             default: ""
         }
     });
-    
     const needTransition = ref(false); //是否需要动画支持
     const imageScale = ref(1); //图像缩放大小
     const cursorType = ref("initial"); //鼠标光标类型
     const transXY = reactive([0, 0]); //图像偏移量
+    
     const maxScaleFinalXY = [0, 0]; //刚好达到 “MAX_SCALE_FINAL” 时的偏移量
     const moveXY = [0, 0]; //单指移动时的位置，或者双指移动时的双指中心位置
     const moveVelocityXY = [0, 0]; //移到时的速度
+    const timeStamp = {
+        forMove: 0, //移动时的时间戳
+        forStart: 0 //开始触摸时的时间戳
+    };
     
     const imageStyle = computed(() => ({
         transition: (needTransition.value ? "transform 300ms ease-out 0s" : "none"),
@@ -132,13 +137,19 @@
         console.log("触控取消…", evt);
     }
     function onImgMouseDown(evt){
-        console.log("鼠标按下…", evt);
+        //console.log("鼠标按下…", evt);
         resetXY(moveXY, [0x88, 0x88]); //设为非零数即可！！！
         cursorType.value = "grab";
+        timeStamp.forMove = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
     }
     function onImgMouseMove(evt){
         //console.log("鼠标移到…", evt);
         if(moveXY[0] && moveXY[1]){//鼠标按下时才处理
+            evt.preventDefault();
+            evt.stopPropagation();
+            
+            const disTS = Math.max(evt.timeStamp - timeStamp.forMove, 1); // 不能小于 1，防止除以 0
+            
             if(transXY[0] > 0 || transXY[0] < limitMinX.value){
                 transXY[0] += (evt.movementX * MOVE_RATIO);
             } else {
@@ -150,10 +161,13 @@
             } else {
                 transXY[1] += (evt.movementY);
             }
+            moveVelocityXY[0] = (evt.movementX / disTS);
+            moveVelocityXY[1] = (evt.movementY / disTS);
+            timeStamp.forMove = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
         }
     }
     function onImgMouseUp(evt){
-        console.log("鼠标松开…", evt);
+        //console.log("鼠标松开…", evt);
         resetXY(moveXY);
         actionEndCallback();
     }
@@ -165,44 +179,32 @@
         }
     }
     function onImgMouseWheel(evt){
-        console.log("鼠标滚动…", evt);
+        //console.log("鼠标滚动…", evt);
         evt.preventDefault();
         evt.stopPropagation();
-        //console.log(evt.offsetX, " = ", (evt.layerX - transXY[0]) / imageScale.value);
-        //console.log(evt.offsetY, " = ", (evt.layerY - transXY[1]) / imageScale.value);
+        
         //滚轮逆时针滚动-放大；滚轮顺时针滚动-缩小
         const oldScale = imageScale.value;
-        const multiplier = (evt.wheelDelta > 0 ? +1: -1) * (MOUSE_WHEEL_SCALE_RATIO  * imageScale.value);
-        const nowScale = (imageScale.value + multiplier);
-        const xxxx = [...transXY];
+        const oldTrans = [...transXY];
+        const multiplier = (evt.wheelDelta > 0 ? +MOUSE_WHEEL_SCALE_RATIO: -MOUSE_WHEEL_SCALE_RATIO) * oldScale;
+        const newScale = (oldScale + multiplier);
         
-        if(nowScale >= MIN_SCALE && nowScale <= MAX_SCALE){
-            imageScale.value = nowScale;
-            transXY[0] -= (evt.offsetX * multiplier);
-            transXY[1] -= (evt.offsetY * multiplier);
+        if(newScale >= MIN_SCALE && newScale <= MAX_SCALE){
+            const deltaX = (evt.offsetX - IMAGE_WIDTH * ORIGIN_X);
+            const deltaY = (evt.offsetY - IMAGE_HEIGHT * ORIGIN_Y);
+            
+            imageScale.value = newScale;
+            transXY[0] -= (deltaX * multiplier);
+            transXY[1] -= (deltaY * multiplier);
+            
+            //记录缩放到这个点时的偏移量，后面还原时有用！
+            if(newScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[0] && !maxScaleFinalXY[1]){
+                maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE_FINAL - oldScale));
+                maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE_FINAL - oldScale));
+            }
+            
+            cursorType.value = (evt.wheelDelta > 0 ? "zoom-in" : "zoom-out");
         }
-        
-        //记录这个点的偏移量，后面还原时有用！
-        //if(nowScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[0] && !maxScaleFinalXY[1]){
-            //公式一
-            //maxScaleFinalXY[0] = transXY[0] * (2 - nowScale/MAX_SCALE_FINAL);
-            //maxScaleFinalXY[1] = transXY[1] * (2 - nowScale/MAX_SCALE_FINAL);
-            
-            //公式二
-            //maxScaleFinalXY[0] = (evt.layerX / (nowScale-1) + transXY[0]);
-            //maxScaleFinalXY[1] = (evt.layerY / (nowScale-1) + transXY[1]);
-            
-            //公式三
-            //maxScaleFinalXY[0] = xxxx[0] - evt.offsetX *(MAX_SCALE_FINAL-oldScale);
-            //maxScaleFinalXY[1] = xxxx[1] - evt.offsetY *(MAX_SCALE_FINAL-oldScale);
-            
-            //公式四
-            maxScaleFinalXY[0] = transXY[0] - evt.offsetX * (MAX_SCALE_FINAL - nowScale);
-            maxScaleFinalXY[1] = transXY[1] - evt.offsetY * (MAX_SCALE_FINAL - nowScale)
-            console.log(nowScale,MAX_SCALE_FINAL, transXY, maxScaleFinalXY);
-            
-        //}
-        cursorType.value = (evt.wheelDelta > 0 ? "zoom-in" : "zoom-out");
         
         needDebounce(actionEndCallback, 200);
     }
@@ -220,7 +222,10 @@
         evt.preventDefault();
         evt.stopPropagation();
         
+        timeStamp.forMove = 0;
+        timeStamp.forStart = 0;
         needTransition.value = false;
+        
         resetXY(maxScaleFinalXY);
     };
     
@@ -232,7 +237,7 @@
         } else if(transXY[0] < limitMinX.value){//松手后右边自动回位
             needTransition.value = true;
             transXY[0] = limitMinX.value;
-        } else if(Math.abs(moveVelocityXY[0]) >= 1){ //松手后模拟惯性滑动一段距离，数值有负有正
+        } else if(Math.abs(moveVelocityXY[0]) >= VELOCITY_THRESHOLD){ //松手后模拟惯性滑动一段距离，数值有负有正
             needTransition.value = true;
             transXY[0] = getNumberBetween(transXY[0] + moveVelocityXY[0] * INERTIA_STEP, limitMinX.value, limitMaxX.value);
         }
@@ -243,7 +248,7 @@
         } else if(transXY[1] < limitMinY.value){//松手后顶部自定回位
             needTransition.value = true;
             transXY[1] = limitMinY.value;
-        } else if(Math.abs(moveVelocityXY[1]) >= 1){//松手后模拟惯性滑动一段距离，数值有负有正
+        } else if(Math.abs(moveVelocityXY[1]) >= VELOCITY_THRESHOLD){//松手后模拟惯性滑动一段距离，数值有负有正
             needTransition.value = true;
             transXY[1] = getNumberBetween(transXY[1] + moveVelocityXY[1] * INERTIA_STEP, limitMinY.value, limitMaxY.value);
         }
@@ -266,5 +271,6 @@
     .gti-img-box{
         width: 100%;
         height: auto;
+        user-select: none;
     }
 </style>
