@@ -1,5 +1,5 @@
 <template>
-    <div class="wh-s fx-vm">
+    <div class="wh-s bg-ff fx-vm">
         <span class="index-loading-text">正在加载…</span>
     </div>
 </template>

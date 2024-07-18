@@ -46,6 +46,7 @@ const AssetsPathMap = {
     //图片
     imageAppLogo: "images/app_logo.png",
     imageImgError: "images/img_error.png",
+    imageImgLost: "images/img_lost.png",
     imageCanalSegmented: "images/canal_segmented.png",
     imageCanalSingle: "images/canal_single.png",
     imageRegionNone: "images/region_none.png",
