@@ -49,10 +49,10 @@
     });
     const needTransition = ref(false); //是否需要动画支持
     const imageScale = ref(1); //图像缩放大小
-    const cursorType = ref("initial"); //鼠标光标类型
+    const cursorType = ref("pointer"); //鼠标光标类型
     const transXY = reactive([0, 0]); //图像偏移量
     
-    const maxScaleFinalXY = [0, 0]; //刚好达到 “MAX_SCALE_FINAL” 时的偏移量
+    const maxScaleFinalXY = [0, 0, 0]; //刚好达到 “MAX_SCALE_FINAL” 时的偏移量（第一、二元素，第三个元素用于标记是否已被设置值）
     const moveXY = [0, 0]; //单指移动时的位置，或者双指移动时的双指中心位置
     const moveVelocityXY = [0, 0]; //移到时的速度
     const timeStamp = {
@@ -115,9 +115,12 @@
         }
     };
     function resetXY(arr, xy){//重置设置数组值
-        if(!xy || xy.length !== 2){
+        if(!xy || !xy.length){
             arr[0] = 0;
             arr[1] = 0;
+        } else if(xy.length === 1) {
+            arr[0] = xy[0];
+            arr[1] = xy[0];
         } else {
             arr[0] = xy[0];
             arr[1] = xy[1];
@@ -138,7 +141,7 @@
     }
     function onImgMouseDown(evt){
         //console.log("鼠标按下…", evt);
-        resetXY(moveXY, [0x88, 0x88]); //设为非零数即可！！！
+        resetXY(moveXY, [0x88]); //设为非零数即可！！！
         cursorType.value = "grab";
         timeStamp.forMove = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
     }
@@ -185,28 +188,29 @@
         
         //滚轮逆时针滚动-放大；滚轮顺时针滚动-缩小
         const oldScale = imageScale.value;
-        const oldTrans = [...transXY];
         const multiplier = (evt.wheelDelta > 0 ? +MOUSE_WHEEL_SCALE_RATIO: -MOUSE_WHEEL_SCALE_RATIO) * oldScale;
         const newScale = (oldScale + multiplier);
         
         if(newScale >= MIN_SCALE && newScale <= MAX_SCALE){
             const deltaX = (evt.offsetX - IMAGE_WIDTH * ORIGIN_X);
             const deltaY = (evt.offsetY - IMAGE_HEIGHT * ORIGIN_Y);
+            const oldTrans = [...transXY];
             
             imageScale.value = newScale;
             transXY[0] -= (deltaX * multiplier);
             transXY[1] -= (deltaY * multiplier);
             
             //记录缩放到这个点时的偏移量，后面还原时有用！
-            if(newScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[0] && !maxScaleFinalXY[1]){
+            if(newScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[2]){
                 maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE_FINAL - oldScale));
                 maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE_FINAL - oldScale));
+                maxScaleFinalXY[2] = 0x717; //标记为已设置值
             }
             
             cursorType.value = (evt.wheelDelta > 0 ? "zoom-in" : "zoom-out");
         }
         
-        needDebounce(actionEndCallback, 200);
+        needDebounce(actionEndCallback, 300);
     }
     function onImgDblClick(evt){
         //console.log("双击…", evt);
@@ -218,15 +222,16 @@
         resetXY(transXY, getTransXY(evt));
     }
     function onImgTransitionEnd(evt){
-        //console.log("过渡结束…",evt)
+        //console.log("过渡结束…", evt);
         evt.preventDefault();
         evt.stopPropagation();
         
         timeStamp.forMove = 0;
         timeStamp.forStart = 0;
         needTransition.value = false;
+        maxScaleFinalXY[2] = 0; //标记为未设置值
         
-        resetXY(maxScaleFinalXY);
+        resetXY(moveVelocityXY);
     };
     
     //操作结束后的回调
@@ -263,7 +268,7 @@
             resetXY(transXY, maxScaleFinalXY);
         }
         
-        cursorType.value = "initial";
+        cursorType.value = "pointer";
     }
 </script>
 
