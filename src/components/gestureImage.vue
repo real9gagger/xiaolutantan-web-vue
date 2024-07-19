@@ -14,6 +14,7 @@
         @mousewheel="onImgMouseWheel"
         @dblclick="onImgDblClick"
         @transitionend="onImgTransitionEnd"
+        @load="onImgLoad"
         class="gti-img-box"
         draggable="false"
     />
@@ -30,8 +31,6 @@
     const MIN_SCALE = 0.8; //双指缩小时最小的缩小倍数
     const MIN_SCALE_FINAL = 1; //手指离开屏幕时最终允许的最小缩小倍数
     const DOUBLE_CLICK_SPAN = 300; //双击时的时间间隔
-    const IMAGE_WIDTH = Math.min(window.innerWidth, 600); //图片宽度
-    const IMAGE_HEIGHT = 236;//Math.round(window.innerHeight * 0.8); //图片高度
     const ORIGIN_X = 0.0; //[0 - 1] 之间的数
     const ORIGIN_Y = 0.0; //[0 - 1] 之间的数
     const MOUSE_WHEEL_SCALE_RATIO = 0.05; //鼠标滚动时放大缩小的比例
@@ -47,17 +46,21 @@
             default: ""
         }
     });
+    const imageWidth = ref(window.innerWidth); //图片宽度
+    const imageHeight = ref(window.innerHeight); //图片高度
     const needTransition = ref(false); //是否需要动画支持
     const imageScale = ref(1); //图像缩放大小
-    const cursorType = ref("pointer"); //鼠标光标类型
+    const cursorType = ref("grab"); //鼠标光标类型
     const transXY = reactive([0, 0]); //图像偏移量
-    
+
     const maxScaleFinalXY = [0, 0, 0]; //刚好达到 “MAX_SCALE_FINAL” 时的偏移量（第一、二元素，第三个元素用于标记是否已被设置值）
     const moveXY = [0, 0]; //单指移动时的位置，或者双指移动时的双指中心位置
     const moveVelocityXY = [0, 0]; //移到时的速度
-    const timeStamp = {
-        forMove: 0, //移动时的时间戳
-        forStart: 0 //开始触摸时的时间戳
+    //非响应式变量（Non responsive variables）
+    const nonRVs = {
+        lastDIS: 0, //双指移到时的前一次距离
+        moveTS: 0, //移动时的时间戳
+        startTS: 0, //开始触摸时的时间戳
     };
     
     const imageStyle = computed(() => ({
@@ -67,10 +70,10 @@
         cursor: cursorType.value
     }));
     const scaleOffset = computed(() => (imageScale.value - 1)); //缩放大小偏移量
-    const limitMinX = computed(() => Math.round(IMAGE_WIDTH * (ORIGIN_X - 1) * scaleOffset.value)); //负数
-    const limitMaxX = computed(() => Math.round(IMAGE_WIDTH * ORIGIN_X * scaleOffset.value));
-    const limitMinY = computed(() => Math.round(IMAGE_HEIGHT * (ORIGIN_Y - 1) * scaleOffset.value)); //负数
-    const limitMaxY = computed(() => Math.round(IMAGE_HEIGHT * ORIGIN_Y * scaleOffset.value));
+    const limitMinX = computed(() => Math.round(imageWidth.value * (ORIGIN_X - 1) * scaleOffset.value)); //负数
+    const limitMaxX = computed(() => Math.round(imageWidth.value * ORIGIN_X * scaleOffset.value));
+    const limitMinY = computed(() => Math.round(imageHeight.value * (ORIGIN_Y - 1) * scaleOffset.value)); //负数
+    const limitMaxY = computed(() => Math.round(imageHeight.value * ORIGIN_Y * scaleOffset.value));
     
     function getNumberBetween(num, min, max){//介于两个数之间的数
         if(num < min){
@@ -104,13 +107,13 @@
     function getTransXY(evt){//获取双击时的偏移量
         if(evt.type === "touchstart"){
             return [
-                -(evt.touches[0].clientX - evt.target.offsetLeft - IMAGE_WIDTH * ORIGIN_X) * scaleOffset.value,
-                -(evt.touches[0].clientY - evt.target.offsetTop - IMAGE_HEIGHT * ORIGIN_Y) * scaleOffset.value,
+                -(evt.touches[0].clientX - evt.target.offsetLeft - imageWidth.value * ORIGIN_X) * scaleOffset.value,
+                -(evt.touches[0].clientY - evt.target.offsetTop - imageHeight.value * ORIGIN_Y) * scaleOffset.value,
             ];
         } else {
             return [
-                -(evt.offsetX - IMAGE_WIDTH * ORIGIN_X) * scaleOffset.value,
-                -(evt.offsetY - IMAGE_HEIGHT * ORIGIN_Y) * scaleOffset.value,
+                -(evt.offsetX - imageWidth.value * ORIGIN_X) * scaleOffset.value,
+                -(evt.offsetY - imageHeight.value * ORIGIN_Y) * scaleOffset.value,
             ];
         }
     };
@@ -129,12 +132,88 @@
     
     function onImgTouchStart(evt){
         console.log("触控开始…", evt);
+        
+        if(evt.touches.length === 1){//单指操作
+            resetXY(moveXY, getFingerXY(evt));
+            if((evt.timeStamp - nonRVs.startTS) < DOUBLE_CLICK_SPAN){
+                onImgDblClick(evt);
+            }
+        } else if(evt.touches.length === 2){//双指操作
+            resetXY(moveXY, getCenterXY(evt));
+            nonRVs.lastDIS = getDisPx(evt);
+        }
+        
+        nonRVs.moveTS = nonRVs.startTS = evt.timeStamp;
     }
     function onImgTouchMove(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
+        
         console.log("触控移到…", evt);
+        if(evt.touches.length === 1){//单指移到
+            const nowXY = getFingerXY(evt);
+            const disX = (nowXY[0] - moveXY[0]);
+            const disY = (nowXY[1] - moveXY[1]);
+            const disTS = Math.max(evt.timeStamp - nonRVs.moveTS, 1);// 不能小于 1，防止除以 0
+            
+            if(transXY[0] > 0 || transXY[0] < limitMinX.value){
+                transXY[0] += (disX * MOVE_RATIO);
+            } else {
+                transXY[0] += (disX);
+            }
+            
+            if(transXY[1] > 0 || transXY[1] < limitMinY.value){
+                transXY[1] += (disY * MOVE_RATIO);
+            } else {
+                transXY[1] += (disY);
+            }
+            
+            resetXY(moveXY, nowXY);
+            resetXY(moveVelocityXY, [(disX / disTS), (disY / disTS)]);
+
+            if(disX || disY){
+                nonRVs.startTS = 0; //即使有微小的移动也要重置此时间戳！
+            }
+        } else if(evt.touches.length === 2){//双指缩放
+            const disPx = getDisPx(evt);
+            const pointerCenterXY = getCenterXY(evt);
+            const oldScale = imageScale.value;
+            const deltaRatio = (disPx / nonRVs.lastDIS - 1);//大于0放大（双指展开），小于0缩小（双指收缩）
+            const newScale = (oldScale + deltaRatio);
+            
+            //双指放大时的偏移量（累加）公式参见：https://juejin.cn/post/7020243158529212423
+            if(newScale >= MIN_SCALE && newScale <= MAX_SCALE){
+                const deltaX = (pointerCenterXY[0] - transXY[0]) / oldScale - imageWidth.value * ORIGIN_X;
+                const deltaY = (pointerCenterXY[1] - transXY[1]) / oldScale - imageHeight.value * ORIGIN_Y;
+                const oldTrans = [...transXY];
+                
+                transXY[0] -= ((deltaRatio * deltaX) - (pointerCenterXY[0] - moveXY[0]));
+                transXY[1] -= ((deltaRatio * deltaY) - (pointerCenterXY[1] - moveXY[1]));
+                
+                //记录这个点的偏移量，后面还原时有用！
+                if(newScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[2]){
+                    maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE_FINAL - oldScale));
+                    maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE_FINAL - oldScale));
+                    maxScaleFinalXY[2] = 0x717; //标记为已设置值
+                }
+            }
+            
+            //根据双指收缩展开或的距离缩放（累加）
+            imageScale.value = getNumberBetween(newScale, MIN_SCALE, MAX_SCALE);
+            nonRVs.lastDIS = disPx;
+            resetXY(moveXY, pointerCenterXY);
+        }
+        
+        nonRVs.moveTS = evt.timeStamp;
     }
     function onImgTouchEnd(evt){
         console.log("触控结束…", evt);
+        //屏幕上一个手指都没有的时候才处理
+        if(evt.touches.length <= 0){
+            actionEndCallback();
+        } else {
+            resetXY(moveXY, getFingerXY(evt));
+        }
     }
     function onImgTouchCancel(evt){
         console.log("触控取消…", evt);
@@ -142,8 +221,7 @@
     function onImgMouseDown(evt){
         //console.log("鼠标按下…", evt);
         resetXY(moveXY, [0x88]); //设为非零数即可！！！
-        cursorType.value = "grab";
-        timeStamp.forMove = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
+        nonRVs.moveTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
     }
     function onImgMouseMove(evt){
         //console.log("鼠标移到…", evt);
@@ -151,7 +229,7 @@
             evt.preventDefault();
             evt.stopPropagation();
             
-            const disTS = Math.max(evt.timeStamp - timeStamp.forMove, 1); // 不能小于 1，防止除以 0
+            const disTS = Math.max(evt.timeStamp - nonRVs.moveTS, 1); // 不能小于 1，防止除以 0
             
             if(transXY[0] > 0 || transXY[0] < limitMinX.value){
                 transXY[0] += (evt.movementX * MOVE_RATIO);
@@ -166,7 +244,7 @@
             }
             moveVelocityXY[0] = (evt.movementX / disTS);
             moveVelocityXY[1] = (evt.movementY / disTS);
-            timeStamp.forMove = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
+            nonRVs.moveTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
         }
     }
     function onImgMouseUp(evt){
@@ -192,8 +270,8 @@
         const newScale = (oldScale + multiplier);
         
         if(newScale >= MIN_SCALE && newScale <= MAX_SCALE){
-            const deltaX = (evt.offsetX - IMAGE_WIDTH * ORIGIN_X);
-            const deltaY = (evt.offsetY - IMAGE_HEIGHT * ORIGIN_Y);
+            const deltaX = (evt.offsetX - imageWidth.value * ORIGIN_X);
+            const deltaY = (evt.offsetY - imageHeight.value * ORIGIN_Y);
             const oldTrans = [...transXY];
             
             imageScale.value = newScale;
@@ -226,13 +304,19 @@
         evt.preventDefault();
         evt.stopPropagation();
         
-        timeStamp.forMove = 0;
-        timeStamp.forStart = 0;
+        nonRVs.moveTS = 0;
+        nonRVs.startTS = 0;
+        nonRVs.lastDIS = 0;
         needTransition.value = false;
         maxScaleFinalXY[2] = 0; //标记为未设置值
         
         resetXY(moveVelocityXY);
     };
+    function onImgLoad(evt){
+        //console.log("图片加载完成…", evt.target);
+        imageWidth.value = evt.target.width;
+        imageHeight.value = evt.target.height;
+    }
     
     //操作结束后的回调
     function actionEndCallback(){
@@ -268,7 +352,7 @@
             resetXY(transXY, maxScaleFinalXY);
         }
         
-        cursorType.value = "pointer";
+        cursorType.value = "grab";
     }
 </script>
 
