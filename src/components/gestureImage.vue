@@ -15,6 +15,8 @@
         @dblclick="onImgDblClick"
         @transitionend="onImgTransitionEnd"
         @load="onImgLoad"
+        @pointerdown="onPointerHandler"
+        @pointermove="onPointerHandler"
         class="gti-img-box"
         draggable="false"
     />
@@ -70,6 +72,7 @@
         cursor: cursorType.value
     }));
     const scaleOffset = computed(() => (imageScale.value - 1)); //缩放大小偏移量
+    const canEvent = computed(() => (imageScale.value !== 1)); //只有缩放不等于1才能控制触控事件，防止和 Swiper 事件冲突
     const limitMinX = computed(() => Math.round(imageWidth.value * (ORIGIN_X - 1) * scaleOffset.value)); //负数
     const limitMaxX = computed(() => Math.round(imageWidth.value * ORIGIN_X * scaleOffset.value));
     const limitMinY = computed(() => Math.round(imageHeight.value * (ORIGIN_Y - 1) * scaleOffset.value)); //负数
@@ -131,25 +134,32 @@
     }
     
     function onImgTouchStart(evt){
-        console.log("触控开始…", evt);
-        
+        //console.log("触控开始…", evt);
         if(evt.touches.length === 1){//单指操作
-            resetXY(moveXY, getFingerXY(evt));
             if((evt.timeStamp - nonRVs.startTS) < DOUBLE_CLICK_SPAN){
                 onImgDblClick(evt);
             }
+            if(canEvent.value){
+                resetXY(moveXY, getFingerXY(evt));
+            }
         } else if(evt.touches.length === 2){//双指操作
-            resetXY(moveXY, getCenterXY(evt));
-            nonRVs.lastDIS = getDisPx(evt);
+            if(canEvent.value){
+                resetXY(moveXY, getCenterXY(evt));
+                nonRVs.lastDIS = getDisPx(evt);
+            }
         }
         
         nonRVs.moveTS = nonRVs.startTS = evt.timeStamp;
     }
     function onImgTouchMove(evt){
+        //console.log("触控移到…", evt);
+        if(!canEvent.value){
+            return;
+        }
+        
         evt.preventDefault();
         evt.stopPropagation();
         
-        console.log("触控移到…", evt);
         if(evt.touches.length === 1){//单指移到
             const nowXY = getFingerXY(evt);
             const disX = (nowXY[0] - moveXY[0]);
@@ -207,7 +217,11 @@
         nonRVs.moveTS = evt.timeStamp;
     }
     function onImgTouchEnd(evt){
-        console.log("触控结束…", evt);
+        //console.log("触控结束…", evt);
+        if(!canEvent.value){
+            return;
+        }
+        
         //屏幕上一个手指都没有的时候才处理
         if(evt.touches.length <= 0){
             actionEndCallback();
@@ -216,15 +230,24 @@
         }
     }
     function onImgTouchCancel(evt){
-        console.log("触控取消…", evt);
+        //console.log("触控取消…", evt);
     }
+    
     function onImgMouseDown(evt){
         //console.log("鼠标按下…", evt);
+        if(!canEvent.value){
+            return;
+        }
+        
         resetXY(moveXY, [0x88]); //设为非零数即可！！！
         nonRVs.moveTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
     }
     function onImgMouseMove(evt){
         //console.log("鼠标移到…", evt);
+        if(!canEvent.value){
+            return;
+        }
+        
         if(moveXY[0] && moveXY[1]){//鼠标按下时才处理
             evt.preventDefault();
             evt.stopPropagation();
@@ -249,6 +272,10 @@
     }
     function onImgMouseUp(evt){
         //console.log("鼠标松开…", evt);
+        if(!canEvent.value){
+            return;
+        }
+        
         resetXY(moveXY);
         actionEndCallback();
     }
@@ -261,6 +288,10 @@
     }
     function onImgMouseWheel(evt){
         //console.log("鼠标滚动…", evt);
+        if(!canEvent.value){
+            return;
+        }
+        
         evt.preventDefault();
         evt.stopPropagation();
         
@@ -310,9 +341,16 @@
         resetXY(moveVelocityXY);
     };
     function onImgLoad(evt){
-        //console.log("图片加载完成…", evt.target);
+        //console.log("图片加载完成…", evt);
         imageWidth.value = evt.target.width;
         imageHeight.value = evt.target.height;
+    }
+    function onPointerHandler(evt){
+        //console.log("指针事件…", evt);
+        if(canEvent.value){
+            //evt.preventDefault();
+            evt.stopPropagation();;
+        }
     }
     
     //操作结束后的回调
