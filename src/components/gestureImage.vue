@@ -304,9 +304,6 @@
         evt.preventDefault();
         evt.stopPropagation();
         
-        nonRVs.moveTS = 0;
-        nonRVs.startTS = 0;
-        nonRVs.lastDIS = 0;
         needTransition.value = false;
         maxScaleFinalXY[2] = 0; //标记为未设置值
         
@@ -320,6 +317,16 @@
     
     //操作结束后的回调
     function actionEndCallback(){
+        if(imageScale.value < MIN_SCALE_FINAL){//松手后缩放超过最小值自动还原
+            needTransition.value = true;
+            imageScale.value = MIN_SCALE_FINAL;
+            resetXY(transXY);
+        } else if(imageScale.value > MAX_SCALE_FINAL){//松手后如果缩放超过最大值自动还原
+            needTransition.value = true;
+            imageScale.value = MAX_SCALE_FINAL;
+            resetXY(transXY, maxScaleFinalXY);
+        }
+        
         if(transXY[0] > limitMaxX.value){//松手后左边自动回位
             needTransition.value = true;
             transXY[0] = limitMaxX.value;
@@ -340,16 +347,6 @@
         } else if(Math.abs(moveVelocityXY[1]) >= VELOCITY_THRESHOLD){//松手后模拟惯性滑动一段距离，数值有负有正
             needTransition.value = true;
             transXY[1] = getNumberBetween(transXY[1] + moveVelocityXY[1] * INERTIA_STEP, limitMinY.value, limitMaxY.value);
-        }
-        
-        if(imageScale.value < MIN_SCALE_FINAL){//松手后缩放超过最小值自动还原
-            needTransition.value = true;
-            imageScale.value = MIN_SCALE_FINAL;
-            resetXY(transXY);
-        } else if(imageScale.value > MAX_SCALE_FINAL){//松手后如果缩放超过最大值自动还原
-            needTransition.value = true;
-            imageScale.value = MAX_SCALE_FINAL;
-            resetXY(transXY, maxScaleFinalXY);
         }
         
         cursorType.value = "grab";
