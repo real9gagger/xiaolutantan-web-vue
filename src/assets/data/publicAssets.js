@@ -42,6 +42,7 @@ const AssetsPathMap = {
     iconSharePictureMarker: "icons/share_picture_marker.png",
     iconSharePictureActiviting: "icons/share_picture_activiting.png",
     iconSharePictureVisited: "icons/share_picture_visited.png",
+    iconCloseXGrey: "icons/close_x_grey.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",
@@ -53,6 +54,7 @@ const AssetsPathMap = {
     imageRegionShi: "images/region_shi.png",
     imageRegionXian: "images/region_xian.png",
     imageRegionZhen: "images/region_zhen.png",
+    imageMapCanalThumbnail: "images/map_canal_thumbnail.png",
 };
 
 if(THE_BU){

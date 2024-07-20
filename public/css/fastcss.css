@@ -40,7 +40,12 @@ input:-webkit-autofill {transition: background-color 3600s ease-in-out 0s}
 input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 
 :root{
-	--main-color:#43BA62;	/* 主色 */
+	--main-color:#43BA62; /* 主色 */
+    --bg-close-x-grey: url("../icons/close_x_grey.png"); /* 必须用相对路径！ */
+    --bg-share-picture-marker: url("../icons/share_picture_marker.png"); /* 必须用相对路径！ */
+    --bg-share-picture-activiting: url("../icons/share_picture_activiting.png"); /* 必须用相对路径！ */
+    --bg-share-picture-visited: url("../icons/share_picture_visited.png"); /* 必须用相对路径！ */
+    --bg-map-canal-thumbnail: url("../images/map_canal_thumbnail.png"); /* 必须用相对路径！ */
 }
 
 .hv-mc:hover{color:var(--main-color)}

@@ -7,7 +7,7 @@
 <script setup name="TestMapDev">
     import { onMounted, onUnmounted, getCurrentInstance } from "vue";
     import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canalGeo.js";
-    import { toBMapPoints } from "@/utils/maphelper.js";
+    import { toBMapPoints, getPolylineColorList, gcj02ToBD09, bd09ToGCJ02 } from "@/utils/maphelper.js";
     import { appMainColor } from "@/assets/data/constants.js";
     
     import axios from "axios";
@@ -80,7 +80,40 @@
             strokeOpacity: 1
         })); */
         
-        const dddd = getCanalGeoJSON();
+        const vglView = new mapvgl.View({
+            map: mapInstance
+        });
+        const canalPoints = combineCanalGeoJSON().map(gcj02ToBD09);
+        const lrLayer = new mapvgl.LineRainbowLayer({
+            style: "normal", // road, arrow, normal
+            width: 6,
+            color: getPolylineColorList(0x00dddd, 0x1296db, 32),
+            lineCap: "round",
+            lineJoin: "round",
+            antialias: true,
+            data: [{
+                type:"Feature",
+                geometry: {
+                    type: "LineString",
+                    coordinates: canalPoints,
+                }
+            }],
+            renderOrder: 1
+        });
+        vglView.addLayer(lrLayer);
+        mapInstance.addEventListener("click", function(){
+            const bds = mapInstance.getBounds();
+            console.log(bd09ToGCJ02(bds.getSouthWest()), bd09ToGCJ02(bds.getNorthEast()));
+        });
+        mapInstance.addEventListener("dragging", function(){
+            const idx = canalPoints.length - 3;
+            const p1 = mapInstance.pointToPixel(new BMapGL.Point(canalPoints[0][0], canalPoints[0][1]));
+            const p2 = mapInstance.pointToPixel(new BMapGL.Point(canalPoints[idx][0], canalPoints[idx][1]));
+            
+            console.log(400 - p1.x, p1.y, "::::", p2.x, 800 - p2.y);
+        });
+        
+        /* const dddd = getCanalGeoJSON();
         mapInstance.addOverlay(new BMapGL.Polyline(toBMapPoints(dddd.upperSection), {
             strokeStyle: 'solid',
             strokeColor: "#00dddd",
@@ -92,7 +125,7 @@
             strokeColor: "#0088db",
             strokeWeight: 8,
             strokeOpacity: 1
-        }));
+        })); */
     });
     
     onUnmounted(() => {
@@ -113,8 +146,8 @@
 
 <style scoped="scoped">
     .map-dev-box{
-        width: 15rem;
-        height: 15rem;
+        width: 20rem;
+        height: 40rem;
     }
     :deep(.anchorBL){display:none !important;}
 </style>

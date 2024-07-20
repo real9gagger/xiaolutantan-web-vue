@@ -86,27 +86,27 @@
         } else {
             return num;
         }
-    };
+    }
     function getDisPx(evt){//两指之间的距离（像素）
         const dis = Math.hypot(
             evt.touches[1].clientX - evt.touches[0].clientX,
             evt.touches[1].clientY - evt.touches[0].clientY
         );
         return Math.max(dis, 1); //至少一像素
-    };
+    }
     function getCenterXY(evt){//两指间的中心点（相对于元素左上角的点，像素）
         return [
             (evt.touches[0].clientX + evt.touches[1].clientX) / 2 - evt.target.offsetLeft,
             (evt.touches[0].clientY + evt.touches[1].clientY) / 2 - evt.target.offsetTop
         ];
-    };
+    }
     function getFingerXY(evt){//获取单指触控点的相对于元素左上角的点
         //注意：[clientX, clientY] 是相对于屏幕左上角的点，而非相对于元素左上角
         return [
             evt.touches[0].clientX - evt.target.offsetLeft,
             evt.touches[0].clientY - evt.target.offsetTop,
         ];
-    };
+    }
     function getTransXY(evt){//获取双击时的偏移量
         if(evt.type === "touchstart"){
             return [
@@ -119,7 +119,7 @@
                 -(evt.offsetY - imageHeight.value * ORIGIN_Y) * scaleOffset.value,
             ];
         }
-    };
+    }
     function resetXY(arr, xy){//重置设置数组值
         if(!xy || !xy.length){
             arr[0] = 0;
@@ -339,7 +339,7 @@
         maxScaleFinalXY[2] = 0; //标记为未设置值
         
         resetXY(moveVelocityXY);
-    };
+    }
     function onImgLoad(evt){
         //console.log("图片加载完成…", evt);
         imageWidth.value = evt.target.width;

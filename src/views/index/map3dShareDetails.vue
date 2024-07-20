@@ -31,6 +31,7 @@
             <div class="fixed-limit-width msd-bottom-box fx-c fx-je" :class="{'hidden': isHideText}">
                 <span class="dp-bk">{{shareInfos.pictureList[picIndex].description || shareInfos.title}}</span>
             </div>
+            <map3d-canal-thumbnail :pic-lng="shareInfos.longitude" :pic-lat="shareInfos.latitude" />
         </template>
         <template v-else >
             <div class="content-cage" style="padding-top:15vh">
@@ -48,6 +49,7 @@
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import gestureImage from "@/components/gestureImage.vue";
+    import map3dCanalThumbnail from "@/components/map3dCanalThumbnail.vue";
     
     //swiper开发文档：https://www.swiper.com.cn/api/index.html
     //swiper属性大全：https://swiperjs.com/swiper-api

@@ -1,5 +1,6 @@
 {"styleJson": [
     {
+        "descText": "此地图样式是开发测试用的！",
         "featureType": "background",
         "elementType": "geometry",
         "stylers": {
@@ -90,6 +91,12 @@
             "visibility": "off"
         }
     }, {
+        "featureType": "highway",
+        "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    }, {
         "featureType": "highwaysign",
         "elementType": "labels.icon",
         "stylers": {
@@ -104,6 +111,13 @@
     }, {
         "featureType": "nationalway",
         "elementType": "labels",
+        "stylers": {
+            "visibility": "off"
+        }
+    },
+    {
+        "featureType": "nationalwaysign",
+        "elementType": "labels.icon",
         "stylers": {
             "visibility": "off"
         }

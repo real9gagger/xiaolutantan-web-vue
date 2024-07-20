@@ -32,7 +32,6 @@
             height: props.boxSize + "px",
             paddingTop: Math.round(10 * sizeRadio + paddingLT) + "px",
             paddingLeft: Math.round(18 * sizeRadio + paddingLT) + "px",
-            backgroundImage: "url(" + publicAssets.iconSharePictureMarker +")"
         };
     });
     const picStyle = computed(() => {
@@ -64,10 +63,10 @@
         }
         
         if(!isActiviting){
-            elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureVisited + ")";
+            elem.classList.replace("activiting", "visited");
             return null;
         } else {
-            elem.style.backgroundImage = "url(" + publicAssets.iconSharePictureActiviting + ")";
+            elem.classList.add("activiting");
             return elem;
         }
     }
@@ -97,7 +96,14 @@
         background-position: 0% 0%;
         background-size: 100% 100%;
         background-repeat: no-repeat;
+        background-image: var(--bg-share-picture-marker);
         animation: msp-callout-bubbling-kf 500ms ease 1;
+    }
+    .msp-callout-container.activiting{
+        background-image: var(--bg-share-picture-activiting);
+    }
+    .msp-callout-container.visited{
+        background-image: var(--bg-share-picture-visited);
     }
     .msp-callout-container.devtest{
         position: fixed;
