@@ -1,13 +1,12 @@
 <template>
     <div v-if="isShowing" class="mct-view-container" 
         :style="divStyle"
+        :class="{'grabbing': isGrabbing}"
         @touchstart="onBoxPointerDown"
-        @touchmove="onBoxPointerMove"
-        @touchend="onBoxPointerUp"
-        @transitionend="onBoxTransitionEnd"
-    >
+        @mousedown="onBoxPointerDown"
+        @transitionend="onBoxTransitionEnd">
         <a class="mct-view-close" @click="toggleShowing"></a>
-        <img ref="imgBox" class="mct-view-pin" :src="publicAssets.iconMyLocation" :style="imgStyle" />
+        <img ref="imgBox" class="mct-view-pin" draggable="false" :src="publicAssets.iconSharePictureRed" :style="imgStyle" />
     </div>
 </template>
 
@@ -36,6 +35,7 @@
     const BOX_MARGIN_PX = 10; //距离屏幕边缘的像素
     
     const isShowing = ref(true);
+    const isGrabbing = ref(false);
     const needTransition = ref(false); //是否需要动画支持
     const boxRect = reactive({
         boxWidth: 0,
@@ -45,7 +45,7 @@
         pxPerLnglatX: 0,
         pxPerLnglatY: 0,
     });
-    const posXY = reactive([BOX_MARGIN_PX, BOX_MARGIN_PX]);
+    const posXY = reactive([0, 0]);
     const divStyle = computed(() => ({
         transition: (needTransition.value ? "transform 200ms ease-out 0s" : "none"),
         transform: `translate(${posXY[0]}px, ${posXY[1]}px)`,
@@ -69,39 +69,57 @@
     }
     function onBoxPointerDown(evt){
         console.log("指针按下…", evt);
-        const canMove = (evt.touches.length === 1);
-        movementXY[0] = (canMove ? evt.touches[0].clientX : 0);
-        movementXY[1] = (canMove ? evt.touches[0].clientY : 0);
+        if(evt.type === "touchstart"){
+            const canMove = (evt.touches.length === 1);
+            movementXY[0] = (canMove ? evt.touches[0].clientX : 0);
+            movementXY[1] = (canMove ? evt.touches[0].clientY : 0);
+            document.ontouchmove = onBoxPointerMove;
+            document.ontouchend = onBoxPointerUp;
+        } else {
+            movementXY[0] = 0x168; //随便一个大于0的数即可
+            movementXY[1] = 0x168;
+            document.onmousemove = onBoxPointerMove;
+            document.onmouseup = onBoxPointerUp;
+        }
+        isGrabbing.value = true;
     }
     function onBoxPointerMove(evt){
         console.log("指针移到…", evt);
         if(movementXY[0] || movementXY[1]){
-            const cXY = [
-                evt.touches[0].clientX,
-                evt.touches[0].clientY
-            ];
-            posXY[0] = getNumberBetween(posXY[0] + cXY[0] - movementXY[0], limitXM[0], limitXM[1]);
-            posXY[1] = getNumberBetween(posXY[1] + cXY[1] - movementXY[1], limitYM[0], limitYM[1]);
-            movementXY[0] = cXY[0];
-            movementXY[1] = cXY[1];
+            if(evt.type === "touchmove"){
+                const cXY = [evt.touches[0].clientX, evt.touches[0].clientY];
+                posXY[0] = getNumberBetween(posXY[0] + cXY[0] - movementXY[0], limitXM[0], limitXM[1]);
+                posXY[1] = getNumberBetween(posXY[1] + cXY[1] - movementXY[1], limitYM[0], limitYM[1]);
+                movementXY[0] = cXY[0];
+                movementXY[1] = cXY[1];
+            } else {
+                posXY[0] = getNumberBetween(posXY[0] + evt.movementX, limitXM[0], limitXM[1]);
+                posXY[1] = getNumberBetween(posXY[1] + evt.movementY, limitYM[0], limitYM[1]);
+            }
         }
     }
     function onBoxPointerUp(evt){
         console.log("指针松开…", evt);
         if(movementXY[0] || movementXY[1]){
+            document.onmouseup = null;
+            document.onmousemove = null;
+            document.ontouchmove = null;
+            document.ontouchend = null;
+            
             const wiw = window.innerWidth;
             const wih = window.innerHeight;
-            
-            needTransition.value = true;
+            const olds = [...posXY];
             
             posXY[0] = (posXY[0] > (wiw / 2) ? (wiw - boxRect.boxWidth - BOX_MARGIN_PX) : BOX_MARGIN_PX);
             posXY[1] = getNumberBetween(posXY[1], BOX_MARGIN_PX, wih - boxRect.boxHeight - BOX_MARGIN_PX);
             
-            movementXY[0] = 0;
-            movementXY[1] = 0;
+            needTransition.value = (olds[0] !== posXY[0] || olds[1] !== posXY[1]);
+
+            movementXY[0] = movementXY[1] = 0;
+            isGrabbing.value = false;
         }
     }
-    function onImgTransitionEnd(evt){
+    function onBoxTransitionEnd(evt){
         //console.log("过渡结束…", evt);
         needTransition.value = false;
     }
@@ -116,6 +134,8 @@
         
         limitXM[1] = (window.innerWidth - boxRect.boxWidth);
         limitYM[1] = (window.innerHeight - boxRect.boxHeight);
+        posXY[0] = BOX_MARGIN_PX;
+        posXY[1] = window.innerHeight / 2;
     });
 </script>
 
@@ -125,14 +145,18 @@
         left: 0;
         top: 0;
         z-index: 8888;
-        width: 5rem;
-        height: 10rem;
+        width: 4rem;
+        height: 8rem;
         background-position: 0% 0%;
         background-size: 100% 100%;
         background-repeat: no-repeat;
         background-image: var(--bg-map-canal-thumbnail);
         box-shadow: 0 0 0.5rem 0 #ccc;
-        border-radius: 0.5rem;
+        border-radius: 0.3rem;
+        cursor: grab;
+    }
+    .mct-view-container.grabbing{
+        box-shadow: 0 0 0.5rem 0 #aaa;
     }
     .mct-view-pin{
         display: block;

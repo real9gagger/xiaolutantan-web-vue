@@ -43,6 +43,7 @@ const AssetsPathMap = {
     iconSharePictureActiviting: "icons/share_picture_activiting.png",
     iconSharePictureVisited: "icons/share_picture_visited.png",
     iconCloseXGrey: "icons/close_x_grey.png",
+    iconSharePictureRed: "icons/share_picture_red.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

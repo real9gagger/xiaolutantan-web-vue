@@ -83,6 +83,7 @@
         background-image: linear-gradient(0deg,rgba(255,255,255,0),rgba(255,255,255,0.7));
         transform: translateY(0%);
         transition: transform 300ms;
+        user-select: none;
     }
     .msd-userinfo-box.hidden{
         transform: translateY(-100%);
@@ -102,6 +103,7 @@
         background-image: linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.7));
         transform: translateY(0%);
         transition: transform 300ms;
+        user-select: none;
     }
     .msd-bottom-box.hidden{
         transform: translateY(100%);
