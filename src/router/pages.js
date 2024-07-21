@@ -12,6 +12,12 @@ export default [
         meta: {}
 	},
     {
+    	path: "/error",
+    	name: "服务器错误",
+    	component: () => import("@/views/error/index"),
+    	meta: {}
+    },
+    {
     	path: "/e404",
     	name: "找不到页面",
     	component: () => import("@/views/error/http404"),

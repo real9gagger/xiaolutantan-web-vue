@@ -91,6 +91,6 @@
         flex: 1;
         font-size: 0.8rem;
         padding: 0 0.5rem;
-        min-height: 1.1rem;
+        min-height: 1.2rem;
     }
 </style>

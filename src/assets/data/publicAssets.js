@@ -56,6 +56,7 @@ const AssetsPathMap = {
     imageRegionXian: "images/region_xian.png",
     imageRegionZhen: "images/region_zhen.png",
     imageMapCanalThumbnail: "images/map_canal_thumbnail.png",
+    imageServerError: "images/server_error.png",
 };
 
 if(THE_BU){
