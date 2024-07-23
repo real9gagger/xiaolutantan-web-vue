@@ -11,7 +11,7 @@
     const $router = useRouter();
     
     function gotoShareAdd(){
-        $router.push("/shareadd")
+        $router.push("/shareadd");
     }
 </script>
 

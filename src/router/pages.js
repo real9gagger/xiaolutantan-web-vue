@@ -66,6 +66,14 @@ export default [
         }
     },
     {
+    	path: "/map3dpicker",
+    	name: "选择地点",
+    	component: () => import("@/views/index/map3dPositionPicker"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/login",
     	name: "用户登录",
     	component: () => import("@/views/login/index"),
