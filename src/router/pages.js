@@ -72,5 +72,21 @@ export default [
     	meta: {
             showPageTitle: true
         }
+    },
+    {
+    	path: "/mine",
+    	name: "个人中心",
+    	component: () => import("@/views/mine/index"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
+    	path: "/shareadd",
+    	name: "分享照片",
+    	component: () => import("@/views/mine/shareAdd"),
+    	meta: {
+            showPageTitle: true
+        }
     }
 ];

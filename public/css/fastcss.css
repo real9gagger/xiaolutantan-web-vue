@@ -33,7 +33,7 @@ input[type=text],
 input[type=time],
 input[type=url],
 input[type=week],
-select,textarea{width:100%;outline:0}
+select,textarea{width:100%;outline:0;font-family:inherit}
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button{-webkit-appearance: none !important}/* chrome 去掉箭头 */
 input:-webkit-autofill {transition: background-color 3600s ease-in-out 0s}
@@ -45,6 +45,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
     --bg-share-picture-marker: url("../icons/share_picture_marker.png"); /* 必须用相对路径！ */
     --bg-share-picture-activiting: url("../icons/share_picture_activiting.png"); /* 必须用相对路径！ */
     --bg-share-picture-visited: url("../icons/share_picture_visited.png"); /* 必须用相对路径！ */
+    --bg-add-share-pictures: url("../icons/add_share_pictures.png"); /* 必须用相对路径！ */
     --bg-map-canal-thumbnail: url("../images/map_canal_thumbnail.png"); /* 必须用相对路径！ */
 }
 
@@ -372,6 +373,9 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .bd-t-dd{border-top:0.05rem solid #ddd}.bd-b-dd{border-bottom:0.05rem solid #ddd}
 .bd-l-dd{border-left:0.05rem solid #ddd}
 .bd-r-dd{border-right:0.05rem solid #ddd}
+.bd-t-f0{border-top:0.05rem solid #f0f0f0}.bd-b-f0{border-bottom:0.05rem solid #f0f0f0}
+.bd-l-f0{border-left:0.05rem solid #f0f0f0}
+.bd-r-f0{border-right:0.05rem solid #f0f0f0}
 
 .dp-hx{display:none !important}
 .dp-hd{display:none} /* hide */
