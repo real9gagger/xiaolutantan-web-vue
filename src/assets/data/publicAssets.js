@@ -52,6 +52,7 @@ const AssetsPathMap = {
     iconPoiNoResults: "icons/poi_no_results.png",
     iconCheckV: "icons/check_v.png",
     iconSearchGrey: "icons/search_grey.png",
+    iconSearchGreen: "icons/search_green.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div id="positionPickerMapBox" class="wi-f hi-cwh"></div>
+    <div class="hi-cwh">
+        <div id="positionPickerMapBox" class="wi-f" style="height:60vh"></div>
         <div class="mpp-my-location" :class="{'mpp-positionning-ani': isPositionning}" @click="onPositionMyLocation"><img :src="publicAssets.iconMapLocationPosition" class="wh-f" alt="定位到我的位置" /></div>
         <div class="mpp-pin-box">
             <img class="mpp-pin-icon" alt="地图中心点"
@@ -9,22 +9,20 @@
                 @animationend="onImgAnimationEnd" />
             <span class="mpp-pin-shadow" :class="{'scaling': mapPinUpDowning}"><!-- 底部阴影 --></span>
         </div>
-        <div class="mpp-search-panel fx-c of-no-sb">
-            <!-- <div class="ta-c pd-tb-rem5 bg-ff ps-s">
-            	<span class="dp-ib bg-ee va-m br-rem5" style="width:20%;height:0.3rem"></span>
-            </div> -->
-            <div class="pd-rem5 bg-ff ps-s">
-                <img :src="publicAssets.iconSearchGrey" class="ps-a po-t-c wh-1em" style="left:1rem" />
+        <slide-search-panel scroller-id="searchResultsListBox">
+            <div class="pd-rem5 ps-r">
+                <img :src="!isSearchFocus ? publicAssets.iconSearchGrey : publicAssets.iconSearchGreen" class="ps-a po-t-c wh-1em" style="left:1.2rem" />
                 <input type="search" maxlength="60" class="mpp-search-input" placeholder="搜索地点" @focus="onInputFocusOrBlur" @blur="onInputFocusOrBlur" />
             </div>
-            <div v-if="!poiList" class="pd-1rem ta-c">
+            <div v-if="isSearchFocus" class="fx-g1"><!-- 占位专用 --></div>
+            <div v-else-if="!poiList" class="pd-1rem ta-c fx-g1">
                 <img :src="publicAssets.imageLoadingGif" class="dp-ib wh-2rem" />
             </div>
-            <div v-else-if="!poiList.length" class="pd-1rem ta-c">
+            <div v-else-if="!poiList.length" class="pd-1rem ta-c fx-g1">
                 <img :src="publicAssets.iconPoiNoResults" class="dp-ib wh-3rem" />
                 <p class="mg-t-rem5 tc-cc">当前位置暂无数据</p>
             </div>
-            <ul v-else class="pd-rem5 us-n">
+            <ul v-else class="pd-lr-rem5 fx-g1 of-a of-no-sb" id="searchResultsListBox">
                 <li v-for="item,idx in poiList" :key="item.uid" class="mpp-poi-item" @click="onPoiItemSelected(idx)">
                     <p :class="{'tc-mc': poiIndex===idx}">{{item.title}}</p>
                     <p class="fs-rem6" :class="poiIndex===idx ? 'tc-g2': 'tc-99'">{{item.distance}} | {{item.address}}</p>
@@ -32,10 +30,10 @@
                 </li>
                 <li class="pd-t-rem5 ta-c tc-aa fs-rem6">没有更多了~</li>
             </ul>
-            <div v-show="!isSearchFocus" class="pd-rem5 bg-ff ps-s po-b-0">
+            <div v-show="!isSearchFocus" class="pd-rem5">
                 <button class="btn-box" :class="{'disabled': !poiList?.length}" @click="onConfirm">确 定</button>
             </div>
-        </div>
+        </slide-search-panel>
     </div>
 </template>
 
@@ -43,6 +41,7 @@
     import { nextTick, onMounted, onUnmounted, ref } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
     import { getFriendlyDistance } from "@/utils/maphelper.js";
+    import slideSearchPanel from "@/components/slideSearchPanel.vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     let mapInstance = null; //地图实例。单独放在外面，避免被 vue 响应化处理（避免添加太多 getter/setter 造成卡顿）。
@@ -72,10 +71,7 @@
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
         mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMapGL.Size(10, 6) })); //添加比例尺控件
         mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_TOP_RIGHT, offset: new BMapGL.Size(10, 10) }));//添加缩放控件
-        mapInstance.setViewport([ //默认视图款
-            (new BMapGL.Point(108.415365, 22.817497)),
-            (new BMapGL.Point(109.375871, 21.592572))
-        ]);
+        mapInstance.centerAndZoom(new BMapGL.Point(108.95692720580574, 22.286438780735033), 8);
         mapInstance.addEventListener("dragend", onMapDragEnd);
     }
     function onMapDragEnd(evt){
@@ -123,21 +119,19 @@
         poiList.value = null;
         
         geocoder.getLocation(centerPoint, function(res){
-            console.log(res);
+            //console.log(res);
             poiList.value = (res?.surroundingPois || []).map(vx => ({
                 uid: vx.uid,
                 address: vx.address,
                 title: vx.title,
-                lng: vx.point.lng,
-                lat: vx.point.lat,
+                point: vx.point,
                 distance: getFriendlyDistance(centerPoint, vx.point)
             }));
-            
-            console.log(poiList.value)
-        }, {poiRadius: 500, numPois: 20});
+        }, {poiRadius: 1000, numPois: 30});
     }
     function onPoiItemSelected(idx){
         poiIndex.value = idx;
+        mapInstance.panTo(poiList.value[idx].point);
     }
     function onConfirm(){
         
@@ -180,7 +174,7 @@
     .mpp-pin-box{
         position: fixed;
         left: 50%;
-        top: 50%;
+        top: 30vh;
         transform: translate(-50%, -2.5rem);
         z-index: 88;
     }
@@ -225,21 +219,10 @@
     .mpp-positionning-ani{
         animation: mcv-location-positionning-kf 1s ease infinite; /* 动画帧在控件 “map3dControlVertical” 里定义 */
     }
-    .mpp-search-panel{
-        position: fixed;
-        left: 0.5rem;
-        right: 0.5rem;
-        bottom: 0.5rem;
-        z-index: 99;
-        background-color: #fff;
-        border-radius: 0.5rem;
-        border: 0.05rem solid #eee;
-        max-height: 60vh;
-        overflow: auto;
-    }
+    
     .mpp-search-input{
         background-color: #f0f0f0;
-        padding: 0.4rem 1.6rem;
+        padding: 0.4rem 2rem;
         border-radius: 3rem;
         border: 0.1rem solid #f0f0f0;
     }
