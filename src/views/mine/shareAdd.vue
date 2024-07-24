@@ -14,7 +14,7 @@
             </div>
             <div class="mg-b-rem5 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 tp-f0 us-n" @click="gotoAddressPicker">
-                <img :src="publicAssets.iconAddShareLocation" style="width:1rem;height:1rem;" />
+                <img :src="publicAssets.iconAddShareLocation" class="wh-1rem" />
                 <a class="mg-lr-rem25 tc-99 fx-g1">添加照片拍摄位置</a>
                 <img :src="publicAssets.iconArrowRight" style="width:0.8rem;height:0.8rem;opacity:0.6;" />
             </div>
@@ -85,7 +85,6 @@
         display: block;
         border: 0;
         resize: none;
-        font-size: 0.8rem;
         padding: 0;
         line-height: 1.5;
     }

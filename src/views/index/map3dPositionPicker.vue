@@ -1,7 +1,7 @@
 <template>
     <div>
         <div id="positionPickerMapBox" class="wi-f hi-cwh"></div>
-        <a class="mpp-my-location" :class="{'mpp-positionning-ani': isPositionning}" @click="onPositionMyLocation"><img :src="publicAssets.iconMapLocationPosition" class="wh-f" alt="定位到我的位置" /></a>
+        <div class="mpp-my-location" :class="{'mpp-positionning-ani': isPositionning}" @click="onPositionMyLocation"><img :src="publicAssets.iconMapLocationPosition" class="wh-f" alt="定位到我的位置" /></div>
         <div class="mpp-pin-box">
             <img class="mpp-pin-icon" alt="地图中心点"
                 :src="publicAssets.iconMapPositionPin" 
@@ -9,18 +9,49 @@
                 @animationend="onImgAnimationEnd" />
             <span class="mpp-pin-shadow" :class="{'scaling': mapPinUpDowning}"><!-- 底部阴影 --></span>
         </div>
+        <div class="mpp-search-panel fx-c of-no-sb">
+            <!-- <div class="ta-c pd-tb-rem5 bg-ff ps-s">
+            	<span class="dp-ib bg-ee va-m br-rem5" style="width:20%;height:0.3rem"></span>
+            </div> -->
+            <div class="pd-rem5 bg-ff ps-s">
+                <img :src="publicAssets.iconSearchGrey" class="ps-a po-t-c wh-1em" style="left:1rem" />
+                <input type="search" maxlength="60" class="mpp-search-input" placeholder="搜索地点" @focus="onInputFocusOrBlur" @blur="onInputFocusOrBlur" />
+            </div>
+            <div v-if="!poiList" class="pd-1rem ta-c">
+                <img :src="publicAssets.imageLoadingGif" class="dp-ib wh-2rem" />
+            </div>
+            <div v-else-if="!poiList.length" class="pd-1rem ta-c">
+                <img :src="publicAssets.iconPoiNoResults" class="dp-ib wh-3rem" />
+                <p class="mg-t-rem5 tc-cc">当前位置暂无数据</p>
+            </div>
+            <ul v-else class="pd-rem5 us-n">
+                <li v-for="item,idx in poiList" :key="item.uid" class="mpp-poi-item" @click="onPoiItemSelected(idx)">
+                    <p :class="{'tc-mc': poiIndex===idx}">{{item.title}}</p>
+                    <p class="fs-rem6" :class="poiIndex===idx ? 'tc-g2': 'tc-99'">{{item.distance}} | {{item.address}}</p>
+                    <img v-if="poiIndex===idx" :src="publicAssets.iconCheckV" class="mpp-poi-checked" />
+                </li>
+                <li class="pd-t-rem5 ta-c tc-aa fs-rem6">没有更多了~</li>
+            </ul>
+            <div v-show="!isSearchFocus" class="pd-rem5 bg-ff ps-s po-b-0">
+                <button class="btn-box" :class="{'disabled': !poiList?.length}" @click="onConfirm">确 定</button>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup name="IndexMap3DPositionPicker">
     import { nextTick, onMounted, onUnmounted, ref } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
+    import { getFriendlyDistance } from "@/utils/maphelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     let mapInstance = null; //地图实例。单独放在外面，避免被 vue 响应化处理（避免添加太多 getter/setter 造成卡顿）。
     
     const mapPinUpDowning = ref(false);
     const isPositionning = ref(false); //是否正在定位
+    const poiList = ref(null);
+    const poiIndex = ref(0);
+    const isSearchFocus = ref(false);
     
     function buildBaiduMap(){//创建百度地图
         //请确保已在 /piblic/index.html 中引入百度地图 JS API 脚本！
@@ -39,8 +70,8 @@
         //百度地图JSAPI WebGL v1.0类参考 https://mapopen-pub-jsapi.bj.bcebos.com/jsapi/reference/jsapi_webgl_1_0.html
         mapInstance.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
-        mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT, offset: new BMapGL.Size(15, 15) })); //添加比例尺控件
-        mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT, offset: new BMapGL.Size(15, 45) }));//添加缩放控件
+        mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMapGL.Size(10, 6) })); //添加比例尺控件
+        mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_TOP_RIGHT, offset: new BMapGL.Size(10, 10) }));//添加缩放控件
         mapInstance.setViewport([ //默认视图款
             (new BMapGL.Point(108.415365, 22.817497)),
             (new BMapGL.Point(109.375871, 21.592572))
@@ -48,10 +79,8 @@
         mapInstance.addEventListener("dragend", onMapDragEnd);
     }
     function onMapDragEnd(evt){
-        console.log(evt)
-        needDebounce(function(){
-            mapPinUpDowning.value = true;
-        }, 500);
+        //console.log(evt)
+        needDebounce(onGeocoderPoint, 800);
     }
     function onImgAnimationEnd(evt){
         mapPinUpDowning.value = false;
@@ -85,6 +114,36 @@
             enableHighAccuracy: true, //是否要求浏览器获取最佳效果，同浏览器定位接口参数。默认为false
             timeout: 15, //超时时间，单位为毫秒。默认为10秒
         });
+    }
+    function onGeocoderPoint(){
+        const geocoder = new BMapGL.Geocoder();
+        const centerPoint = mapInstance.getCenter();
+        
+        mapPinUpDowning.value = true;
+        poiList.value = null;
+        
+        geocoder.getLocation(centerPoint, function(res){
+            console.log(res);
+            poiList.value = (res?.surroundingPois || []).map(vx => ({
+                uid: vx.uid,
+                address: vx.address,
+                title: vx.title,
+                lng: vx.point.lng,
+                lat: vx.point.lat,
+                distance: getFriendlyDistance(centerPoint, vx.point)
+            }));
+            
+            console.log(poiList.value)
+        }, {poiRadius: 500, numPois: 20});
+    }
+    function onPoiItemSelected(idx){
+        poiIndex.value = idx;
+    }
+    function onConfirm(){
+        
+    }
+    function onInputFocusOrBlur(evt){
+        isSearchFocus.value = (evt.type === "focus");
     }
     
     onMounted(() => {
@@ -121,8 +180,8 @@
     .mpp-pin-box{
         position: fixed;
         left: 50%;
-        bottom: 50%;
-        transform: translateX(-50%);
+        top: 50%;
+        transform: translate(-50%, -2.5rem);
         z-index: 88;
     }
     .mpp-pin-icon{
@@ -151,10 +210,9 @@
         animation: mpp-pin-scale-kf 1s ease 0s 1 normal;
     }
     .mpp-my-location{
-        display: block;
         position: fixed;
-        right: 0.6rem;
-        bottom: 6rem;
+        right: 0.35rem;
+        top: 3.5rem;
         z-index: 88;
         width: 1.6rem;
         height: 1.6rem;
@@ -162,9 +220,54 @@
         background-color: #fff;
         box-shadow: 0 0 0.5rem 0 #ccc;
         border-radius: 50%;
+        cursor: pointer;
     }
     .mpp-positionning-ani{
         animation: mcv-location-positionning-kf 1s ease infinite; /* 动画帧在控件 “map3dControlVertical” 里定义 */
+    }
+    .mpp-search-panel{
+        position: fixed;
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: 0.5rem;
+        z-index: 99;
+        background-color: #fff;
+        border-radius: 0.5rem;
+        border: 0.05rem solid #eee;
+        max-height: 60vh;
+        overflow: auto;
+    }
+    .mpp-search-input{
+        background-color: #f0f0f0;
+        padding: 0.4rem 1.6rem;
+        border-radius: 3rem;
+        border: 0.1rem solid #f0f0f0;
+    }
+    .mpp-search-input:focus{
+        border-color: var(--main-color);
+    }
+    .mpp-poi-item{
+        padding: 0.5rem 0;
+        border-bottom: 0.05rem solid #f0f0f0;
+        position: relative;
+        cursor: pointer;
+    }
+    .mpp-poi-item:active::before{
+        content: "";
+        display: block;
+        position: absolute;
+        inset: 0 -0.5rem 0 -0.5rem;
+        background-color: #f0f0f0;
+        z-index: -1;
+    }
+    .mpp-poi-checked{
+        display: block;
+        position: absolute;
+        right: 0;
+        top: calc(50% - 0.5rem);
+        z-index: 1;
+        width: 1rem;
+        height: 1rem;
     }
     
     :deep(.anchorBL){display:none !important;}
