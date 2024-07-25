@@ -46,7 +46,7 @@
         mapInstance.enableResizeOnCenter(); //开启图区resize中心点不变
         mapInstance.addControl(new BMapGL.ScaleControl({ anchor: BMAP_ANCHOR_TOP_LEFT, offset: new BMapGL.Size(10, 6) })); //添加比例尺控件
         mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_TOP_RIGHT, offset: new BMapGL.Size(10, 10) }));//添加缩放控件
-        mapInstance.centerAndZoom(new BMapGL.Point(108.95692720580574, 22.286438780735033), 10);
+        mapInstance.centerAndZoom(new BMapGL.Point(108.95692705, 22.28643878), 10);
         mapInstance.addEventListener("dragend", onMapDragEnd);
     }
     function onMapDragEnd(evt){

@@ -36,8 +36,9 @@ input[type=week],
 select,textarea{width:100%;outline:0;font-family:inherit;font-size:inherit}
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button{-webkit-appearance: none !important}/* chrome 去掉箭头 */
-input:-webkit-autofill {transition: background-color 3600s ease-in-out 0s}
+input:-webkit-autofill{transition: background-color 3600s ease-in-out 0s}
 input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
+input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 
 :root{
 	--main-color:#43BA62; /* 主色 */

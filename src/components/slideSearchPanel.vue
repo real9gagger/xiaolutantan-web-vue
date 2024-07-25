@@ -11,7 +11,7 @@
         @mouseleave="onPanelTouchEnd">
         <div class="pd-rem5 ps-r fx-hc">
             <img :src="isSearchFocus ? publicAssets.iconSearchGreen : publicAssets.iconSearchGrey" alt="搜索图标" class="ps-a po-t-c wh-1rem" style="left:1.2rem" />
-            <input v-model="searchKeywords" type="search" maxlength="60" class="ssp-search-input" placeholder="搜索地点" @focus="onInputFocusOrBlur" @blur="onInputFocusOrBlur" />
+            <input v-model="searchKeywords" type="search" maxlength="60" class="ssp-search-input" placeholder="搜索地点" @focus="onInputFocusOrBlur" @blur="onInputFocusOrBlur" @keydown.enter="onInputKeydownEnter" />
             <img v-show="!isSearchFocus" :src="publicAssets.iconMapRestoreGrey" alt="还原地图视图" class="ssp-my-location" @click="onMapZoomRestore" />
             <img v-show="!isSearchFocus" :src="publicAssets.iconUpOrDown" alt="面板展开或收起" class="ssp-my-location" @click="onPanelUpOrDown" />
             <img v-show="!isSearchFocus" :src="isPositionning ? publicAssets.iconMapLocationPosition : publicAssets.iconMapLocationGrey" alt="定位到我的位置" class="ssp-my-location" :class="{'positionning': isPositionning}" @click="onPositionMyLocation" />
@@ -26,14 +26,14 @@
             <img :src="publicAssets.iconPoiNoResults" alt="暂无数据" draggable="false" class="dp-ib wh-3rem" />
             <p class="mg-t-rem5 tc-cc">当前位置暂无数据</p>
         </div>
-        <ul v-else class="pd-lr-rem5 fx-g1 of-no-sb" :id="SCROLLER_BOX_ID">
+        <ul v-else class="pd-lr-rem5 fx-g1 of-no-sb" :id="SCROLLER_BOX_ID" @scroll="onUlScroll">
             <li v-for="item,idx in poiList" :key="item.uid" class="ssp-poi-item" @click="onPoiItemSelected(idx)">
                 <p :class="{'tc-mc': poiIndex===idx}">{{item.title}}</p>
                 <p v-if="poiIndex===idx" class="fs-rem6 tc-g2">{{item.distance}} | {{item.address}} | <span class="tc-b0">近看</span></p>
                 <p v-else class="fs-rem6 tc-99">{{item.distance}} | {{item.address}}</p>
                 <img v-if="poiIndex===idx" :src="publicAssets.iconCheckV" alt="选中打勾" draggable="false" class="ssp-poi-checked" />
             </li>
-            <li class="pd-t-1rem pd-b-rem5 ta-c tc-aa fs-rem6">没有更多了~</li>
+            <li class="pd-t-1rem pd-b-rem5 ta-c tc-aa fs-rem6">{{isLoadingMore ? "正在加载更多…" : "没有更多了~"}}</li>
         </ul>
 
         <div v-show="!isSearchFocus" class="pd-rem5">
@@ -43,7 +43,7 @@
 </template>
 
 <script setup name="SlideSearchPanel">
-    import { ref, watch, defineProps, defineEmits, onMounted, nextTick } from "vue";
+    import { ref, watch, defineProps, defineEmits, onMounted, nextTick, onUnmounted } from "vue";
     import { getFriendlyDistance } from "@/utils/maphelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
@@ -69,16 +69,24 @@
     });
     const SCROLLER_BOX_ID = "sspSearchResultListBox";
     const AUTO_SLIDE_THRESHOLD = 40;
+    const PULL_UP_THRESHOLD = 40;
+    
     const panelHeight = ref(40);
     const isSearchFocus = ref(false);
     const isPositionning = ref(false); //是否正在定位
+    const isLoadingMore = ref(false); //是否正在加载更多
     const cursorType = ref("auto");
     const poiList = ref([]);
     const poiIndex = ref(0);
     const searchKeywords = ref("");
+    
     const touchStartXY = [0, 0];
     const nonRVs = { //非响应式变量（Non responsive variables）
-        isRunTransition: false
+        isRunTransition: false,
+        mapSearcher: null, //文字搜索器
+        mapGeocoder: null, //拖动搜索器
+        pageIndex: 0, //文字搜索时表示第几页内容
+        myLocalPoint: null
     };
     
     function onPanelTouchStart(evt){
@@ -146,6 +154,20 @@
     function onInputFocusOrBlur(evt){
         isSearchFocus.value = (evt.type === "focus");
     }
+    function onInputKeydownEnter(evt){
+        evt.target.blur();
+        if(searchKeywords.value){
+            if(!poiList.value){
+                return; //正在加载
+            } else {
+                poiList.value = null;
+            }
+            
+            nonRVs.pageIndex = 1; //因为是拖动搜索的，所以需要重置为 0
+            nonRVs.mapSearcher.clearResults();
+            nonRVs.mapSearcher.search(searchKeywords.value.trim());
+        }
+    }
     function onPoiItemSelected(idx){
         if(poiIndex.value === idx){
             emits("itemzoomin", poiList.value[idx].point);
@@ -168,6 +190,7 @@
         geolocation.getCurrentPosition(function(res) {
             const statusCode = geolocation.getStatus();
             if (statusCode === BMAP_STATUS_SUCCESS) {
+                nonRVs.myLocalPoint = res.point;
                 getPoiListByMapPoint(res.point);
                 emits("itemselected", res.point);
             } else if (statusCode === BMAP_STATUS_PERMISSION_DENIED) {
@@ -189,31 +212,77 @@
     function onMapZoomRestore(){
         emits("maprestore", poiList.value[poiIndex.value].point);
     }
+    function onUlScroll(evt){
+        const elem = evt.target;
+        //上拉加载更多，最多十页
+        if(!isLoadingMore.value && nonRVs.pageIndex >= 1 && nonRVs.pageIndex <= 10 && (elem.scrollTop + elem.clientHeight + PULL_UP_THRESHOLD) >= elem.scrollHeight){
+            isLoadingMore.value = true;
+            nonRVs.mapSearcher.gotoPage(++nonRVs.pageIndex);
+        }
+    }
+    function searchCompleteCallback(evt){
+        const isGeocoding = !!(evt?.surroundingPois); //是否是拖动搜索的
+        const resRows = (isGeocoding ? evt?.surroundingPois : evt?._pois) || [];
+        const pois = resRows.map(vx => ({
+            uid: vx.uid,
+            address: vx.address,
+            title: vx.title,
+            point: vx.point,
+            distance: getFriendlyDistance(nonRVs.myLocalPoint, vx.point)
+        }));
+        
+        poiIndex.value = 0;
+        isLoadingMore.value = false;
+        if(nonRVs.pageIndex > 1){
+            poiList.value.push(...pois);
+        } else {
+            poiList.value = pois;
+        }
+        
+        if(!poiList.value.length && isGeocoding && evt.point){
+            poiList.value.push({
+                uid: "P001",
+                address: evt.address || "暂无详细地址",
+                title: "地图中心点位置",
+                point: evt.point,
+                distance: "0m"
+            });
+        }
+        
+        if(isGeocoding && evt.addressComponents.city){
+            nonRVs.mapSearcher.setLocation(evt.addressComponents.city);
+        }
+    }
     function getPoiListByMapPoint(thePoint){
         if(!poiList.value || !thePoint){
             return; //正在加载
         } else {
             poiList.value = null;
-            poiIndex.value = 0;
         }
         
-        const geocoder = new BMapGL.Geocoder();
-        geocoder.getLocation(thePoint, function(res){
-            //console.log(res);
-            poiList.value = (res?.surroundingPois || []).map(vx => ({
-                uid: vx.uid,
-                address: vx.address,
-                title: vx.title,
-                point: vx.point,
-                distance: getFriendlyDistance(thePoint, vx.point)
-            }));
-        }, {poiRadius: 1000, numPois: 30});
+        nonRVs.pageIndex = 0; //因为是拖动搜索的，所以需要重置为 0
+        nonRVs.mapGeocoder.getLocation(thePoint, searchCompleteCallback, { poiRadius: 1000, numPois: 20 });
     }
     
     watch(() => props.mapCenterPoint, getPoiListByMapPoint);
-    
     onMounted(() => {
+        nonRVs.mapSearcher = new BMapGL.LocalSearch("南宁市", {
+            pageCapacity: 20,
+            onSearchComplete: searchCompleteCallback
+        });
+        nonRVs.mapGeocoder = new BMapGL.Geocoder();
+        
         nextTick(onPositionMyLocation);
+    });
+    onUnmounted(() => {
+        if(nonRVs.mapSearcher){
+            nonRVs.mapSearcher.dispose();
+            nonRVs.mapSearcher = null;
+        }
+        if(nonRVs.mapGeocoder){
+            nonRVs.mapGeocoder.dispose();
+            nonRVs.mapGeocoder = null;
+        }
     });
 </script>
 
