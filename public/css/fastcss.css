@@ -289,6 +289,7 @@ input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 .of-hs{overflow-x:auto;overflow-y:hidden} /* horizontal scrollable */
 .of-te{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}/* 文本溢出显示省略号 */
 .of-lc1{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
+.of-no-sb{overflow:auto}
 .of-no-sb::-webkit-scrollbar{display:none}
 
 .fl-n{float:none}

@@ -52,14 +52,10 @@
             const statusCode = geolocation.getStatus();
             if (statusCode === BMAP_STATUS_SUCCESS) {
                 //console.log(res)
-                if(res.point){
-                    emits("positionlocation", {
-                        locationAddress: getMyAddress(res.address),
-                        locationPoint: res.point
-                    });
-                } else {
-                    appToast("定位失败：BMAP_STATUS_NULL_POINT");
-                }
+                emits("positionlocation", {
+                    locationAddress: getMyAddress(res.address),
+                    locationPoint: res.point
+                });
             } else if (statusCode === BMAP_STATUS_PERMISSION_DENIED) {
                 appToast("定位失败：BMAP_STATUS_PERMISSION_DENIED");
             } else if (statusCode === BMAP_STATUS_TIMEOUT) {

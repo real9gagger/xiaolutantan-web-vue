@@ -1,6 +1,5 @@
 <template>
-    <div class="ssp-search-panel"
-        :style="`height:${panelHeight}vh`"
+    <div class="ssp-search-panel" :style="`height:${panelHeight}vh;cursor:${cursorType}`"
         @touchstart="onPanelTouchStart"
         @touchmove="onPanelTouchMove"
         @touchend="onPanelTouchEnd"
@@ -9,15 +8,51 @@
         @mousedown="onPanelTouchStart"
         @mousemove="onPanelTouchMove"
         @mouseup="onPanelTouchEnd"
-        @mouseleave="onPanelTouchEnd"
-        @scroll="console.log"><slot />
-        <div v-show="isTouched.ttt" class="ssp-mask-box"></div>
+        @mouseleave="onPanelTouchEnd">
+        <div class="pd-rem5 ps-r fx-hc">
+            <img :src="isSearchFocus ? publicAssets.iconSearchGreen : publicAssets.iconSearchGrey" alt="搜索图标" class="ps-a po-t-c wh-1rem" style="left:1.2rem" />
+            <input v-model="searchKeywords" type="search" maxlength="60" class="ssp-search-input" placeholder="搜索地点" @focus="onInputFocusOrBlur" @blur="onInputFocusOrBlur" />
+            <img v-show="!isSearchFocus" :src="publicAssets.iconMapRestoreGrey" alt="还原地图视图" class="ssp-my-location" @click="onMapZoomRestore" />
+            <img v-show="!isSearchFocus" :src="publicAssets.iconUpOrDown" alt="面板展开或收起" class="ssp-my-location" @click="onPanelUpOrDown" />
+            <img v-show="!isSearchFocus" :src="isPositionning ? publicAssets.iconMapLocationPosition : publicAssets.iconMapLocationGrey" alt="定位到我的位置" class="ssp-my-location" :class="{'positionning': isPositionning}" @click="onPositionMyLocation" />
+        </div>
+
+        <div v-if="isSearchFocus" class="fx-g1"><!-- 占位专用 --></div>
+        <div v-else-if="!poiList" class="pd-1rem ta-c fx-g1">
+            <img :src="publicAssets.imageLoadingGif" alt="正在加载" draggable="false" class="dp-ib wh-2rem" />
+            <p class="mg-t-rem5 tc-mc">正在加载…</p>
+        </div>
+        <div v-else-if="!poiList.length" class="pd-1rem ta-c fx-g1">
+            <img :src="publicAssets.iconPoiNoResults" alt="暂无数据" draggable="false" class="dp-ib wh-3rem" />
+            <p class="mg-t-rem5 tc-cc">当前位置暂无数据</p>
+        </div>
+        <ul v-else class="pd-lr-rem5 fx-g1 of-no-sb" :id="SCROLLER_BOX_ID">
+            <li v-for="item,idx in poiList" :key="item.uid" class="ssp-poi-item" @click="onPoiItemSelected(idx)">
+                <p :class="{'tc-mc': poiIndex===idx}">{{item.title}}</p>
+                <p v-if="poiIndex===idx" class="fs-rem6 tc-g2">{{item.distance}} | {{item.address}} | <span class="tc-b0">近看</span></p>
+                <p v-else class="fs-rem6 tc-99">{{item.distance}} | {{item.address}}</p>
+                <img v-if="poiIndex===idx" :src="publicAssets.iconCheckV" alt="选中打勾" draggable="false" class="ssp-poi-checked" />
+            </li>
+            <li class="pd-t-1rem pd-b-rem5 ta-c tc-aa fs-rem6">没有更多了~</li>
+        </ul>
+
+        <div v-show="!isSearchFocus" class="pd-rem5">
+            <button class="btn-box" :class="{'disabled': !poiList?.length}" @click="onSelectedConfirm">确 定</button>
+        </div>
     </div>
 </template>
 
 <script setup name="SlideSearchPanel">
-    import { ref, defineProps } from "vue";
+    import { ref, watch, defineProps, defineEmits, onMounted, nextTick } from "vue";
+    import { getFriendlyDistance } from "@/utils/maphelper.js";
+    import publicAssets from "@/assets/data/publicAssets.js";
     
+    const emits = defineEmits([
+        "itemselected",//item-selected
+        "itemzoomin", //item-zoom-in
+        "itemconfirm",//item-confirm
+        "maprestore" //map-restore
+    ]);
     const props = defineProps({
         minHeight: {
             type: Number,
@@ -27,26 +62,33 @@
             type: Number,
             default: 80 /*单位：vh*/
         },
-        scrollerId: { /*滚动的元素的ID*/
-            type: String,
-            default: ""
+        mapCenterPoint: {
+            type: Object,
+            default: null
         }
     });
-    
+    const SCROLLER_BOX_ID = "sspSearchResultListBox";
     const AUTO_SLIDE_THRESHOLD = 40;
     const panelHeight = ref(40);
-    const isTouched = ref(false);
+    const isSearchFocus = ref(false);
+    const isPositionning = ref(false); //是否正在定位
+    const cursorType = ref("auto");
+    const poiList = ref([]);
+    const poiIndex = ref(0);
+    const searchKeywords = ref("");
     const touchStartXY = [0, 0];
-    //非响应式变量（Non responsive variables）
-    const nonRVs = { 
+    const nonRVs = { //非响应式变量（Non responsive variables）
         isRunTransition: false
     };
     
     function onPanelTouchStart(evt){
         //还原/重置
-        const elem = document.getElementById(props.scrollerId);
-        console.log(elem?.scrollTop)
+        const elem = document.getElementById(SCROLLER_BOX_ID);
         if(!elem || elem.scrollTop <= 0){//滚动位置为0时才处理
+            if(elem){
+                elem.style.overflow = (panelHeight.value !== props.maxHeight ? "hidden" : null);
+            }
+            
             if(evt.type === "touchstart"){
                 touchStartXY[0] = (evt.touches.length === 1 ? evt.touches[0].clientX : -1);
                 touchStartXY[1] = (evt.touches.length === 1 ? evt.touches[0].clientY : -1);
@@ -54,14 +96,7 @@
                 touchStartXY[0] = (evt.clientX);
                 touchStartXY[1] = (evt.clientY);
             }
-            if(elem && panelHeight.value !== props.maxHeight){
-                //evt.preventDefault();
-                //evt.stopPropagation();
-                elem.style.overflow = "hidden";
-            } else {
-                elem.style.overflow = null;
-            }
-            isTouched.value = (panelHeight.value !== props.maxHeight);
+            cursorType.value = "grab";
         } else {
             touchStartXY[0] = -1;
             touchStartXY[1] = -1;
@@ -96,13 +131,90 @@
         //还原/重置
         touchStartXY[0] = -1;
         touchStartXY[1] = -1;
-        isTouched.value = false;
+        
+        const elem = document.getElementById(SCROLLER_BOX_ID);
+        if(elem){
+            elem.style.overflow = null;
+        }
+        
+        cursorType.value = "auto";
     }
     function onPanelTransitionEnd(evt) {
         //动画执行结束
     	nonRVs.isRunTransition = false;
     }
+    function onInputFocusOrBlur(evt){
+        isSearchFocus.value = (evt.type === "focus");
+    }
+    function onPoiItemSelected(idx){
+        if(poiIndex.value === idx){
+            emits("itemzoomin", poiList.value[idx].point);
+        } else {
+            emits("itemselected", poiList.value[idx].point);
+        }
+        poiIndex.value = idx;
+    }
+    function onSelectedConfirm(){
+        emits("itemconfirm", poiList.value[poiIndex.value]);
+    }
+    function onPositionMyLocation() {
+        if (isPositionning.value) {
+            return;
+        } else {
+            isPositionning.value = true;
+        }
     
+        const geolocation = new BMapGL.Geolocation();
+        geolocation.getCurrentPosition(function(res) {
+            const statusCode = geolocation.getStatus();
+            if (statusCode === BMAP_STATUS_SUCCESS) {
+                getPoiListByMapPoint(res.point);
+                emits("itemselected", res.point);
+            } else if (statusCode === BMAP_STATUS_PERMISSION_DENIED) {
+                appToast("定位失败：BMAP_STATUS_PERMISSION_DENIED");
+            } else if (statusCode === BMAP_STATUS_TIMEOUT) {
+                appToast("定位失败：BMAP_STATUS_TIMEOUT");
+            } else {
+                appToast("定位失败：BMAP_STATUS_UNKNOWN_LOCATION");
+            }
+            setTimeout(() => (isPositionning.value = false), 1000);
+        }, {
+            enableHighAccuracy: true, //是否要求浏览器获取最佳效果，同浏览器定位接口参数。默认为false
+            timeout: 15, //超时时间，单位为毫秒。默认为10秒
+        });
+    }
+    function onPanelUpOrDown(){
+        panelHeight.value = (panelHeight.value !== props.maxHeight ? props.maxHeight : props.minHeight);
+    }
+    function onMapZoomRestore(){
+        emits("maprestore", poiList.value[poiIndex.value].point);
+    }
+    function getPoiListByMapPoint(thePoint){
+        if(!poiList.value || !thePoint){
+            return; //正在加载
+        } else {
+            poiList.value = null;
+            poiIndex.value = 0;
+        }
+        
+        const geocoder = new BMapGL.Geocoder();
+        geocoder.getLocation(thePoint, function(res){
+            //console.log(res);
+            poiList.value = (res?.surroundingPois || []).map(vx => ({
+                uid: vx.uid,
+                address: vx.address,
+                title: vx.title,
+                point: vx.point,
+                distance: getFriendlyDistance(thePoint, vx.point)
+            }));
+        }, {poiRadius: 1000, numPois: 30});
+    }
+    
+    watch(() => props.mapCenterPoint, getPoiListByMapPoint);
+    
+    onMounted(() => {
+        nextTick(onPositionMyLocation);
+    });
 </script>
 
 <style>
@@ -117,12 +229,52 @@
         background-color: #fff;
         user-select: none;
         transition: height 300ms;
-    }
-    .ssp-mask-box{
-        position: fixed;
-        inset: 0 0 0 0;
-        z-index: 8888;
+        box-shadow: 0 0 0.2rem 0 #eee;
         cursor: grab;
-        background-color: rgba(0,0,0,0.4);
+    }
+    .ssp-search-input{
+        background-color: #f0f0f0;
+        padding: 0.4rem 2rem;
+        border-radius: 3rem;
+        border: 0.1rem solid #f0f0f0;
+        flex: 1;
+    }
+    .ssp-search-input:focus{
+        border-color: var(--main-color);
+    }
+    .ssp-poi-item{
+        padding: 0.5rem 0;
+        border-bottom: 0.05rem solid #f0f0f0;
+        position: relative;
+    }
+    .ssp-poi-item:active::before{
+        content: "";
+        display: block;
+        position: absolute;
+        inset: 0 -0.5rem 0 -0.5rem;
+        background-color: #f0f0f0;
+        z-index: -1;
+    }
+    .ssp-poi-checked{
+        display: block;
+        position: absolute;
+        right: 0;
+        top: calc(50% - 0.5rem);
+        z-index: 1;
+        width: 1rem;
+        height: 1rem;
+    }
+    .ssp-my-location {
+        display: inline-block;
+        width: 1.9rem;
+        height: 1.9rem;
+        padding: 0.25rem;
+        background-color: #f0f0f0;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-left: 0.5rem;
+    }
+    .ssp-my-location.positionning{
+        animation: mcv-location-positionning-kf 1s ease infinite; /* 动画帧在控件 “map3dControlVertical” 里定义 */
     }
 </style>

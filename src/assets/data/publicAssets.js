@@ -25,7 +25,9 @@ const AssetsPathMap = {
     iconMapCalloutHiding: "icons/map_callout_hiding.png",
     iconMapCalloutShowing: "icons/map_callout_showing.png",
     iconMapLocationPosition: "icons/map_location_position.png",
+    iconMapLocationGrey: "icons/map_location_grey.png",
     iconMapRestorePerspective: "icons/map_restore_perspective.png",
+    iconMapRestoreGrey: "icons/map_restore_grey.png",
     iconMapSatelliteFill: "icons/map_satellite_fill.png",
     iconMapToggleLayers: "icons/map_toggle_layers.png",
     iconPingtangjiangEntrance: "icons/pingtangjiang_entrance.png",
@@ -53,6 +55,7 @@ const AssetsPathMap = {
     iconCheckV: "icons/check_v.png",
     iconSearchGrey: "icons/search_grey.png",
     iconSearchGreen: "icons/search_green.png",
+    iconUpOrDown: "icons/up_or_down.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

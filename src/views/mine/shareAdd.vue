@@ -122,6 +122,6 @@
         z-index: 1;
         color: #aaa;
         font-size: 0.6rem;
-        line-height: 1;
+        line-height: 1.0;
     }
 </style>
