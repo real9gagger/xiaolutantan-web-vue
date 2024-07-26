@@ -13,12 +13,12 @@ function getDistanceBetween(lat1, lng1, lat2, lng2) {
         return -1;
     }
     
-	var EARTH_RADIUS = 6378137.0; //单位：米
+	var EARTH_RADIUS = 2 * 6378137.0; //地球直径，单位：米
 	var radLat1 = (lat1 * Math.PI / 180.0); //角度转成弧度
 	var radLat2 = (lat2 * Math.PI / 180.0);
 	var aaaa = (radLat1 - radLat2) / 2;
 	var bbbb = ((lng1 * Math.PI / 180.0) - (lng2 * Math.PI / 180.0)) / 2;
-	var cccc = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(aaaa), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(bbbb), 2)));
+	var cccc = Math.asin(Math.sqrt(Math.pow(Math.sin(aaaa), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(bbbb), 2)));
 	
 	return Math.round(cccc * EARTH_RADIUS);
 }
@@ -150,7 +150,7 @@ export function getFriendlyDistance(p1, p2){
     
     const dis = getDistanceBetween(p1.lat, p1.lng, p2.lat, p2.lng);
     if(dis < 0){
-        return "1mm"; //错误数据！一万米以内
+        return "0mm"; //错误数据！
     } else if(dis < 1000){
         return (dis.toFixed(0) + "m"); //小于一千米
     } else if(dis < 100000){

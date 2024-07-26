@@ -1,5 +1,5 @@
 <template>
-    <div class="ssp-search-panel" :style="`height:${panelHeight}vh;cursor:${cursorType}`"
+    <div class="ssp-search-panel" :style="`height:${panelHeight}%;cursor:${cursorType}`"
         @touchstart="onPanelTouchStart"
         @touchmove="onPanelTouchMove"
         @touchend="onPanelTouchEnd"
@@ -29,7 +29,7 @@
         <ul v-else class="pd-lr-rem5 fx-g1 of-no-sb" :id="SCROLLER_BOX_ID" @scroll="onUlScroll">
             <li v-for="item,idx in poiList" :key="item.uid" class="ssp-poi-item" @click="onPoiItemSelected(idx)">
                 <p :class="{'tc-mc': poiIndex===idx}">{{item.title}}</p>
-                <p v-if="poiIndex===idx" class="fs-rem6 tc-g2">{{item.distance}} | {{item.address}} | <span class="tc-b0">近看</span></p>
+                <p v-if="poiIndex===idx" class="fs-rem6 tc-g2">{{item.distance}} | {{item.address}} | <span class="tc-b0">放大视图</span></p>
                 <p v-else class="fs-rem6 tc-99">{{item.distance}} | {{item.address}}</p>
                 <img v-if="poiIndex===idx" :src="publicAssets.iconCheckV" alt="选中打勾" draggable="false" class="ssp-poi-checked" />
             </li>
@@ -56,11 +56,11 @@
     const props = defineProps({
         minHeight: {
             type: Number,
-            default: 40 /*单位：vh*/
+            default: 40 /*单位：%，相对于父元素*/
         },
         maxHeight: {
             type: Number,
-            default: 80 /*单位：vh*/
+            default: 90 /*单位：%，相对于父元素*/
         },
         mapCenterPoint: {
             type: Object,
@@ -154,7 +154,7 @@
     function onInputFocusOrBlur(evt){
         isSearchFocus.value = (evt.type === "focus");
     }
-    function onInputKeydownEnter(evt){
+    function onInputKeydownEnter(evt){//关键字搜索
         evt.target.blur();
         if(searchKeywords.value){
             if(!poiList.value){
@@ -188,7 +188,7 @@
     
         const geolocation = new BMapGL.Geolocation();
         geolocation.getCurrentPosition(function(res) {
-            const statusCode = geolocation.getStatus();
+            const statusCode = this.getStatus();
             if (statusCode === BMAP_STATUS_SUCCESS) {
                 nonRVs.myLocalPoint = res.point;
                 getPoiListByMapPoint(res.point);
@@ -200,10 +200,21 @@
             } else {
                 appToast("定位失败：BMAP_STATUS_UNKNOWN_LOCATION");
             }
+            
+            //如果定位失败，则根据IP地址获取用户所在的城市
+            if(!nonRVs.myLocalPoint){
+                (new BMapGL.LocalCity()).get(function(exo){
+                    nonRVs.myLocalPoint = exo.center;
+                    getPoiListByMapPoint(exo.center);
+                    emits("itemselected", exo.center);
+                });
+            }
+            
             setTimeout(() => (isPositionning.value = false), 1000);
         }, {
             enableHighAccuracy: true, //是否要求浏览器获取最佳效果，同浏览器定位接口参数。默认为false
             timeout: 15, //超时时间，单位为毫秒。默认为10秒
+            SDKLocation: true, //是否开启SDK辅助定位
         });
     }
     function onPanelUpOrDown(){
@@ -215,7 +226,7 @@
     function onUlScroll(evt){
         const elem = evt.target;
         //上拉加载更多，最多十页
-        if(!isLoadingMore.value && nonRVs.pageIndex >= 1 && nonRVs.pageIndex <= 10 && (elem.scrollTop + elem.clientHeight + PULL_UP_THRESHOLD) >= elem.scrollHeight){
+        if(!isLoadingMore.value && nonRVs.pageIndex >= 1 && nonRVs.pageIndex <= 9 && (elem.scrollTop + elem.clientHeight + PULL_UP_THRESHOLD) >= elem.scrollHeight){
             isLoadingMore.value = true;
             nonRVs.mapSearcher.gotoPage(++nonRVs.pageIndex);
         }
@@ -241,9 +252,9 @@
         
         if(!poiList.value.length && isGeocoding && evt.point){
             poiList.value.push({
-                uid: "P001",
+                uid: 0,
                 address: evt.address || "暂无详细地址",
-                title: "地图中心点位置",
+                title: "地图中心点",
                 point: evt.point,
                 distance: "0m"
             });
@@ -253,7 +264,7 @@
             nonRVs.mapSearcher.setLocation(evt.addressComponents.city);
         }
     }
-    function getPoiListByMapPoint(thePoint){
+    function getPoiListByMapPoint(thePoint){//拖动搜索
         if(!poiList.value || !thePoint){
             return; //正在加载
         } else {
