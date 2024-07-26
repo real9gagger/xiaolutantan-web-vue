@@ -29,7 +29,7 @@
         <ul v-else class="pd-lr-rem5 fx-g1 of-no-sb" :id="SCROLLER_BOX_ID" @scroll="onUlScroll">
             <li v-for="item,idx in poiList" :key="item.uid" class="ssp-poi-item" @click="onPoiItemSelected(idx)">
                 <p :class="{'tc-mc': poiIndex===idx}">{{item.title}}</p>
-                <p v-if="poiIndex===idx" class="fs-rem6 tc-g2">{{item.distance}} | {{item.address}} | <span class="tc-b0">放大视图</span></p>
+                <p v-if="poiIndex===idx" class="fs-rem6 tc-g2">{{item.distance}} | {{item.address}} | <span class="tc-b0">近看</span></p>
                 <p v-else class="fs-rem6 tc-99">{{item.distance}} | {{item.address}}</p>
                 <img v-if="poiIndex===idx" :src="publicAssets.iconCheckV" alt="选中打勾" draggable="false" class="ssp-poi-checked" />
             </li>
@@ -254,7 +254,7 @@
             poiList.value.push({
                 uid: 0,
                 address: evt.address || "暂无详细地址",
-                title: "地图中心点",
+                title: "未知地点",
                 point: evt.point,
                 distance: "0m"
             });

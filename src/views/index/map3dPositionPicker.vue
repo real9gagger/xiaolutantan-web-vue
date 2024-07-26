@@ -12,18 +12,23 @@
             :map-center-point="mapCenterPoint" 
             @itemselected="onPoiItemSelected" 
             @itemzoomin="onPoiItemZoomIn" 
-            @maprestore="onPoiRestorePerspective" />
+            @maprestore="onPoiRestorePerspective"
+            @itemconfirm="onPoiConfirm" />
     </div>
 </template>
 
 <script setup name="IndexMap3DPositionPicker">
     import { nextTick, onMounted, onUnmounted, ref } from "vue";
+    import { useStore } from "vuex";
+    import { useRouter } from "vue-router";
     import { needDebounce } from "@/utils/cocohelper.js";
     import slideSearchPanel from "@/components/slideSearchPanel.vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     let mapInstance = null; //地图实例。单独放在外面，避免被 vue 响应化处理（避免添加太多 getter/setter 造成卡顿）。
     
+    const $store = useStore();
+    const $router = useRouter();
     const mapPinUpDowning = ref(false);
     const mapCenterPoint = ref(null);
     
@@ -50,7 +55,6 @@
         mapInstance.addEventListener("dragend", onMapDragEnd);
     }
     function onMapDragEnd(evt){
-        //console.log(evt)
         needDebounce(onGeocoderPoint, 800);
     }
     function onGeocoderPoint(){
@@ -68,6 +72,10 @@
     }
     function onPoiRestorePerspective(poiPoint){
         mapInstance.centerAndZoom(poiPoint, 10);
+    }
+    function onPoiConfirm(poiInfo){
+        $store.dispatch("setPickPlaceInfo", poiInfo);
+        $router.back();
     }
     
     onMounted(() => {

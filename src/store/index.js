@@ -13,6 +13,11 @@ const myGetters = {
     
     mapAdministrativeType: (state) => state.moduleSettings.mapAdministrativeType,
     canalDisplayType: (state) => state.moduleSettings.canalDisplayType,
+    
+    pickPlaceAddress: (state) => state.moduleSettings.pickPlaceAddress,
+    pickPlaceTitle: (state) => state.moduleSettings.pickPlaceTitle,
+    pickPlaceLongitude: (state) => state.moduleSettings.pickPlaceLongitude,
+    pickPlaceLatitude: (state) => state.moduleSettings.pickPlaceLatitude,
 };
 
 const vuexStore = createStore({

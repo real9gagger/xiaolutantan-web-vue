@@ -15,7 +15,8 @@
             <div class="mg-b-rem5 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 tp-f0 us-n" @click="gotoAddressPicker">
                 <img :src="publicAssets.iconAddShareLocation" class="wh-1rem" />
-                <a class="mg-lr-rem25 tc-99 fx-g1">添加照片拍摄位置</a>
+                <a v-if="!shootingAddress" class="mg-lr-rem25 tc-99 fx-g1">添加照片拍摄位置</a>
+                <a v-else class="mg-lr-rem25 tc-66 fx-g1">{{shootingAddress}}</a>
                 <img :src="publicAssets.iconArrowRight" style="width:0.8rem;height:0.8rem;opacity:0.6;" />
             </div>
         </div>
@@ -36,8 +37,9 @@
 </template>
 
 <script setup name="MineShareAdd">
-    import { ref, getCurrentInstance, reactive } from "vue";
+    import { ref, getCurrentInstance, reactive, computed } from "vue";
     import { useRouter } from "vue-router";
+    import { useStore } from "vuex";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF"; //可接受的图片类型
@@ -46,11 +48,13 @@
     
     const $instance = getCurrentInstance();
     const $router = useRouter();
+    const $store = useStore();
     const chooseType = ref(0x9); //0x9 - 图片，0x1 - 视频。（值表示可以上传的文件数量！）
     const inputRemainingLength = ref(MAX_TEXT_LENGTH);
     const uploadFileList = reactive([]);
-    const uploadSrcList = reactive([])
-    
+    const uploadSrcList = reactive([]);
+    const shootingAddress = computed(() => $store.getters.pickPlaceTitle);
+
     function onChooseFiles(type){
         chooseType.value = type;
         $instance.refs.inputFileBox.click();
