@@ -91,5 +91,6 @@
   -moz-osx-font-smoothing: grayscale;
   background-color: #fff;
   font-size: 0.8rem;
+  overflow: hidden;
 }
 </style>

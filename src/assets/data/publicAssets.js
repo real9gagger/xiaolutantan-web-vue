@@ -47,7 +47,9 @@ const AssetsPathMap = {
     iconCloseXGrey: "icons/close_x_grey.png",
     iconSharePictureRed: "icons/share_picture_red.png",
     iconAddSharePictures: "icons/add_share_pictures.png",
+    iconAddSharePicturesGreen: "icons/add_share_pictures_green.png",
     iconAddShareLocation: "icons/add_share_location.png",
+    iconAddShareLocationGreen: "icons/add_share_location_green.png",
     iconArrowRight: "icons/arrow_right.png", //原始图标来源：https://www.iconfont.cn/collections/detail?spm=a313x.user_detail.i1.dc64b3430.15ea3a81IdfAL4&cid=599
     iconArrowLeft: "icons/arrow_left.png",
     iconMapPositionPin: "icons/map_position_pin.png",

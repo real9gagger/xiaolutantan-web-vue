@@ -80,7 +80,7 @@
     const poiIndex = ref(0);
     const searchKeywords = ref("");
     
-    const touchStartXY = [0, 0];
+    const touchStartXY = [-1, -1];
     const nonRVs = { //非响应式变量（Non responsive variables）
         isRunTransition: false,
         mapSearcher: null, //文字搜索器
