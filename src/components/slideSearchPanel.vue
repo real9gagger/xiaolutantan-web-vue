@@ -97,12 +97,12 @@
                 elem.style.overflow = (panelHeight.value !== props.maxHeight ? "hidden" : null);
             }
             
-            if(evt.type === "touchstart"){
+            if(evt.type === "touchstart"){//单个手指触控时才有效
                 touchStartXY[0] = (evt.touches.length === 1 ? evt.touches[0].clientX : -1);
                 touchStartXY[1] = (evt.touches.length === 1 ? evt.touches[0].clientY : -1);
-            } else {
-                touchStartXY[0] = (evt.clientX);
-                touchStartXY[1] = (evt.clientY);
+            } else {//鼠标左键按下时才有效
+                touchStartXY[0] = (evt.button === 0 ? evt.clientX : -1);
+                touchStartXY[1] = (evt.button === 0 ? evt.clientY : -1);
             }
             cursorType.value = "grab";
         } else {

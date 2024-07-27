@@ -68,23 +68,28 @@
         isShowing.value = !isShowing.value;
     }
     function onBoxPointerDown(evt){
-        console.log("指针按下…", evt);
+        //console.log("指针按下…", evt);
         if(evt.type === "touchstart"){
-            const canMove = (evt.touches.length === 1);
+            const canMove = (evt.touches.length === 1); //单个手指触控时才有效
             movementXY[0] = (canMove ? evt.touches[0].clientX : 0);
             movementXY[1] = (canMove ? evt.touches[0].clientY : 0);
-            document.ontouchmove = onBoxPointerMove;
-            document.ontouchend = onBoxPointerUp;
+            if(canMove){
+                document.ontouchmove = onBoxPointerMove;
+                document.ontouchend = onBoxPointerUp;
+            }
         } else {
-            movementXY[0] = 0x168; //随便一个大于0的数即可
-            movementXY[1] = 0x168;
-            document.onmousemove = onBoxPointerMove;
-            document.onmouseup = onBoxPointerUp;
+            const canMove = (evt.button === 0); //鼠标左键按下时才有效
+            movementXY[0] = (canMove ? 0x168 : 0); //随便一个大于0的数即可
+            movementXY[1] = (canMove ? 0x168 : 0);
+            if(canMove){
+                document.onmousemove = onBoxPointerMove;
+                document.onmouseup = onBoxPointerUp;
+            }
         }
         isGrabbing.value = true;
     }
     function onBoxPointerMove(evt){
-        console.log("指针移到…", evt);
+        //console.log("指针移到…", evt);
         if(movementXY[0] || movementXY[1]){
             if(evt.type === "touchmove"){
                 const cXY = [evt.touches[0].clientX, evt.touches[0].clientY];
@@ -99,7 +104,7 @@
         }
     }
     function onBoxPointerUp(evt){
-        console.log("指针松开…", evt);
+        //console.log("指针松开…", evt);
         if(movementXY[0] || movementXY[1]){
             document.onmouseup = null;
             document.onmousemove = null;

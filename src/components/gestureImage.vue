@@ -231,6 +231,7 @@
     }
     function onImgTouchCancel(evt){
         //console.log("触控取消…", evt);
+        resetXY(moveXY);
     }
     
     function onImgMouseDown(evt){
@@ -239,7 +240,11 @@
             return;
         }
         
-        resetXY(moveXY, [0x88]); //设为非零数即可！！！
+        //鼠标左键按下时才有效
+        if(evt.button === 0){
+            resetXY(moveXY, [0x88]); //设为非零数即可！！！
+        }
+        
         nonRVs.moveTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
     }
     function onImgMouseMove(evt){
