@@ -81,7 +81,7 @@
     const searchKeywords = ref("");
     
     const touchStartXY = [-1, -1];
-    const nonRVs = { //非响应式变量（Non responsive variables）
+    const nonRVs = { //非响应式变量（non Responsive Variables）
         isRunTransition: false,
         mapSearcher: null, //文字搜索器
         mapGeocoder: null, //拖动搜索器

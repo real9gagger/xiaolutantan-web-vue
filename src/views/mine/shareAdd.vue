@@ -7,8 +7,8 @@
             </div>
             <div class="mg-b-rem5 bd-t-f0"><!-- 分隔线 --></div>
             <picture-uploader ref="puBox" />
-            <div class="mg-b-rem5 bd-t-f0"><!-- 分隔线 --></div>
-            <div class="fx-hc lh-1x pd-tb-rem5 tp-f0 us-n" @click="gotoAddressPicker">
+            <div class="mg-t-rem25 bd-t-f0"><!-- 分隔线 --></div>
+            <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoAddressPicker">
                 <template v-if="!shootingAddress">
                     <img :src="publicAssets.iconAddShareLocation" class="wh-1em" />
                     <a class="mg-lr-rem5 tc-99 fx-g1">添加照片拍摄位置</a>

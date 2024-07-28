@@ -76,6 +76,7 @@
             if(canMove){
                 document.ontouchmove = onBoxPointerMove;
                 document.ontouchend = onBoxPointerUp;
+                document.ontouchcancel = onBoxPointerUp;
             }
         } else {
             const canMove = (evt.button === 0); //鼠标左键按下时才有效
@@ -84,6 +85,7 @@
             if(canMove){
                 document.onmousemove = onBoxPointerMove;
                 document.onmouseup = onBoxPointerUp;
+                document.onmouseleave = onBoxPointerUp;
             }
         }
         isGrabbing.value = true;
@@ -106,10 +108,12 @@
     function onBoxPointerUp(evt){
         //console.log("指针松开…", evt);
         if(movementXY[0] || movementXY[1]){
-            document.onmouseup = null;
             document.onmousemove = null;
+            document.onmouseup = null;
+            document.onmouseleave = null;
             document.ontouchmove = null;
             document.ontouchend = null;
+            document.ontouchcancel = null;
             
             const wiw = window.innerWidth;
             const wih = window.innerHeight;

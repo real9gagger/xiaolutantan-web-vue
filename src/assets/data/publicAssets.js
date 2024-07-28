@@ -63,6 +63,7 @@ const AssetsPathMap = {
     imageAppLogo: "images/app_logo.png",
     imageImgError: "images/img_error.png",
     imageImgLost: "images/img_lost.png",
+    imageImgReading: "images/img_reading.png",
     imageCanalSegmented: "images/canal_segmented.png",
     imageCanalSingle: "images/canal_single.png",
     imageRegionNone: "images/region_none.png",

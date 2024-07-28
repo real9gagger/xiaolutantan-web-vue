@@ -76,6 +76,7 @@
         		if(fs_px2 < 20){
         			fs_px2 = 20;
         		}
+                window.pxOf1rem = fs_px2; //px of 1 rem。1rem有多少像素
         	    document.documentElement.style.fontSize = (fs_px2 + "px");
                 document.documentElement.style.setProperty("--current-window-height", window.innerHeight + "px");
         		document.getElementById("xlttapp").style.minHeight = (window.innerHeight + "px");

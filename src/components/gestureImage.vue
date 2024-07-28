@@ -58,7 +58,7 @@
     const maxScaleFinalXY = [0, 0, 0]; //刚好达到 “MAX_SCALE_FINAL” 时的偏移量（第一、二元素，第三个元素用于标记是否已被设置值）
     const moveXY = [0, 0]; //单指移动时的位置，或者双指移动时的双指中心位置
     const moveVelocityXY = [0, 0]; //移到时的速度
-    //非响应式变量（Non responsive variables）
+    //非响应式变量（non Responsive Variables）
     const nonRVs = {
         lastDIS: 0, //双指移到时的前一次距离
         moveTS: 0, //移动时的时间戳
