@@ -19,6 +19,19 @@ export function needThrottle(func, delay, ...args){
     if (!isThrottled) {
         isThrottled = true;
         func(...args);
-        setTimeout(() => isThrottled=false, delay);
+        debounceTimer = setTimeout(() => isThrottled=false, delay);
     }
+}
+
+// 清除定时器
+export function clearTimer(isJustDoIt){
+    if(isJustDoIt && debounceTimer){
+        clearTimeout(debounceTimer);
+        debounceTimer = 0;
+    }
+}
+
+// 定时器是否正在运行
+export function isTimerRunning(){
+    return (debounceTimer > 0);
 }

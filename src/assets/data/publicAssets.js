@@ -58,6 +58,8 @@ const AssetsPathMap = {
     iconSearchGrey: "icons/search_grey.png",
     iconSearchGreen: "icons/search_green.png",
     iconUpOrDown: "icons/up_or_down.png",
+    iconTrashCloseWhite: "icons/trash_close_white.png",
+    iconTrashOpenWhite: "icons/trash_open_white.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

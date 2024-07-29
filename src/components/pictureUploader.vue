@@ -3,27 +3,38 @@
         <a v-for="item,index in uploadFileList" :key="item.name" class="pud-pic-box" :data-picindex="index" :style="getItemCssStyle(index)">
             <img :src="uploadSrcList[index] || publicAssets.imageImgReading" :alt="item.name" class="wi-f" draggable="false" />
         </a>
-        <a v-if="uploadFileList.length < chooseType" class="pud-pic-add" title="添加照片" @click="onChoosePictures">
-            <input class="dp-hx" 
-                title="隐藏着的文件选择器"
-                ref="inputFileBox" 
-                name="inputFileBox"
-                type="file" 
-                :accept="chooseType===0x1 ? VIDEO_ACCEPT_TYPE : IMAGE_ACCEPT_TYPE" 
-                :multiple="chooseType!==0x1"
-                @change="onChooseChange"
-            />
-            <span>+{{chooseType - uploadFileList.length}}</span>
-        </a>
-        <div v-if="dragIndex >= 0" class="pud-pic-box grabbing" :style="dragBoxStyle" @transitionend="onDragBoxTransitionEnd">
-            <img :src="uploadSrcList[dragIndex]" alt="正在拖动的图片" class="wi-f" draggable="false" />
-        </div>
+        <template v-if="dragIndex < 0">
+            <a class="pud-pic-add" :class="{'dp-hx': uploadFileList.length >= chooseType}" title="添加照片" @click="onChoosePictures">
+                <span>+{{chooseType - uploadFileList.length}}</span>
+                <input 
+                    class="op-h" 
+                    title="隐藏着的文件选择器"
+                    ref="inputFileBox" 
+                    name="inputFileBox"
+                    type="file" 
+                    :accept="chooseType===0x1 ? VIDEO_ACCEPT_TYPE : IMAGE_ACCEPT_TYPE" 
+                    :multiple="chooseType!==0x1"
+                    @change="onChooseChange"
+                />
+            </a>
+        </template>
+        <template v-else >
+            <div class="pud-pic-delete" :class="{'activing': insertIndex===uploadFileList.length}">
+                <img :src="publicAssets.iconTrashCloseWhite" class="wh-2rem closing" alt="回收站" draggable="false" />
+                <img :src="publicAssets.iconTrashOpenWhite" class="wh-2rem openning" alt="回收站开盖" draggable="false" />
+                <span class="closing">拖至此处以删除</span>
+                <span class="openning">松手即可删除</span>
+            </div>
+            <div class="pud-pic-box grabbing" :style="dragBoxStyle" @transitionend="onDragBoxTransitionEnd">
+                <img :src="uploadSrcList[dragIndex]" alt="正在拖动的图片" class="wi-f" draggable="false" />
+            </div>
+        </template>
     </div>
 </template>
 
 <script setup name="PictureUploader">
     import { ref, reactive, computed, defineExpose, getCurrentInstance, onMounted } from "vue";
-    import { needDebounce } from "@/utils/cocohelper.js";
+    import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF"; //可接受的图片类型
@@ -39,6 +50,7 @@
     const insertIndex = ref(-1); //图像插入的位置对应的索引
     const isReleaseHand = ref(false); //是否是松开手
     const dragBoxStyle = computed(() => ({
+        opacity: (insertIndex.value === uploadFileList.length ? 0.5 : 1),
         transition: (isReleaseHand.value ? "transform 300ms" : "none"),
         transform: `translate(${dragTransXY[0]}px, ${dragTransXY[1]}px)`
     }));
@@ -50,6 +62,9 @@
     function onItemPointerDown(evt){
         const theElem = (evt.target.hasAttribute("data-picindex") ? evt.target : (evt.target.parentNode.hasAttribute("data-picindex") ? evt.target.parentNode : null));
         if(theElem){
+            evt.preventDefault();
+            evt.stopPropagation();
+            
             if(evt.type === "touchstart"){
                 if(evt.touches.length !== 1){//多个手指触控时无效
                     return;
@@ -59,6 +74,14 @@
                 document.ontouchmove = onItemPointerMove;
                 document.ontouchend = onItemPointerUp;
                 document.ontouchcancel = onItemPointerUp;
+                
+                //移动端需要长按才生效
+                needDebounce(function(dom){
+                    navigator.vibrate(30);
+                    dragTransXY[0] = dom.offsetLeft;
+                    dragTransXY[1] = dom.offsetTop;
+                    dragIndex.value = (+dom.getAttribute("data-picindex") || 0);
+                }, 200, theElem);
             } else {
                 if(evt.button !== 0){//非鼠标左键按下时无效：https://developer.mozilla.org/zh-CN/docs/Web/API/MouseEvent/button
                     return;
@@ -68,11 +91,11 @@
                 document.onmousemove = onItemPointerMove;
                 document.onmouseup = onItemPointerUp;
                 document.onmouseleave = onItemPointerUp;
+                
+                dragTransXY[0] = theElem.offsetLeft;
+                dragTransXY[1] = theElem.offsetTop;
+                dragIndex.value = (+theElem.getAttribute("data-picindex") || 0);
             }
-            
-            dragTransXY[0] = theElem.offsetLeft;
-            dragTransXY[1] = theElem.offsetTop;
-            dragIndex.value = (+theElem.getAttribute("data-picindex") || 0);
         }
     }
     function onItemPointerMove(evt){
@@ -90,7 +113,14 @@
             const iCol = Math.round(dragTransXY[0] / PIC_WIDTH_AND_MARGIN); //第几列，从 0 开始
             const iRow = Math.round(dragTransXY[1] / PIC_WIDTH_AND_MARGIN); //第几行，从 0 开始
             
-            insertIndex.value = Math.min(Math.max(iCol + nonRVs.numberOfColumns * iRow, 0), uploadFileList.length - 1);
+            insertIndex.value = Math.max(iCol + nonRVs.numberOfColumns * iRow, 0);
+        } else {
+            if(isTimerRunning() && evt.touches){
+                //有时候长按时也会触发 “触控移动” 事件，因此需要判断是否是真心移到的，还是手指一时抖动导致的！
+                //移到距离大于某个值说明用户的意图是真心移到的，因此需要关闭定时器！
+                const disMove = Math.hypot(evt.touches[0].clientX - pointerXY[0], evt.touches[0].clientY - pointerXY[1]);
+                clearTimer(disMove >= 5);
+            }
         }
     }
     function onItemPointerUp(evt){
@@ -103,35 +133,51 @@
         document.ontouchend = null;
         document.ontouchcancel = null;
         
-        //根据插入的位置索引计算第几列第几行
-        const posX = PIC_WIDTH_AND_MARGIN * Math.floor(insertIndex.value % nonRVs.numberOfColumns); //第几列，从 0 开始
-        const posY = PIC_WIDTH_AND_MARGIN * Math.floor(insertIndex.value / nonRVs.numberOfColumns); //第几行，从 0 开始
-        if((posX === dragTransXY[0] && posY === dragTransXY[1]) || insertIndex.value < 0){
-            console.log("执行了回调函数，防止过渡动画不发生时无法调用回调函数...");
-            onDragBoxTransitionEnd();
+        clearTimer(true);
+        
+        if(insertIndex.value >= 0){
+            if(insertIndex.value > uploadFileList.length){
+                //如果拖动到了不知道是哪个图片的索引，则回归最后一项的位置！
+                insertIndex.value = uploadFileList.length - 1;
+            }
+            
+            //根据插入的位置索引计算第几列第几行
+            const posX = PIC_WIDTH_AND_MARGIN * Math.floor(insertIndex.value % nonRVs.numberOfColumns); //第几列，从 0 开始
+            const posY = PIC_WIDTH_AND_MARGIN * Math.floor(insertIndex.value / nonRVs.numberOfColumns); //第几行，从 0 开始
+            if(posX === dragTransXY[0] && posY === dragTransXY[1]){
+                console.log("执行了回调函数，因为过渡动画无法触发...");
+                onDragBoxTransitionEnd();
+            } else {
+                dragTransXY[0] = posX;
+                dragTransXY[1] = posY;
+            }
         } else {
-            dragTransXY[0] = posX;
-            dragTransXY[1] = posY;
+            console.log("执行了回调函数，因为无法判断插入哪个位置...");
+            onDragBoxTransitionEnd();
         }
     }
     function onDragBoxTransitionEnd(){
-        //重新排列图片
-        if(dragIndex.value >= 0 && insertIndex.value >= 0 && dragIndex.value !== insertIndex.value){
-            const tempFile = uploadFileList[dragIndex.value];
-            const tempSrc = uploadSrcList[dragIndex.value];
-            if(dragIndex.value > insertIndex.value){
-                for(let ix = dragIndex.value; ix > insertIndex.value; ix--){
-                    uploadFileList[ix] = uploadFileList[ix - 1];
-                    uploadSrcList[ix] = uploadSrcList[ix - 1];
+        if(dragIndex.value >= 0 && dragIndex.value !== insertIndex.value){
+            if(insertIndex.value >= 0 && insertIndex.value < uploadFileList.length){ //重新排列图片
+                const tempFile = uploadFileList[dragIndex.value];
+                const tempSrc = uploadSrcList[dragIndex.value];
+                if(dragIndex.value > insertIndex.value){
+                    for(let ix = dragIndex.value; ix > insertIndex.value; ix--){
+                        uploadFileList[ix] = uploadFileList[ix - 1];
+                        uploadSrcList[ix] = uploadSrcList[ix - 1];
+                    }
+                } else {
+                    for(let ix = dragIndex.value; ix < insertIndex.value; ix++){
+                        uploadFileList[ix] = uploadFileList[ix + 1];
+                        uploadSrcList[ix] = uploadSrcList[ix + 1];
+                    }
                 }
-            } else {
-                for(let ix = dragIndex.value; ix < insertIndex.value; ix++){
-                    uploadFileList[ix] = uploadFileList[ix + 1];
-                    uploadSrcList[ix] = uploadSrcList[ix + 1];
-                }
+                uploadFileList[insertIndex.value] = tempFile;
+                uploadSrcList[insertIndex.value] = tempSrc;
+            } else if(insertIndex.value === uploadFileList.length){//删除图片
+                uploadFileList.splice(dragIndex.value, 1);
+                uploadSrcList.splice(dragIndex.value, 1);
             }
-            uploadFileList[insertIndex.value] = tempFile;
-            uploadSrcList[insertIndex.value] = tempSrc;
         }
         
         isReleaseHand.value = false;
@@ -173,16 +219,25 @@
         if(idx === dragIndex.value){
             outStyle.visibility = "hidden";
         } else if(insertIndex.value >= 0){
+            /* const iCol0 = Math.floor((idx - 1) % nonRVs.numberOfColumns);
+            const iRow0 = Math.floor((idx - 1) / nonRVs.numberOfColumns);
+            const iCol1 = Math.floor(idx % nonRVs.numberOfColumns);
+            const iRow1 = Math.floor(idx / nonRVs.numberOfColumns);
+            const diffCol = (iCol1 - iCol0); //相隔多少列
+            const diffRow = (iRow1 - iRow0); //相隔多少行
+            outStyle.transform = `translate(${-diffCol * PIC_WIDTH_AND_MARGIN}px, ${-diffRow * PIC_WIDTH_AND_MARGIN}px)`;
+            */
+           const tempNum = (nonRVs.numberOfColumns - 1);
             outStyle.transition = "transform 300ms";
             if(idx > dragIndex.value && idx <= insertIndex.value){//非拖到项向左移到
-                if(!(idx % nonRVs.numberOfColumns)){//如果是每行的第一项
-                    outStyle.transform = `translate(${(nonRVs.numberOfColumns - 1) * PIC_WIDTH_AND_MARGIN}px, ${-PIC_WIDTH_AND_MARGIN}px)`;
+                if((idx % nonRVs.numberOfColumns) === 0){//如果是每行的第一项
+                    outStyle.transform = `translate(${tempNum * PIC_WIDTH_AND_MARGIN}px, ${-PIC_WIDTH_AND_MARGIN}px)`;
                 } else {
                     outStyle.transform = `translate(${-PIC_WIDTH_AND_MARGIN}px, 0px)`;
                 }
             } else if(idx >= insertIndex.value && idx < dragIndex.value){//非拖到项向右移动
-                if(!((idx + 1) % nonRVs.numberOfColumns)){//如果是每行的最后一项
-                    outStyle.transform = `translate(${(1 - nonRVs.numberOfColumns) * PIC_WIDTH_AND_MARGIN}px, ${PIC_WIDTH_AND_MARGIN}px)`;
+                if((idx % nonRVs.numberOfColumns) === tempNum){//如果是每行的最后一项
+                    outStyle.transform = `translate(${-tempNum * PIC_WIDTH_AND_MARGIN}px, ${PIC_WIDTH_AND_MARGIN}px)`;
                 } else {
                     outStyle.transform = `translate(${PIC_WIDTH_AND_MARGIN}px, 0px)`;
                 }
@@ -214,6 +269,7 @@
         margin: 0 $picBoxMargin $picBoxMargin 0;
         background-color: #eee;
         overflow: hidden;
+        transform: translate(0, 0);
     }
     .pud-pic-box.grabbing{
         position: absolute;
@@ -238,8 +294,27 @@
         padding: 0.2rem 0.3rem;
         font-size: 0.7rem;
         text-align: right;
+        user-select: none;
     }
     .pud-pic-add:active{
         background-color: #e0e0e0;
     }
+    .pud-pic-delete{
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: $picBoxSize;
+        height: $picBoxSize;
+        margin-bottom: $picBoxMargin;
+        background-color: rgba(255, 0, 0, 0.4);
+        color: #fff;
+        font-size: 0.5rem;
+        user-select: none;
+    }
+    .pud-pic-delete.activing{ background-color: #f00; }
+    .pud-pic-delete.activing > .openning{ display: inline-block; }
+    .pud-pic-delete.activing > .closing{ display: none; }
+    .pud-pic-delete > .openning{ display: none; }
+    .pud-pic-delete > .closing{ display: inline-block; }
 </style>
