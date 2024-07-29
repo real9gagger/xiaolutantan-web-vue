@@ -4,7 +4,7 @@
             <img :src="uploadSrcList[index] || publicAssets.imageImgReading" :alt="item.name" class="wi-f" draggable="false" />
         </a>
         <template v-if="dragIndex < 0">
-            <a class="pud-pic-add" :class="{'dp-hx': uploadFileList.length >= chooseType}" title="添加照片" @click="onChoosePictures">
+            <a class="pud-pic-add" :style="addBoxStyle" title="添加照片" @click="onChoosePictures">
                 <span>+{{chooseType - uploadFileList.length}}</span>
                 <input 
                     class="op-h" 
@@ -42,18 +42,36 @@
     const PIC_WIDTH_AND_MARGIN = (5.25 * window.pxOf1rem); /* （宽度加上外边距）乘以（1rem有多少像素） */
     
     const $instance = getCurrentInstance();
-    const uploadFileList = reactive([]);
-    const uploadSrcList = reactive([]);
+    const uploadFileList = reactive([]); //待上传的图片信息
+    const uploadSrcList = reactive([]); //图片源数据
     const dragTransXY = reactive([0, 0]);//第〇、一索引用来保存当前位置
     const chooseType = ref(0x9); //0x9 - 图片，0x1 - 视频。（值表示最多可以上传的文件数量！）
     const dragIndex = ref(-1); //当前拖动的图像的索引
     const insertIndex = ref(-1); //图像插入的位置对应的索引
     const isReleaseHand = ref(false); //是否是松开手
+    const isDeleting = ref(false); //是否正在删除某项
     const dragBoxStyle = computed(() => ({
         opacity: (insertIndex.value === uploadFileList.length ? 0.5 : 1),
         transition: (isReleaseHand.value ? "transform 300ms" : "none"),
         transform: `translate(${dragTransXY[0]}px, ${dragTransXY[1]}px)`
     }));
+    const addBoxStyle = computed(() => {
+        const tXY = [0, 0];
+        if(isDeleting.value){
+            if(((uploadFileList.length + 1) % nonRVs.numberOfColumns) === 0){
+                tXY[0] = PIC_WIDTH_AND_MARGIN * (1 - nonRVs.numberOfColumns);
+                tXY[1] = PIC_WIDTH_AND_MARGIN;
+            } else {
+                tXY[0] = PIC_WIDTH_AND_MARGIN;
+                tXY[1] = 0;
+            }
+        }
+        return {
+            display: (uploadFileList.length >= chooseType.value ? "none": ""),
+            transform: `translate(${tXY[0]}px, ${tXY[1]}px)`,
+            backgroundColor: (isDeleting.value ? "red" : "")
+        }
+    });
     const pointerXY = [0, 0];
     const nonRVs = { //非响应式变量（non Responsive Variables）
         numberOfColumns: 3, //每行最多可以放多少张照片
@@ -119,7 +137,7 @@
                 //有时候长按时也会触发 “触控移动” 事件，因此需要判断是否是真心移到的，还是手指一时抖动导致的！
                 //移到距离大于某个值说明用户的意图是真心移到的，因此需要关闭定时器！
                 const disMove = Math.hypot(evt.touches[0].clientX - pointerXY[0], evt.touches[0].clientY - pointerXY[1]);
-                clearTimer(disMove >= 5);
+                clearTimer(disMove >= 8);
             }
         }
     }
@@ -177,6 +195,8 @@
             } else if(insertIndex.value === uploadFileList.length){//删除图片
                 uploadFileList.splice(dragIndex.value, 1);
                 uploadSrcList.splice(dragIndex.value, 1);
+                isDeleting.value = true;
+                setTimeout(onAddBoxTransitionEnd, 10);
             }
         }
         
@@ -187,6 +207,9 @@
         pointerXY[1] = 0;
         dragTransXY[0] = 0;
         dragTransXY[1] = 0;
+    }
+    function onAddBoxTransitionEnd(){
+        isDeleting.value = false;
     }
     
     function onChoosePictures(){
@@ -249,6 +272,8 @@
     
     onMounted(() => {
         nonRVs.numberOfColumns = Math.floor($instance.proxy.$el.clientWidth / PIC_WIDTH_AND_MARGIN);
+        //const maxCol = Math.floor($instance.proxy.$el.clientWidth / 100);
+        //console.log(maxCol, $instance.proxy.$el.clientWidth / maxCol);
     });
     
     defineExpose({
@@ -295,6 +320,7 @@
         font-size: 0.7rem;
         text-align: right;
         user-select: none;
+        transition: transform 300ms, background-color 300ms;
     }
     .pud-pic-add:active{
         background-color: #e0e0e0;
@@ -309,7 +335,7 @@
         margin-bottom: $picBoxMargin;
         background-color: rgba(255, 0, 0, 0.4);
         color: #fff;
-        font-size: 0.5rem;
+        font-size: 0.6rem;
         user-select: none;
     }
     .pud-pic-delete.activing{ background-color: #f00; }
