@@ -23,9 +23,9 @@
                 style="padding:0;overflow:hidden">
                 <swiper-slide v-for="item in shareInfos.pictureList" :key="item.id" class="fx-vm">
                     <!-- 2024年7月19日。swiper自带缩放功能，体验不佳，弃用 <div class="swiper-zoom-container">
-                        <img :alt="item.description" :src="item.path" class="wi-f" />
+                        <img :alt="item.description" :src="item.picPath" class="wi-f" />
                     </div> -->
-                    <gesture-image :alt="item.description" :src="item.path" />
+                    <gesture-image :alt="item.description" :src="item.picPath" />
                 </swiper-slide>
             </swiper-container>
             <div class="fixed-limit-width msd-bottom-box fx-c fx-je" :class="{'hidden': isHideText}">

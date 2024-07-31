@@ -1,5 +1,6 @@
 [
 	{
+		"tips": "【！！！！这是测试用的数据！！！！】",
 		"id": 10000,
 		"title": "马道枢纽",
 		"createTime": "2024/07/10 14:55:00",
@@ -12,38 +13,44 @@
 			{
                 "id": 1,
 				"description": "正在建设中的马道枢纽",
-				"path": "sharepics/madao_hinge_1.jpg",
+				"picPath": "sharepics/madao_hinge_1.jpg",
+                "thumbnailPath": "sharepics/madao_hinge_1.jpg",
                 "width": 2647,
 				"height": 1080,
 				"size": 1875910,
 				"sort": 0,
 				"longitude": 108.944385,
 				"latitude": 22.378856,
-				"shootingTime": "2024/07/10 14:52:00"
+                "mimeType": "image/jpeg",
+				"captureTime": "2024/07/10 14:52:00"
 			},
             {
                 "id": 2,
             	"description": "正在建设中的马道枢纽",
-            	"path": "sharepics/madao_hinge_2.jpg",
+            	"picPath": "sharepics/madao_hinge_2.jpg",
+                "thumbnailPath": "sharepics/madao_hinge_2.jpg",
                 "width": 1080,
             	"height": 607,
             	"size": 156791,
             	"sort": 0,
             	"longitude": 108.944385,
             	"latitude": 22.378856,
-            	"shootingTime": "2024/07/10 14:52:00"
+                "mimeType": "image/jpeg",
+            	"captureTime": "2024/07/10 14:52:00"
             },
             {
                 "id": 3,
             	"description": "平陆运河概览",
-            	"path": "sharepics/madao_hinge_3.jpg",
+            	"picPath": "sharepics/madao_hinge_3.jpg",
+                "thumbnailPath": "sharepics/madao_hinge_3.jpg",
                 "width": 736,
             	"height": 825,
             	"size": 163333,
             	"sort": 0,
             	"longitude": 108.944385,
             	"latitude": 22.378856,
-            	"shootingTime": "2024/07/10 14:52:00"
+                "mimeType": "image/jpeg",
+            	"captureTime": "2024/07/10 14:52:00"
             }
 		],
 		"likesCount": 0,
@@ -64,14 +71,16 @@
     		{
                 "id": 1,
     			"description": "平塘江入口鸟瞰图",
-    			"path": "sharepics/pingtangjiang_entrance_1.jpg",
+    			"picPath": "sharepics/pingtangjiang_entrance_1.jpg",
+                "thumbnailPath": "sharepics/pingtangjiang_entrance_1.jpg",
                 "width": 1920,
     			"height": 800,
     			"size": 753957,
     			"sort": 0,
     			"longitude": 109.073873,
     			"latitude": 22.642090,
-    			"shootingTime": "2024/07/10 14:52:00"
+                "mimeType": "image/jpeg",
+    			"captureTime": "2024/07/10 14:52:00"
     		}
     	],
     	"likesCount": 0,
@@ -92,14 +101,16 @@
     		{
                 "id": 1,
     			"description": "正在建设中的青年枢纽",
-    			"path": "sharepics/qingnian_hinge_1.jpg",
+    			"picPath": "sharepics/qingnian_hinge_1.jpg",
+                "thumbnailPath": "sharepics/qingnian_hinge_1.jpg",
                 "width": 2741,
     			"height": 1080,
     			"size": 2170453,
     			"sort": 0,
     			"longitude": 108.654629,
     			"latitude": 22.005420,
-    			"shootingTime": "2024/07/10 14:52:00"
+                "mimeType": "image/jpeg",
+    			"captureTime": "2024/07/10 14:52:00"
     		}
     	],
     	"likesCount": 0,
@@ -120,14 +131,16 @@
     		{
                 "id": 1,
     			"description": "正在建设中的企石枢纽",
-    			"path": "sharepics/qishi_hinge_1.jpg",
+    			"picPath": "sharepics/qishi_hinge_1.jpg",
+                "thumbnailPath": "sharepics/qishi_hinge_1.jpg",
                 "width": 2663,
     			"height": 1080,
     			"size": 2086058,
     			"sort": 0,
     			"longitude": 108.942663,
     			"latitude": 22.322861,
-    			"shootingTime": "2024/07/10 14:52:00"
+                "mimeType": "image/jpeg",
+    			"captureTime": "2024/07/10 14:52:00"
     		}
     	],
     	"likesCount": 0,

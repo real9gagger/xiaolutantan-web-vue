@@ -46,7 +46,7 @@
         const theImg = document.createElement("img");
         
         theImg.classList.add("msp-callout-pic");
-        theImg.src = properties.pictureList[0].path;
+        theImg.src = properties.pictureList[0].thumbnailPath;
         Object.assign(theImg.style, picStyle.value);
         
         theDiv.classList.add("msp-callout-container");

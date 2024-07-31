@@ -49,17 +49,17 @@ module.exports = {
     ],
   },
   // 配置转发代理
-  /* devServer: {
+  devServer: {
     port: 8080,
     proxy: {
-      '/xltt-api': {
-        target: 'https://api.foodie.vc/interface.php',
+      '/xlttapi': {
+        target: 'http://localhost:80',
         ws: true,
         pathRewrite: {
-          '^/xltt-api': ''
+          '^/xlttapi': '/php/uploader.php'
         },
 		changeOrigin: true
       }
     }
-  } */
+  }
 }
