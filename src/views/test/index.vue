@@ -14,14 +14,10 @@
 </template>
 
 <script setup name="TestIndex">
-    import {
-        ref
-    } from "vue";
-    import {
-        useRouter
-    } from "vue-router";
-    import axios from "axios";
-
+    import { ref } from "vue";
+    import { useRouter } from "vue-router";
+    import fileUploader from "@/utils/fileuploader.js";
+    
     const $router = useRouter();
     const aliveTimes = ref(90);
 
@@ -35,20 +31,16 @@
     }
 
     function startUploadFile(evt) {
-        console.log(evt)
-
-        const formData = new FormData();
-        formData.append("my_file", evt.target.files[0]);
-
-        axios.post("/xlttapi?action=upload_picture", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        }).then(res => {
-            console.log(res);
-        }).catch(err => {
-            console.error(err);
-        });
+        //console.log(evt)
+        const fud = new fileUploader();
+        console.log(fud);
+        fud.reset().progress(function(arg){
+            console.log("上传进度::::", arguments);
+        }).success(function(arg){
+            console.log("上传成功::::", arguments);
+        }).error(function(arg){
+            console.log("上传出错::::", arguments);
+        }).upload(evt.target.files[0]);
     }
 </script>
 

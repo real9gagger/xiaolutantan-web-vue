@@ -1,7 +1,7 @@
 <template>
     <div class="fx-r fx-wp ps-r" @touchstart="onItemPointerDown" @mousedown="onItemPointerDown">
-        <a v-for="item,index in uploadFileList" :key="item.name" class="pud-pic-box" :data-picindex="index" :style="getItemCssStyle(index)">
-            <img :src="uploadSrcList[index] || publicAssets.imageImgReading" :alt="item.name" class="wi-f" draggable="false" />
+        <a v-for="item,index in uploadFileList" :key="item.srcId" class="pud-pic-box" :data-picindex="index" :style="getItemCssStyle(index)">
+            <img :src="item.base64Src || publicAssets.imageImgReading" :alt="item.srcId" class="wi-f" draggable="false" />
         </a>
         <template v-if="dragIndex < 0">
             <a class="pud-pic-add" :style="addBoxStyle" title="添加照片" @click="onChoosePictures">
@@ -26,15 +26,16 @@
                 <span class="openning">松手即可删除</span>
             </div>
             <div class="pud-pic-box grabbing" :style="dragBoxStyle" @transitionend="onDragBoxTransitionEnd">
-                <img :src="uploadSrcList[dragIndex]" alt="正在拖动的图片" class="wi-f" draggable="false" />
+                <img :src="uploadFileList[dragIndex].base64Src" alt="正在拖动的图片" class="wi-f" draggable="false" />
             </div>
         </template>
     </div>
 </template>
 
 <script setup name="PictureUploader">
-    import { ref, reactive, computed, defineExpose, getCurrentInstance, onMounted } from "vue";
+    import { ref, reactive, computed, defineExpose, getCurrentInstance, onMounted, onUnmounted } from "vue";
     import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
+    import fileUploader from "@/utils/fileuploader.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF"; //可接受的图片类型
@@ -43,7 +44,6 @@
     
     const $instance = getCurrentInstance();
     const uploadFileList = reactive([]); //待上传的图片信息
-    const uploadSrcList = reactive([]); //图片源数据
     const dragTransXY = reactive([0, 0]);//第〇、一索引用来保存当前位置
     const chooseType = ref(0x9); //0x9 - 图片，0x1 - 视频。（值表示最多可以上传的文件数量！）
     const dragIndex = ref(-1); //当前拖动的图像的索引
@@ -76,6 +76,7 @@
     const nonRVs = { //非响应式变量（non Responsive Variables）
         numberOfColumns: 3, //每行最多可以放多少张照片
     };
+    const picFU = new fileUploader(); //图片文件上传器
     
     function onItemPointerDown(evt){
         const theElem = (evt.target.hasAttribute("data-picindex") ? evt.target : (evt.target.parentNode.hasAttribute("data-picindex") ? evt.target.parentNode : null));
@@ -178,23 +179,18 @@
         if(dragIndex.value >= 0 && dragIndex.value !== insertIndex.value){
             if(insertIndex.value >= 0 && insertIndex.value < uploadFileList.length){ //重新排列图片
                 const tempFile = uploadFileList[dragIndex.value];
-                const tempSrc = uploadSrcList[dragIndex.value];
                 if(dragIndex.value > insertIndex.value){
                     for(let ix = dragIndex.value; ix > insertIndex.value; ix--){
                         uploadFileList[ix] = uploadFileList[ix - 1];
-                        uploadSrcList[ix] = uploadSrcList[ix - 1];
                     }
                 } else {
                     for(let ix = dragIndex.value; ix < insertIndex.value; ix++){
                         uploadFileList[ix] = uploadFileList[ix + 1];
-                        uploadSrcList[ix] = uploadSrcList[ix + 1];
                     }
                 }
                 uploadFileList[insertIndex.value] = tempFile;
-                uploadSrcList[insertIndex.value] = tempSrc;
             } else if(insertIndex.value === uploadFileList.length){//删除图片
                 uploadFileList.splice(dragIndex.value, 1);
-                uploadSrcList.splice(dragIndex.value, 1);
                 isDeleting.value = true;
                 setTimeout(onAddBoxTransitionEnd, 10);
             }
@@ -218,22 +214,50 @@
     }
     function onChooseChange(evt){
         //console.log(evt)
+        const nowTS = Date.now() * 10;
         for(const file of evt.target.files){
-            const nth = uploadSrcList.length;
+            const nth = uploadFileList.length;
             if((nth + 1) > chooseType.value){
                 break;
             }
             const reader = new FileReader();
-            reader.onload = (arg) => (uploadSrcList[nth] = arg.target.result);
+            reader.onload = (arg) => (uploadFileList[nth].base64Src = arg.target.result);
             reader.readAsDataURL(file);
             
-            uploadFileList.push({name: file.name});
-            uploadSrcList.push(null);
+            uploadFileList.push({
+                srcId: nowTS + nth,
+                uploadProgress: -1, //上传进度。小于0表示未在上传，等于0表示等待上传，等于100表示上传成功，等于 -4444 表示上传失败。
+                base64Src: null, //图片的 base64 数据
+                uploadResult: null, //上传成功返回的数据
+                picFile: file //图片文件
+            });
         }
     }
-    function startUpload(){
+    function startUpload(){//外部组件调用
         return new Promise(function (resolve, reject) {
-            resolve();
+            //等待上传的文件
+            const waitToUploads = [];
+            const indexesList = [];
+            for(let ix = 0; ix < uploadFileList.length; ix++){
+                if(uploadFileList[ix].uploadProgress <= 0){//仅上传没有上传或上传失败的文件
+                    waitToUploads.push(uploadFileList[ix].picFile);
+                    indexesList.push(ix);
+                }
+            }
+            
+            picFU.reset().progress(function(num, idx){
+                uploadFileList[indexesList[idx]].uploadProgress = num;
+            }).success(function(dat, idx){
+                uploadFileList[indexesList[idx]].uploadResult = dat;
+                if((idx + 1) >= indexesList.length){
+                    resolve(uploadFileList.every(vx => vx.uploadProgress===100));
+                }
+            }).error(function(msg, idx){
+                uploadFileList[indexesList[idx]].uploadProgress = -4444;
+                if((idx + 1) >= indexesList.length){
+                    resolve(false);
+                }
+            }).queue(waitToUploads);
         });
     }
     function getItemCssStyle(idx){
@@ -274,6 +298,10 @@
         nonRVs.numberOfColumns = Math.floor($instance.proxy.$el.clientWidth / PIC_WIDTH_AND_MARGIN);
         //const maxCol = Math.floor($instance.proxy.$el.clientWidth / 100);
         //console.log(maxCol, $instance.proxy.$el.clientWidth / maxCol);
+    });
+    
+    onUnmounted(() => {
+        picFU.dispose();
     });
     
     defineExpose({

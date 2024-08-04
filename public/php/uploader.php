@@ -3,7 +3,7 @@
 function ajax_success($result = array()) {
 	$data = array();
     $data['data'] = $result;
-    $data['status'] = 1;
+    $data['code'] = 200;
     $data['msg'] = '操作成功';
     header('Content-Type:application/json; charset=utf-8');
     die(json_encode($data, JSON_UNESCAPED_UNICODE));
@@ -13,7 +13,7 @@ function ajax_success($result = array()) {
 function ajax_error($msg = null) {
 	$data = array();
     $data['data'] = null;
-    $data['status'] = 0;
+    $data['code'] = 0;
     $data['msg'] = ($msg ?: '操作失败');
     header('Content-Type:application/json; charset=utf-8');
     die(json_encode($data, JSON_UNESCAPED_UNICODE));
@@ -44,6 +44,8 @@ function upload_picture(){
     $new_name = get_new_name($my_file['name']);
     if(!$new_name){
         ajax_error('不支持的图片格式');
+    } else if($_GET['is_test']==1){
+        $new_name = ('test_pic_'.$new_name);
     }
     
     $root_dir = $_SERVER['DOCUMENT_ROOT'];
@@ -77,7 +79,13 @@ function upload_picture(){
             break;
         case IMAGETYPE_GIF: 
             $src_pic = imagecreatefromgif($root_dir.$path_original.$new_name);
-            $img_resized = imagescale($src_pic, $thumbnail_width, $thumbnail_height);
+            //$img_resized = imagescale($src_pic, $thumbnail_width, $thumbnail_height); //无法保存背景透明色，弃用
+            
+            $img_resized = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
+            $transparent_bg = imagecolorallocatealpha($img_resized, 255, 255, 255, 127); //默认透明背景
+            imagecolortransparent($img_resized, $transparent_bg);
+            imagefill($img_resized, 0, 0, $transparent_bg);
+            imagecopyresampled($img_resized, $src_pic, 0, 0, 0, 0, $thumbnail_width, $thumbnail_height, $image_info[0], $image_info[1]);
             imagegif($img_resized, $root_dir.$path_thumbnail.$new_name);
             break;
         case IMAGETYPE_BMP:
