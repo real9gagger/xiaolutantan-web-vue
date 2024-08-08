@@ -2,6 +2,7 @@
     <div class="fx-r fx-wp ps-r" @touchstart="onItemPointerDown" @mousedown="onItemPointerDown">
         <a v-for="item,index in uploadFileList" :key="item.srcId" class="pud-pic-box" :data-picindex="index" :style="getItemCssStyle(index)">
             <img :src="item.base64Src || publicAssets.imageImgReading" :alt="item.srcId" class="wi-f" draggable="false" />
+            <progress-circle :value="item.uploadProgress" />
         </a>
         <template v-if="dragIndex < 0">
             <a class="pud-pic-add" :style="addBoxStyle" title="添加照片" @click="onChoosePictures">
@@ -37,6 +38,7 @@
     import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
     import fileUploader from "@/utils/fileuploader.js";
     import publicAssets from "@/assets/data/publicAssets.js";
+    import progressCircle from "./progressCircle.vue";
     
     const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF"; //可接受的图片类型
     const VIDEO_ACCEPT_TYPE = ".MP4"; //可接受的视频类型
@@ -250,12 +252,16 @@
             }).success(function(dat, idx){
                 uploadFileList[indexesList[idx]].uploadResult = dat;
                 if((idx + 1) >= indexesList.length){
-                    resolve(uploadFileList.every(vx => vx.uploadProgress===100));
+                    if(uploadFileList.every(vx => vx.uploadProgress===100)){ //全部图片都上传成功！
+                        resolve(uploadFileList.map(vx => vx.uploadResult));
+                    } else {
+                        resolve(null);
+                    }
                 }
             }).error(function(msg, idx){
                 uploadFileList[indexesList[idx]].uploadProgress = -4444;
                 if((idx + 1) >= indexesList.length){
-                    resolve(false);
+                    resolve(null);
                 }
             }).queue(waitToUploads);
         });
@@ -317,6 +323,7 @@
         display: inline-flex;
         flex-direction: column;
         justify-content: center;
+        position: relative;
         width: $picBoxSize;
         height: $picBoxSize;
         margin: 0 $picBoxMargin $picBoxMargin 0;
