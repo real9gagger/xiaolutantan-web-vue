@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="fixed-limit-width po-br-0 pd-1rem">
-            <button class="btn-box" @click="onPublishes">发 布</button>
+            <button type="button" class="btn-box" @click="onPublishes">发 布</button>
         </div>
     </div>
 </template>
@@ -70,7 +70,8 @@
                 "latitude": $store.getters.pickPlaceLatitude,
                 "locationAddress": shootingAddress.value,
                 "pictureList": pics
-            }).then(res => {
+            }).then(res => { 
+                //！！！如果保存成功后页面会自动刷新，那是因为 vue-cli 监听到项目文件有变更，因此刷新页面，正式环境不会有此问题
                 $store.dispatch("setPickPlaceInfo", null);
                 $router.back();
             }).catch(err => {

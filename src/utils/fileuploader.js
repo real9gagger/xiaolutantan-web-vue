@@ -19,6 +19,7 @@ const instance = axios.create({
 
 let myAbortController = null;
 let fileNth = 0; //这是上传的第几个文件
+let isTest = (process.env.NODE_ENV === "production" ? 0 : 1);
 
 //（内部函数）模拟上传进度时，定时器调用的函数
 function fn_ProgressInterval(that){
@@ -43,7 +44,7 @@ function fn_UploadPicture(picFile){
         myAbortController = new AbortController();
         fileNth++;
         
-        instance.post("/xlttapi?action=upload_picture&is_test=1&file_nth=" + fileNth, formData, { signal: myAbortController.signal }).then(res => {
+        instance.post("/xlttapi?action=upload_picture&is_test=" + isTest + "&file_nth=" + fileNth, formData, { signal: myAbortController.signal }).then(res => {
             //console.log("上传文件结果:::", res);
             myAbortController = null;
             if(res.data?.code === 200){

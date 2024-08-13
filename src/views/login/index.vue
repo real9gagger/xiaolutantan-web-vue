@@ -29,7 +29,7 @@
                 <span class="login-input-digit" v-for="idx in vcMaxLength" :key="idx">{{verifyCode[idx - 1]}}</span>
             </div>
             <div class="mg-t-2rem">
-                <button class="btn-box" @click="onSubmit">登 录</button>
+                <button type="button" class="btn-box" @click="onSubmit">登 录</button>
             </div>
         </div>
         <div class="fixed-limit-width po-br-0 pd-rem5 ta-c fs-rem7">

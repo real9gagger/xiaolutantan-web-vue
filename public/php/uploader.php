@@ -137,7 +137,7 @@ function save_share_pics(){
     
     $dat_list[] = array(
         'id'                => $new_id,
-        'title'             => $posts['title'],
+        'title'             => trim($posts['title']),
         'createTime'        => date('Y/m/d H:i:s'),
         'authorNickname'    => '平平',
         'authorAvatarUrl'   => '',
@@ -153,7 +153,7 @@ function save_share_pics(){
     
     file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
     
-    ajax_success($posts);
+    ajax_success($new_id);
 }
 
 //调用函数

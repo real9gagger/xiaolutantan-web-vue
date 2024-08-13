@@ -37,7 +37,7 @@
         </ul>
 
         <div v-show="!isSearchFocus" class="pd-rem5">
-            <button class="btn-box" :class="{'disabled': !poiList?.length}" @click="onSelectedConfirm">确 定</button>
+            <button type="button" class="btn-box" :class="{'disabled': !poiList?.length}" @click="onSelectedConfirm">确 定</button>
         </div>
     </div>
 </template>

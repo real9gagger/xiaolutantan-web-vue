@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="fixed-limit-width po-br-0 pd-1rem">
-            <button class="btn-box" @click="onConfirm">完 成</button>
+            <button type="button" class="btn-box" @click="onConfirm">完 成</button>
         </div>
     </div>
 </template>
