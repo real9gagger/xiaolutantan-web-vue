@@ -18,6 +18,9 @@ const myGetters = {
     pickPlaceTitle: (state) => state.moduleSettings.pickPlaceTitle,
     pickPlaceLongitude: (state) => state.moduleSettings.pickPlaceLongitude,
     pickPlaceLatitude: (state) => state.moduleSettings.pickPlaceLatitude,
+    
+    pickUserNickName: (state) => state.moduleSettings.pickUserNickName,
+    pickUserAvatarUrl: (state) => state.moduleSettings.pickUserAvatarUrl,
 };
 
 const vuexStore = createStore({

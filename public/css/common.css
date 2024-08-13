@@ -43,6 +43,10 @@
     height: var(--current-window-height);
     overflow: auto;
 }
+.page-limit-width > .content-cage.no-tbpd{
+    padding: 0 1rem;
+}
+
 .fixed-limit-width{
     position: fixed;
     z-index: 8;

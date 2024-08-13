@@ -7,6 +7,8 @@ export default {
             pickPlaceTitle: "", //选取的地点的名称
             pickPlaceLongitude: 0, //选取的地点的经度
             pickPlaceLatitude: 0, //选取的地点的纬度
+            pickUserNickName: "", //选取的发布用户昵称
+            pickUserAvatarUrl: "" //选取的发布用户头像链接
     	}
     },
     mutations: {
@@ -28,6 +30,15 @@ export default {
                 state.pickPlaceLongitude = 0;
                 state.pickPlaceLatitude = 0;
             }
+        },
+        SET_PICK_USER_INFO(state, payload){
+            if(payload && payload.nickName && payload.avatarUrl){
+                state.pickUserNickName = payload.nickName;
+                state.pickUserAvatarUrl = payload.avatarUrl;
+            } else {
+                state.pickUserNickName = "";
+                state.pickUserAvatarUrl = "";
+            }
         }
     },
     actions: {
@@ -39,6 +50,9 @@ export default {
         },
         setPickPlaceInfo({ commit }, payload){
             commit("SET_PICK_PLACE_INFO", payload);
+        },
+        setPickUserInfo({ commit }, payload){
+            commit("SET_PICK_USER_INFO", payload);
         }
     },
 }

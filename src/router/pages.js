@@ -96,5 +96,13 @@ export default [
     	meta: {
             showPageTitle: true
         }
+    },
+    {
+    	path: "/userpicker",
+    	name: "选择用户",
+    	component: () => import("@/views/mine/userPicker"),
+    	meta: {
+            showPageTitle: true
+        }
     }
 ];

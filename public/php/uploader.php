@@ -124,6 +124,8 @@ function upload_picture(){
 function save_share_pics(){
     $posts = json_decode(file_get_contents('php://input'), true);
     if( !$posts['title'] || 
+        !$posts['authorNickname'] ||
+        !$posts['authorAvatarUrl'] ||
         !$posts['longitude'] ||
         !$posts['latitude'] || 
         !$posts['locationAddress'] ||
@@ -139,8 +141,8 @@ function save_share_pics(){
         'id'                => $new_id,
         'title'             => trim($posts['title']),
         'createTime'        => date('Y/m/d H:i:s'),
-        'authorNickname'    => '平平',
-        'authorAvatarUrl'   => '',
+        'authorNickname'    => $posts['authorNickname'],
+        'authorAvatarUrl'   => $posts['authorAvatarUrl'],
         'longitude'         => floatval($posts['longitude']),
         'latitude'          => floatval($posts['latitude']),
         'locationAddress'   => $posts['locationAddress'],

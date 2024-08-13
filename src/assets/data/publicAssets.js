@@ -75,6 +75,9 @@ const AssetsPathMap = {
     imageMapCanalThumbnail: "images/map_canal_thumbnail.png",
     imageServerError: "images/server_error.png",
     imageLoadingGif: "images/loading_gif.svg",
+    imageAvatarPingping: "images/avatar_pingping.jpeg",
+    imageAvatarTantan: "images/avatar_tantan.jpeg",
+    imageAvatarLulu: "images/avatar_lulu.jpeg",
 };
 
 if(THE_BU){
