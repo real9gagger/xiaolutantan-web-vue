@@ -31,7 +31,7 @@ function get_new_name($old_name){
         return null;
     }
     
-    return md5(hrtime(true).$old_name) .$file_ext;
+    return md5(hrtime(true).$old_name) . $file_ext;
 }
 
 //上传一张图片
@@ -103,7 +103,7 @@ function upload_picture(){
     }
     
     $output_data = array(
-        'id'            => 0,
+        'id'            => intval($_GET['file_nth']),
         'description'   => $my_file['name'],
         'size'          => $my_file['size'],
         'picPath'       => $path_original.$new_name,
@@ -118,6 +118,42 @@ function upload_picture(){
     );
     
     ajax_success($output_data);
+}
+
+//保存用户分享额照片信息
+function save_share_pics(){
+    $posts = json_decode(file_get_contents('php://input'), true);
+    if( !$posts['title'] || 
+        !$posts['longitude'] ||
+        !$posts['latitude'] || 
+        !$posts['locationAddress'] ||
+        !$posts['pictureList']){
+        ajax_error('保存失败，数据不全');
+    }
+    
+    $path_dataset = $_SERVER['DOCUMENT_ROOT'] . '/sharepics/dataset.json';
+    $dat_list = json_decode(file_get_contents($path_dataset), true);
+    $new_id = count($dat_list) + 1;
+    
+    $dat_list[] = array(
+        'id'                => $new_id,
+        'title'             => $posts['title'],
+        'createTime'        => date('Y/m/d H:i:s'),
+        'authorNickname'    => '平平',
+        'authorAvatarUrl'   => '',
+        'longitude'         => floatval($posts['longitude']),
+        'latitude'          => floatval($posts['latitude']),
+        'locationAddress'   => $posts['locationAddress'],
+        'pictureList'       => $posts['pictureList'],
+        'likesCount'        => 0, //点赞数量
+        'commentCount'      => 0, //评论数量
+        'shareCount'        => 0, //分享次数
+        'viewCount'         => 0 //查看次数
+    );
+    
+    file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+    
+    ajax_success($posts);
 }
 
 //调用函数

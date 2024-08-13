@@ -246,6 +246,10 @@
     }
     function startUpload(){//外部组件调用
         return new Promise(function (resolve, reject) {
+            if(!uploadFileList.length){
+                return !reject(null); //没有要上传的文件
+            }
+            
             //等待上传的文件
             const waitToUploads = [];
             const indexesList = [];
@@ -255,6 +259,10 @@
                     indexesList.push(ix);
                     uploadFileList[ix].uploadProgress = uploadStatusCode.waiting;
                 }
+            }
+            
+            if(!waitToUploads.length){
+                return !resolve(uploadFileList.map(vx => vx.uploadResult)); //所有文件都已上传完
             }
             
             picFU.reset().progress(function(num, idx){
@@ -275,6 +283,9 @@
                 }
             }).queue(waitToUploads);
         });
+    }
+    function getFileCount(){//外部组件调用
+        return uploadFileList.length;
     }
     function getItemCssStyle(idx){
         const outStyle = {};
@@ -321,7 +332,8 @@
     });
     
     defineExpose({
-        startUpload
+        startUpload,
+        getFileCount
     });
 </script>
 
