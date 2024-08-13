@@ -11,7 +11,10 @@ const instance = axios.create({
     timeout: 15000,
     headers: {
         "Content-Type": "multipart/form-data"
-    }
+    },
+    /* onUploadProgress: function (progressEvent) { //上传进度
+        console.log(progressEvent);
+    } */
 });
 
 let myAbortController = null;

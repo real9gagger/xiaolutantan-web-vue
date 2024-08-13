@@ -36,6 +36,7 @@
 <script setup name="PictureUploader">
     import { ref, reactive, computed, defineExpose, getCurrentInstance, onMounted, onUnmounted } from "vue";
     import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
+    import { uploadStatusCode } from "@/assets/data/constants.js";
     import fileUploader from "@/utils/fileuploader.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import progressCircle from "./progressCircle.vue";
@@ -217,18 +218,26 @@
     function onChooseChange(evt){
         //console.log(evt)
         const nowTS = Date.now() * 10;
+        const maxFileSize = 16777216; //最大16M
+        const maxIndex = chooseType.value - 1; //允许的最大索引
         for(const file of evt.target.files){
-            const nth = uploadFileList.length;
-            if((nth + 1) > chooseType.value){
-                break;
+            if(uploadFileList.length > maxIndex){
+                //appToast("最多 9 张图片");
+                break; //最多 9 张图片
             }
+            if(file.size > maxFileSize){
+                appToast("部分文件大小超过16M，已忽略");
+                continue; //忽略超过 16M 的文件
+            }
+            
+            const nth = uploadFileList.length;
             const reader = new FileReader();
             reader.onload = (arg) => (uploadFileList[nth].base64Src = arg.target.result);
             reader.readAsDataURL(file);
             
             uploadFileList.push({
                 srcId: nowTS + nth,
-                uploadProgress: -1, //上传进度。小于0表示未在上传，等于0表示等待上传，等于100表示上传成功，等于 -4444 表示上传失败。
+                uploadProgress: uploadStatusCode.unactived, //上传进度。小于0表示未在上传，等于0表示等待上传，等于100表示上传成功，等于 -4444 表示上传失败。
                 base64Src: null, //图片的 base64 数据
                 uploadResult: null, //上传成功返回的数据
                 picFile: file //图片文件
@@ -241,9 +250,10 @@
             const waitToUploads = [];
             const indexesList = [];
             for(let ix = 0; ix < uploadFileList.length; ix++){
-                if(uploadFileList[ix].uploadProgress <= 0){//仅上传没有上传或上传失败的文件
+                if(uploadFileList[ix].uploadProgress <= uploadStatusCode.waiting){//仅上传没有上传或上传失败的文件
                     waitToUploads.push(uploadFileList[ix].picFile);
                     indexesList.push(ix);
+                    uploadFileList[ix].uploadProgress = uploadStatusCode.waiting;
                 }
             }
             
@@ -252,16 +262,16 @@
             }).success(function(dat, idx){
                 uploadFileList[indexesList[idx]].uploadResult = dat;
                 if((idx + 1) >= indexesList.length){
-                    if(uploadFileList.every(vx => vx.uploadProgress===100)){ //全部图片都上传成功！
+                    if(uploadFileList.every(vx => vx.uploadProgress===uploadStatusCode.success)){ //全部图片都上传成功！
                         resolve(uploadFileList.map(vx => vx.uploadResult));
                     } else {
-                        resolve(null);
+                        reject(null);
                     }
                 }
             }).error(function(msg, idx){
-                uploadFileList[indexesList[idx]].uploadProgress = -4444;
+                uploadFileList[indexesList[idx]].uploadProgress = uploadStatusCode.failed;
                 if((idx + 1) >= indexesList.length){
-                    resolve(null);
+                    reject(null);
                 }
             }).queue(waitToUploads);
         });

@@ -18,3 +18,12 @@ export const appMainColor = "#43BA62";
 
 //小程序网页版名称
 export const appWebName = "小鹿坦坦";
+
+//上传状态码
+export const uploadStatusCode = {
+    unactived: -0x1, //未在上传
+    waiting: 0x0, //等待上传
+    uploading: 0x1, //正在上传
+    success: 0x64, //上传成功
+    failed: -0x5124, //上传失败
+};
