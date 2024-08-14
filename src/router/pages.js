@@ -99,7 +99,7 @@ export default [
     },
     {
     	path: "/userpicker",
-    	name: "选择用户",
+    	name: "选择作者",
     	component: () => import("@/views/mine/userPicker"),
     	meta: {
             showPageTitle: true

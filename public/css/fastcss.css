@@ -58,6 +58,7 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 /* tap */
 .tp-dim:active{background-image:linear-gradient(0deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.1) 100%)}
 .tp-f0:active{background-color: #f0f0f0}
+.tp-op6:active{opacity:0.6}
 
 /***************************************************** HTML基准字体大小 20 像素 **************************************************************/
 .fs-0{font-size:0}
@@ -337,7 +338,7 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 .tc-cc{color:#ccc}
 .tc-ff{color:#fff}
 .tc-a6{color:#a6a6a6}
-.tc-o0{color:#E6A23C}/*Orange*/
+.tc-o0{color:#FF9900}/*Orange*/
 .tc-o1{color:#F5AE3B}
 .tc-g0{color:#00ab28}/* Green */
 .tc-g1{color:#A6DB11}

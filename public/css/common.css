@@ -1,3 +1,8 @@
+@keyframes btn-box-ajaxing-kf {
+	from{background-position:100% 50%}
+	to{background-position:0% 50%}
+}
+
 .disabled{
 	opacity: 0.6;
 	cursor: no-drop;
@@ -17,6 +22,11 @@
     user-select: none;
 }
 .btn-box:active{opacity: 0.75;}
+.btn-box.ajaxing{
+    background-image:repeating-linear-gradient(135deg, rgba(167,209,41,0.0) 0%, rgba(167,209,41,0.7) 25%, rgba(167,209,41,0.0) 50%);
+    background-size:200% 100%;
+    animation:btn-box-ajaxing-kf 1s ease infinite;
+}
 .app-toast-box{
 	position:fixed;
 	bottom: 20vh;
@@ -46,7 +56,6 @@
 .page-limit-width > .content-cage.no-tbpd{
     padding: 0 1rem;
 }
-
 .fixed-limit-width{
     position: fixed;
     z-index: 8;

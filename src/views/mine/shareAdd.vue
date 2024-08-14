@@ -1,5 +1,5 @@
 <template>
-    <div class="page-limit-width" :class="{'disabled': isPublishing}">
+    <div class="page-limit-width">
         <div class="content-cage">
             <div class="ps-r mg-b-1rem">
                 <textarea v-model="descText" class="msa-textarea-box of-no-sb" rows="3" placeholder="说点什么吧~" :maxlength="MAX_TEXT_LENGTH" @input="onTextAreaInput" />
@@ -9,19 +9,20 @@
             <picture-uploader ref="puBox" />
             <div class="mg-t-rem25 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoAddressPicker">
-                <template v-if="!shootingAddress">
+                <template v-if="!captureAddress">
                     <img :src="publicAssets.iconAddShareLocation" class="wh-1em" />
-                    <a class="mg-lr-rem5 tc-99 fx-g1">添加照片拍摄地点</a>
+                    <a class="mg-lr-rem25 tc-66 fx-g1">添加照片拍摄地点</a>
                 </template>
                 <template v-else >
                     <img :src="publicAssets.iconAddShareLocationGreen" class="wh-1em" />
-                    <a class="mg-lr-rem5 tc-mc fx-g1">{{shootingAddress}}</a>
+                    <a class="mg-lr-rem25 tc-mc fx-g1">{{captureAddress}}</a>
                 </template>
                 <img :src="publicAssets.iconArrowRight" class="wh-1em op-6" />
             </div>
             <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoUserPicker">
-                <span class="fx-g1 tc-66 ta-r">内容创作者</span>
+                <img :src="publicAssets.iconThePostAuthor" class="wh-1em" />
+                <span class="mg-lr-rem25 tc-66 fx-g1">内容创作者</span>
                 <template v-if="authorName" >
                     <b class="mg-lr-rem5">{{authorName}}</b>
                     <img :src="$store.getters.pickUserAvatarUrl" class="wh-1rem br-h" />
@@ -30,8 +31,10 @@
             </div>
         </div>
         <div class="fixed-limit-width po-br-0 pd-1rem">
-            <button type="button" class="btn-box" @click="onPublishes">发 布</button>
+            <button v-if="!isPublishing" type="button" class="btn-box" @click="onPublishes">发 布</button>
+            <button v-else type="button" class="btn-box ajaxing">正在发布…</button>
         </div>
+        <div v-if="isPublishing" class="ps-f po-f zi-x5" @click="onPublishingTips"><!-- 正在发布时显示的遮罩层，防止误触 --></div>
     </div>
 </template>
 
@@ -51,7 +54,7 @@
     const inputRemainingLength = ref(MAX_TEXT_LENGTH);
     const descText = ref("");
     const isPublishing = ref(false); //是否正在发布
-    const shootingAddress = computed(() => $store.getters.pickPlaceTitle);
+    const captureAddress = computed(() => $store.getters.pickPlaceAddress);
     const authorName = computed(() => $store.getters.pickUserNickName);
     
     function gotoAddressPicker(){
@@ -66,13 +69,17 @@
         inputRemainingLength.value = (MAX_TEXT_LENGTH - evt.target.value.length);
     }
     function onPublishes(){
+        if(isPublishing.value){
+            return false;
+        }
+        
         if(!descText.value.trim()){
             return !appToast("请填写照片标题");
         }
         if(!$instance.refs.puBox.getFileCount()){
             return !appToast("请上传要分享的照片");
         }
-        if(!shootingAddress.value){
+        if(!captureAddress.value){
             return !appToast("请添加照片拍摄地点");
         }
         if(!authorName.value){
@@ -87,7 +94,7 @@
                 "authorAvatarUrl": $store.getters.pickUserAvatarUrl,
                 "longitude": $store.getters.pickPlaceLongitude,
                 "latitude": $store.getters.pickPlaceLatitude,
-                "locationAddress": shootingAddress.value,
+                "locationAddress": captureAddress.value,
                 "pictureList": pics
             }).then(res => { 
                 //！！！如果保存成功后页面会自动刷新，那是因为 vue-cli 监听到项目文件有变更，因此刷新页面，正式环境不会有此问题
@@ -100,6 +107,9 @@
             appToast("上传照片失败，请稍后重试");
             isPublishing.value = false;
         });
+    }
+    function onPublishingTips(){
+        appToast("正在上传文件，请耐心等待…");
     }
 </script>
 
