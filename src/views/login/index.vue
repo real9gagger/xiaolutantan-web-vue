@@ -112,7 +112,9 @@
             return !appToast("请填写短信验证码");
         }
         
-        //待完成
+        //登录部分待完成...
+        
+        $router.push("/mine");
     }
     function onPnBoxClick(){
         $("#pnInputBox").focus();

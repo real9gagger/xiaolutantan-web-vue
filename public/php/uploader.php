@@ -145,6 +145,7 @@ function save_share_pics(){
         'authorAvatarUrl'   => $posts['authorAvatarUrl'],
         'longitude'         => floatval($posts['longitude']),
         'latitude'          => floatval($posts['latitude']),
+        'coordinateSystem'  => 'BD09', //经纬度坐标系系统类型：BD09、GCJ02、WGS84
         'locationAddress'   => $posts['locationAddress'],
         'pictureList'       => $posts['pictureList'],
         'likesCount'        => 0, //点赞数量

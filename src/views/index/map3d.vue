@@ -120,9 +120,10 @@
     
     //转到我的账户
     function onGotoMyAccount(){
-        const isLogin = false;
-        if(!isLogin){
+        if(!$store.getters.isUserLogined){
             $router.push("/login");
+        } else {
+            $router.push("/mine");
         }
     }
     

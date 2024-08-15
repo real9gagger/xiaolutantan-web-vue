@@ -1,7 +1,7 @@
 <template>
     <div class="page-limit-width">
-        <div class="content-cage" @click="gotoShareAdd">
-            
+        <div class="content-cage" style="padding:0">
+            <div class="mni-user-bg" @click="gotoShareAdd"></div>
         </div>
     </div>
 </template>
@@ -16,4 +16,8 @@
 </script>
 
 <style scoped="scoped">
+    .mni-user-bg{
+        background-color: red;
+        height: 25%;
+    }
 </style>

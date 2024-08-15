@@ -1,10 +1,12 @@
 import { createStore } from "vuex";
 import routeController from "./routeController";
 import moduleSettings from "./moduleSettings";
+import userInfo from "./userInfo";
 
 const myModules = {
     routeController,
-    moduleSettings
+    moduleSettings,
+    userInfo
 };
 
 const myGetters = {
@@ -21,6 +23,10 @@ const myGetters = {
     
     pickUserNickName: (state) => state.moduleSettings.pickUserNickName,
     pickUserAvatarUrl: (state) => state.moduleSettings.pickUserAvatarUrl,
+    
+    isUserLogined: (state) => !!state.userInfo.authToken,
+    currentUserNickName: (state) => state.userInfo.nickName,
+    currentUserAvatarUrl: (state) => state.userInfo.avatarUrl,
 };
 
 const vuexStore = createStore({
