@@ -61,6 +61,7 @@ const AssetsPathMap = {
     iconTrashCloseWhite: "icons/trash_close_white.png",
     iconTrashOpenWhite: "icons/trash_open_white.png",
     iconThePostAuthor: "icons/the_post_author.png",
+    iconPublishPost: "icons/publish_post.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

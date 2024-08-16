@@ -8,9 +8,7 @@
                         <h4 class="dp-bk fs-1rem">火星人</h4>
                         <p class="mg-t-rem25 fs-rem7">帖子&nbsp;<b>{{postList.length}}</b>&emsp;</p>
                     </div>
-                    <div>
-                        <button type="button" class="btn-box" @click="gotoShareAdd">发帖</button>
-                    </div>
+                    <button type="button" class="btn-box" style="width:auto" @click="gotoShareAdd"><img :src="publicAssets.iconPublishPost" alt="发贴" class="wh-1em va-tt" />&nbsp;发帖</button>
                 </div>
                 <lulu-bg-bubble />
             </header>

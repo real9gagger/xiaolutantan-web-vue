@@ -66,7 +66,7 @@
                 timerID = window.oRequestAnimationFrame(callback);
             } else {
                 clearTimeout(timerID);
-                timerID = setTimeout(callback, 16);
+                timerID = setTimeout(callback, 20);
             }
         };
         const drawCircle = function(x, y, radius, color, alpha) {
