@@ -16,7 +16,8 @@
     "unplugin-vue-setup-extend-plus": "^1.0.1",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.13",

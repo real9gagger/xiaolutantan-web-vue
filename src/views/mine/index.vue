@@ -3,9 +3,9 @@
         <div class="content-cage" style="padding:0">
             <header class="mni-user-bg">
                 <div class="mni-user-profile fx-hc">
-                    <img :src="publicAssets.imageAvatarAdmin" class="mni-user-avatar" alt="用户头像" />
+                    <img :src="$store.getters.currentUserAvatarUrl" class="mni-user-avatar" alt="用户头像" />
                     <div class="pd-lr-rem5 fx-g1 tc-ff">
-                        <h4 class="dp-bk fs-1rem">火星人</h4>
+                        <h4 class="dp-bk fs-1rem">{{$store.getters.currentUserNickName}}</h4>
                         <p class="mg-t-rem25 fs-rem7">帖子&nbsp;<b>{{postList.length}}</b>&emsp;</p>
                     </div>
                     <button type="button" class="btn-box" style="width:auto" @click="gotoShareAdd"><img :src="publicAssets.iconPublishPost" alt="发贴" class="wh-1em va-tt" />&nbsp;发帖</button>
@@ -46,6 +46,7 @@
 <script setup name="MineIndex">
     import { onMounted, reactive, ref } from "vue";
     import { useRouter } from "vue-router";
+    import { useStore } from "vuex";
     
     import axios from "axios";
     import myStorage from "@/utils/mystorage.js";
@@ -53,6 +54,7 @@
     import luluBgBubble from "@/components/luluBgBubble.vue";
     
     const $router = useRouter();
+    const $store = useStore();
     const postList = reactive([]); //帖子列表，支持下拉加载更多！
     const isLoading = ref(false); //是否正在加载
     const isNoMore = ref(false); //是否还有更多数据

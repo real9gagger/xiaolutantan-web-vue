@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import createPersistedState from "vuex-persistedstate";
 import routeController from "./routeController";
 import moduleSettings from "./moduleSettings";
 import userInfo from "./userInfo";
@@ -29,9 +30,16 @@ const myGetters = {
     currentUserAvatarUrl: (state) => state.userInfo.avatarUrl,
 };
 
+const dataState = createPersistedState({//持久化存储
+    storage: window.localStorage,
+    key: "xlttweb_vuex_storage",
+    paths: ["userInfo"] 
+});
+
 const vuexStore = createStore({
     modules: myModules,
-    getters: myGetters
+    getters: myGetters,
+    plugins: [dataState]
 });
 
 export default vuexStore;

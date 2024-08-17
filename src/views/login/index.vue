@@ -40,8 +40,10 @@
 </template>
 
 <script setup name="LoginIndex">
+    import publicAssets from "@/assets/data/publicAssets.js";
     import { onUnmounted, ref } from "vue";
-    import { useRouter } from "vue-router";
+    import { useStore } from "vuex";
+    import { useRouter, useRoute } from "vue-router";
     
     const pnMaxLength = 11;
     const vcMaxLength = 6;
@@ -50,8 +52,11 @@
     const waitSeconds = ref(0); // 88 正在发送验证码， 1-60 XX秒后重新发送，0-默认状态
     const phoneNumber = ref(""); //手机号码
     const verifyCode = ref(""); //短信验证码
-    const $router = useRouter();
     
+    const $store = useStore();
+    const $router = useRouter();
+    const $route = useRoute();
+
     let waitTimerID = 0;
     
     function onPnFocus(evt){
@@ -113,8 +118,17 @@
         }
         
         //登录部分待完成...
-        
-        $router.push("/mine");
+        if(phoneNumber.value === "18249944619" && verifyCode.value === "520971"){
+            $store.dispatch("setUserInfo", {
+                authToken: "iLoveYou971", //令牌信息
+                nickName: "火星人", //昵称
+                userName: phoneNumber.value, //账号
+                avatarUrl: publicAssets.imageAvatarAdmin, //头像URL
+            });
+            $router.replace($route.query.redirect_url || "/");
+        } else {
+            appToast("登录失败：验证码不正确");
+        }
     }
     function onPnBoxClick(){
         $("#pnInputBox").focus();

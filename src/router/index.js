@@ -9,8 +9,11 @@ const myRouter = createRouter({
 	//scrollBehavior: function(to, from, savedPosition){}
 });
 
-//添加导航守卫，用的是 vue-router4
+//添加导航守卫，用的是 vue-router4：https://router.vuejs.org/zh/guide/advanced/navigation-guards.html
 myRouter.beforeEach(function(to, from){
+    if(to.meta.loginRequired && !vuexStore.getters.isUserLogined){
+        return ("/login?redirect_url=" + encodeURIComponent(to.fullPath));
+    }
 	return true;
 });
 

@@ -120,11 +120,7 @@
     
     //转到我的账户
     function onGotoMyAccount(){
-        if(!$store.getters.isUserLogined){
-            $router.push("/login");
-        } else {
-            $router.push("/mine");
-        }
+        $router.push("/mine");
     }
     
     //监听地图缩放

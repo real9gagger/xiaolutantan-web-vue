@@ -1,9 +1,9 @@
 export default [
     {
-      path: "/:pathMatch(.*)",
-      name: "未知页面",
-      redirect: "/e404",
-      meta: {}
+        path: "/:pathMatch(.*)",
+        name: "未知页面",
+        redirect: "/e404",
+        meta: {}
     },
 	{
 		path: "/", 
@@ -43,7 +43,7 @@ export default [
 	},
     {
     	path: "/map3d",
-    	name: "平陆运河3D视图",
+    	name: "平陆运河",
     	component: () => import("@/views/index/map3d"),
     	meta: {
             showPageTitle: true
@@ -70,7 +70,8 @@ export default [
     	name: "选择地点",
     	component: () => import("@/views/index/map3dPositionPicker"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            loginRequired: true
         }
     },
     {
@@ -86,7 +87,8 @@ export default [
     	name: "个人中心",
     	component: () => import("@/views/mine/index"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            loginRequired: true
         }
     },
     {
@@ -94,7 +96,8 @@ export default [
     	name: "分享照片",
     	component: () => import("@/views/mine/shareAdd"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            loginRequired: true
         }
     },
     {
@@ -102,7 +105,8 @@ export default [
     	name: "选择作者",
     	component: () => import("@/views/mine/userPicker"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            loginRequired: true
         }
     }
 ];
