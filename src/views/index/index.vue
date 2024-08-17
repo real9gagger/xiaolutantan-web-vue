@@ -6,7 +6,7 @@
 
 <script setup name="IndexIndex">
     import { useRouter } from "vue-router";
-    import { onMounted, nextTick } from "vue";
+    import { nextTick, onActivated } from "vue";
     
     const $router = useRouter();
     
@@ -14,7 +14,7 @@
         $router.replace("/map3d");
     }
     
-    onMounted(() => {
+    onActivated(() => {
         nextTick(gotoMap3dPage);
     });
 </script>

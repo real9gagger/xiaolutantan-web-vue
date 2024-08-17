@@ -3,9 +3,9 @@
         <div class="content-cage" style="padding:0">
             <header class="mni-user-bg">
                 <div class="mni-user-profile fx-hc">
-                    <img :src="$store.getters.currentUserAvatarUrl" class="mni-user-avatar" alt="用户头像" />
+                    <img :src="$store.getters.currentUserAvatarUrl || publicAssets.iconDefaultUserAvatar" @click="onLogout" class="mni-user-avatar" alt="用户头像" />
                     <div class="pd-lr-rem5 fx-g1 tc-ff">
-                        <h4 class="dp-bk fs-1rem">{{$store.getters.currentUserNickName}}</h4>
+                        <h4 class="dp-bk fs-1rem">{{$store.getters.currentUserNickName || appWebName}}</h4>
                         <p class="mg-t-rem25 fs-rem7">帖子&nbsp;<b>{{postList.length}}</b>&emsp;</p>
                     </div>
                     <button type="button" class="btn-box" style="width:auto" @click="gotoShareAdd"><img :src="publicAssets.iconPublishPost" alt="发贴" class="wh-1em va-tt" />&nbsp;发帖</button>
@@ -47,6 +47,7 @@
     import { onMounted, reactive, ref } from "vue";
     import { useRouter } from "vue-router";
     import { useStore } from "vuex";
+    import { appWebName } from "@/assets/data/constants.js"
     
     import axios from "axios";
     import myStorage from "@/utils/mystorage.js";
@@ -96,6 +97,12 @@
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos", item);
         $router.push("/map3ddetails?sid=" + item.id);
+    }
+    function onLogout(){
+        alertConfirm("退出登录").then(() => {
+            $store.dispatch("setUserInfo", null);
+            $router.replace("/");
+        }).catch(() => 0);
     }
     
     onMounted(getPostList);

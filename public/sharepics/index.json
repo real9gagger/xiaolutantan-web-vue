@@ -8,6 +8,7 @@
 		"authorAvatarUrl": "",
 		"longitude": 108.944385,
 		"latitude": 22.378856,
+        "coordinateSystem": "GCJ02",
 		"locationAddress": "广西壮族自治区钦州市灵山县旧州镇马道头村",
 		"pictureList": [
 			{
@@ -66,6 +67,7 @@
     	"authorAvatarUrl": "",
     	"longitude": 109.073873,
     	"latitude": 22.642090,
+        "coordinateSystem": "GCJ02",
     	"locationAddress": "广西壮族自治区南宁市横州市新福镇平塘村",
     	"pictureList": [
     		{
@@ -96,6 +98,7 @@
     	"authorAvatarUrl": "",
     	"longitude": 108.654629,
     	"latitude": 22.005420,
+        "coordinateSystem": "GCJ02",
     	"locationAddress": "广西壮族自治区钦州市钦北区泥桥路",
     	"pictureList": [
     		{
@@ -126,6 +129,7 @@
     	"authorAvatarUrl": "",
     	"longitude": 108.942663,
     	"latitude": 22.322861,
+        "coordinateSystem": "GCJ02",
     	"locationAddress": "广西壮族自治区钦州市灵山县陆屋镇企石村",
     	"pictureList": [
     		{

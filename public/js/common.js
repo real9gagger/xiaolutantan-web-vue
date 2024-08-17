@@ -82,3 +82,19 @@ function appToast(msg, duration){
 		$msgbox.data("appToastTimerID1", tid1).data("appToastTimerID2", tid2);
 	}
 }
+
+function alertConfirm(msg){
+    return new Promise(function (resolve, reject) {
+        let $alertbox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button class="alert-confirm-yes">确定</button></div></div>`).appendTo(document.body);
+        
+        $alertbox.on("click", function(evt){
+            if(evt.target.classList.contains("alert-confirm-container")){
+                reject();
+                $(this).remove();
+            } else if(evt.target.classList.contains("alert-confirm-yes")){
+                resolve();
+                $(this).remove();
+            }
+        });
+    });
+}
