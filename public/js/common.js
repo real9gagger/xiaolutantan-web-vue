@@ -85,16 +85,22 @@ function appToast(msg, duration){
 
 function alertConfirm(msg){
     return new Promise(function (resolve, reject) {
-        let $alertbox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button class="alert-confirm-yes">确定</button></div></div>`).appendTo(document.body);
+        let $alertbox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button class="alert-confirm-yes">好</button></div></div>`).appendTo(document.body);
         
         $alertbox.on("click", function(evt){
             if(evt.target.classList.contains("alert-confirm-container")){
+                $(evt.currentTarget).removeClass("showup");
                 reject();
-                $(this).remove();
             } else if(evt.target.classList.contains("alert-confirm-yes")){
+                $(evt.currentTarget).removeClass("showup");
                 resolve();
-                $(this).remove();
+            }
+        }).on("transitionend", function (evt) {
+            if(!evt.currentTarget.classList.contains("showup")){
+                $(evt.currentTarget).remove();
             }
         });
+        
+        setTimeout($alertbox.addClass.bind($alertbox), 50, "showup");
     });
 }

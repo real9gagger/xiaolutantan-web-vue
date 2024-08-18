@@ -51,6 +51,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity 200ms;
+}
+.alert-confirm-container.showup{
+    opacity: 1;
+}
+.alert-confirm-container.showup > .alert-confirm-dialog{
+    transform: scale(1) translate(0, 0);
 }
 .alert-confirm-dialog{
     width: min(80%,20rem);
@@ -59,6 +67,9 @@
     text-align: center;
     font-size: 0.8rem;
     overflow: hidden;
+    transform: scale(0.8) translate(0, 20%);
+    transform-origin: 50% 0%;
+    transition: transform 300ms;
 }
 .alert-confirm-msg{
     padding:1.5rem 1rem;
@@ -72,8 +83,7 @@
     background-color: transparent;
     font-size: inherit;
 }
-.alert-confirm-yes:active,
-.alert-confirm-yes:hover{
+.alert-confirm-yes:active{
     background-color: #f6f6f6;
 }
 .page-limit-width{

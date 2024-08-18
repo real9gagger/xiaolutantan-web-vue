@@ -12,8 +12,8 @@ const AssetsPathMap = {
     geojsonZhen: "geojson/zhen_geojson.json",
     geojsonZhenUnsimplify: "geojson/zhen_geojson_unsimplify.json", //未压缩的文件
     
-    //用户分享的照片数据
-    sharePicsData: "sharepics/index.json",
+    //用户分享的照片数据：测试环境可用：sharepics/index.json 文件
+    sharePicsData: "sharepics/dataset.json", 
     
     //图标
     iconDefaultUserAvatar: "icons/default_user_avatar.png",
