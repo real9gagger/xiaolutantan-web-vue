@@ -93,6 +93,7 @@
         isNoMore.value = false;
         pageIndex.value = 0;
         errMsg.value = null;
+        postList.splice(0);
         getPostList();
     }
     function onItemClick(item){

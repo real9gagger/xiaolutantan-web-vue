@@ -162,6 +162,7 @@ function save_share_pics(){
 //调用函数
 $call_action = $_GET['action'];
 if(function_exists($call_action)){
+    date_default_timezone_set('Asia/Shanghai');
     $call_action();
 } else {
     ajax_error('未知的操作');

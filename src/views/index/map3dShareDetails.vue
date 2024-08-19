@@ -46,6 +46,7 @@
 <script setup name="IndexMap3DShareDetails">
     import { ref } from "vue";
     import { useRoute, useRouter } from "vue-router";
+    import { needThrottle } from "@/utils/cocohelper.js";
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import gestureImage from "@/components/gestureImage.vue";
@@ -65,7 +66,7 @@
         picIndex.value = evt.target.swiper.realIndex;
     }
     function toggleHideText(){
-        //isHideText.value = !isHideText.value;
+        needThrottle(() => (isHideText.value = !isHideText.value), 500);
     }
     function goBackToHomePage(){
         $router.replace("/");

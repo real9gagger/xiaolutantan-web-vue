@@ -28,8 +28,8 @@
     
     const MOVE_RATIO = 0.3; //移到超出范围后的粘合墙壁因子，值越小越粘。
     const INERTIA_STEP = 150; //单指移动放手后的滑动的时间（毫秒）
-    const MAX_SCALE = 6.5; //双指放大时最大的放大倍数
-    const MAX_SCALE_FINAL = 5; //手指离开屏幕时最终允许的最大放大倍数
+    const MAX_SCALE = 7; //双指放大时最大的放大倍数
+    const MAX_SCALE_FINAL = 6; //手指离开屏幕时最终允许的最大放大倍数
     const MIN_SCALE = 0.8; //双指缩小时最小的缩小倍数
     const MIN_SCALE_FINAL = 1; //手指离开屏幕时最终允许的最小缩小倍数
     const DOUBLE_CLICK_SPAN = 300; //双击时的时间间隔

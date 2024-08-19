@@ -25,11 +25,11 @@ const myGetters = {
     pickUserNickName: (state) => state.moduleSettings.pickUserNickName,
     pickUserAvatarUrl: (state) => state.moduleSettings.pickUserAvatarUrl,
     
+    thereAreNewPostsTs:  (state) => state.moduleSettings.thereAreNewPostsTs,
+    
     isUserLogined: (state) => !!state.userInfo.authToken,
     currentUserNickName: (state) => state.userInfo.nickName,
     currentUserAvatarUrl: (state) => state.userInfo.avatarUrl,
-    
-    thereAreNewPostsTs:  (state) => state.thereAreNewPostsTs,
 };
 
 const dataState = createPersistedState({//持久化存储
