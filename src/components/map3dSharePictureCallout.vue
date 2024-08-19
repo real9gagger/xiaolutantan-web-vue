@@ -115,7 +115,7 @@
         border-radius: 50%;
         border: 0.1rem solid #fff;
         overflow: hidden;
-        background-color: #ccc
+        background-color: #ccc;
         object-fit: cover;
     }
 </style>
