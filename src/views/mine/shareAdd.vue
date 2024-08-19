@@ -98,6 +98,7 @@
                 "pictureList": pics
             }).then(res => { 
                 //！！！如果保存成功后页面会自动刷新，那是因为 vue-cli 监听到项目文件有变更，因此刷新页面，正式环境不会有此问题
+                $store.dispatch("setThereAreNewPosts", true);
                 $store.dispatch("setPickPlaceInfo", null);
                 $router.back();
             }).catch(err => {

@@ -3,12 +3,15 @@ export default {
     	return {
     		mapAdministrativeType: 0, //显示的地图行政区域类型：市、县、镇
             canalDisplayType: 0, //显示的运河方式：单段显示、分段显示
+            
             pickPlaceAddress: "", //选取的地点的地址
             pickPlaceTitle: "", //选取的地点的名称
             pickPlaceLongitude: 0, //选取的地点的经度
             pickPlaceLatitude: 0, //选取的地点的纬度
             pickUserNickName: "", //选取的发布用户昵称
-            pickUserAvatarUrl: "" //选取的发布用户头像链接
+            pickUserAvatarUrl: "", //选取的发布用户头像链接
+            
+            thereAreNewPostsTs: 0, //有新帖子发布的时间戳（time stamp）！
     	}
     },
     mutations: {
@@ -39,6 +42,10 @@ export default {
                 state.pickUserNickName = "";
                 state.pickUserAvatarUrl = "";
             }
+        },
+        SET_THERE_ARE_NEW_POSTS(state, payload){
+            //有新帖子发布啦，则更新一个时间戳，用于刷新界面！
+            state.thereAreNewPostsTs = (payload ? Date.now() : 0);
         }
     },
     actions: {
@@ -53,6 +60,9 @@ export default {
         },
         setPickUserInfo({ commit }, payload){
             commit("SET_PICK_USER_INFO", payload);
+        },
+        setThereAreNewPosts({ commit }, payload){
+            commit("SET_THERE_ARE_NEW_POSTS", payload);
         }
     },
 }

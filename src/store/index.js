@@ -28,6 +28,8 @@ const myGetters = {
     isUserLogined: (state) => !!state.userInfo.authToken,
     currentUserNickName: (state) => state.userInfo.nickName,
     currentUserAvatarUrl: (state) => state.userInfo.avatarUrl,
+    
+    thereAreNewPostsTs:  (state) => state.thereAreNewPostsTs,
 };
 
 const dataState = createPersistedState({//持久化存储

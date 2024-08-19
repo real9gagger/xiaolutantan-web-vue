@@ -116,5 +116,6 @@
         border: 0.1rem solid #fff;
         overflow: hidden;
         background-color: #ccc
+        object-fit: cover;
     }
 </style>

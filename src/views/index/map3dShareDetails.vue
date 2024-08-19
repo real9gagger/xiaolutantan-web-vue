@@ -2,7 +2,7 @@
     <div class="page-limit-width">
         <template v-if="shareInfos && shareInfos.id===shareID">
             <div class="fixed-limit-width msd-userinfo-box" :class="{'hidden': isHideText}">
-                <img class="msd-user-avatar" :src="publicAssets.iconDefaultUserAvatar" />
+                <img class="msd-user-avatar" :src="shareInfos.authorAvatarUrl || publicAssets.iconDefaultUserAvatar" />
                 <div class="mg-l-rem25 fx-g1">
                     <span class="dp-bk fw-b" title="分享这张照片的用户的名称">{{shareInfos.authorNickname}}</span>
                     <span class="dp-bk fs-rem6 tc-33" title="分享这张照片的时间和地点">{{shareInfos.createTime}}&nbsp;•&nbsp;拍摄于{{shareInfos.locationAddress}}附近</span>
@@ -29,7 +29,7 @@
                 </swiper-slide>
             </swiper-container>
             <div class="fixed-limit-width msd-bottom-box fx-c fx-je" :class="{'hidden': isHideText}">
-                <span class="dp-bk">{{shareInfos.pictureList[picIndex].description || shareInfos.title}}</span>
+                <span class="dp-bk">{{shareInfos.title}}</span>
             </div>
             <map3d-canal-thumbnail :pic-lng="shareInfos.longitude" :pic-lat="shareInfos.latitude" />
         </template>

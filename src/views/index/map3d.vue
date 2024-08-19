@@ -400,12 +400,16 @@
     
     //绘制用户分享的图片
     function buildSharePicture(isShow){
+        
+        //先清除，在添加！
+        clearMapOverlays("isSharePicture");
+        
         if(!isShow){
-            return !clearMapOverlays("isSharePicture");
+            return;
         }
         
         //2024年7月16日，获取用户分享的照片
-        axios.get(publicAssets.sharePicsData).then(res1 => {
+        axios.get(publicAssets.sharePicsData + $store.getters.thereAreNewPostsTs).then(res1 => {
             for(const item of res1.data){
                 if(item.pictureList?.length){//有图片的才显示
                     const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
@@ -424,9 +428,10 @@
     }
     
     //删除具有某个标识的一组覆盖物
-    function clearMapOverlays(key){
+    function clearMapOverlays(groupKey){
         const olList = mapInstance.getOverlays();
-        const groupKey = (key || "").toString();
+        
+        //倒序遍历
         for(let idx = olList.length - 1; idx >= 0; idx--){
             if(olList[idx]._config[groupKey]){
                mapInstance.removeOverlay(olList[idx]);
@@ -447,6 +452,9 @@
         iwTitle.value = null;
         iwLnglats.value = null;
     });
+    
+    //用户发布啦新帖子！重新加载数据并更新视图！
+    watch(() => $store.getters.thereAreNewPostsTs, buildSharePicture);
     
     onMounted(() => {
         nextTick(() => {

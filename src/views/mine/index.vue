@@ -44,7 +44,7 @@
 </template>
 
 <script setup name="MineIndex">
-    import { onMounted, reactive, ref } from "vue";
+    import { onMounted, reactive, ref, watch } from "vue";
     import { useRouter } from "vue-router";
     import { useStore } from "vuex";
     import { appWebName } from "@/assets/data/constants.js"
@@ -75,7 +75,7 @@
         pageIndex.value++;
         
         //2024年8月16日，获取用户分享的照片
-        axios.get(publicAssets.sharePicsData).then(res => {
+        axios.get(publicAssets.sharePicsData + $store.getters.thereAreNewPostsTs).then(res => {
             if(res.data && res.data.length){
                 postList.push(...res.data);
             }
@@ -89,7 +89,9 @@
         });
     }
     function onRetry(){
+        isLoading.value = false;
         isNoMore.value = false;
+        pageIndex.value = 0;
         errMsg.value = null;
         getPostList();
     }
@@ -104,6 +106,8 @@
             $router.replace("/");
         }).catch(() => 0);
     }
+    
+    watch(() => $store.getters.thereAreNewPostsTs, onRetry);
     
     onMounted(getPostList);
 </script>
@@ -132,5 +136,6 @@
         border-radius: 0.3rem;
         overflow: hidden;
         background-color: #eee;
+        text-align: center;
     }
 </style>
