@@ -4,7 +4,8 @@
         :class="{'grabbing': isGrabbing}"
         @touchstart="onBoxPointerDown"
         @mousedown="onBoxPointerDown"
-        @transitionend="onBoxTransitionEnd">
+        @transitionend="onBoxTransitionEnd"
+        @dblclick="toggleZoomIn">
         <a class="mct-view-close" @click="toggleShowing"></a>
         <img ref="imgBox" class="mct-view-pin" draggable="false" :src="publicAssets.iconSharePictureRed" :style="imgStyle" />
     </div>
@@ -26,8 +27,8 @@
     });
     const $instance = getCurrentInstance();
     
-    const southWestLnglat = ([108.40466648088292, 21.452630195172333]); //西南角经纬度
-    const northEastLnglat = ([109.21613881618927, 22.963278412387110]); //东北角经纬度
+    const southWestLnglat = [108.33817494075683, 21.484622240807173]; //西南角经纬度，GCJ02坐标
+    const northEastLnglat = [109.28198237012651, 22.891271741127913]; //东北角经纬度，GCJ02坐标
     const movementXY = [0, 0]; //单指移动时的位置
     const limitXM = [0, 0]; //可滑动的 minX ~ maxX
     const limitYM = [0, 0]; //可滑动的 minY ~ maxY
@@ -37,6 +38,7 @@
     const isShowing = ref(true);
     const isGrabbing = ref(false);
     const needTransition = ref(false); //是否需要动画支持
+    const isZoomIn = ref(false); //缩略图是否放大显示
     const boxRect = reactive({
         boxWidth: 0,
         boxHeight: 0,
@@ -45,10 +47,11 @@
         pxPerLnglatX: 0,
         pxPerLnglatY: 0,
     });
-    const posXY = reactive([0, 0]);
+    const posXY = reactive([0, 0, 0]); //第一、二元素指定当前位置，第三个元素指示是靠左（0）还是靠右（1）停靠
     const divStyle = computed(() => ({
         transition: (needTransition.value ? "transform 200ms ease-out 0s" : "none"),
-        transform: `translate(${posXY[0]}px, ${posXY[1]}px)`,
+        transform: `translate(${posXY[0]}px, ${posXY[1]}px) scale(${isZoomIn.value ? 4 : 1})`,
+        transformOrigin: (!posXY[2] ? "0% 0%" : "100% 0%")
     }));
     const imgStyle = computed(() => ({
         left: Math.round((props.picLng - southWestLnglat[0]) * boxRect.pxPerLnglatX - boxRect.imgWidth / 2) + "px",
@@ -66,6 +69,10 @@
     }
     function toggleShowing(){
         isShowing.value = !isShowing.value;
+    }
+    function toggleZoomIn(){
+        needTransition.value = true;
+        isZoomIn.value = !isZoomIn.value;
     }
     function onBoxPointerDown(evt){
         //console.log("指针按下…", evt);
@@ -121,6 +128,7 @@
             
             posXY[0] = (posXY[0] > (wiw / 2) ? (wiw - boxRect.boxWidth - BOX_MARGIN_PX) : BOX_MARGIN_PX);
             posXY[1] = getNumberBetween(posXY[1], BOX_MARGIN_PX, wih - boxRect.boxHeight - BOX_MARGIN_PX);
+            posXY[2] = (posXY[0] === BOX_MARGIN_PX ? 0 : 1);
             
             needTransition.value = (olds[0] !== posXY[0] || olds[1] !== posXY[1]);
 
@@ -143,8 +151,17 @@
         
         limitXM[1] = (window.innerWidth - boxRect.boxWidth);
         limitYM[1] = (window.innerHeight - boxRect.boxHeight);
-        posXY[0] = BOX_MARGIN_PX;
-        posXY[1] = window.innerHeight / 2;
+        posXY[0] = limitXM[1] - BOX_MARGIN_PX;
+        posXY[1] = BOX_MARGIN_PX;
+        posXY[2] = 1;// 默认靠右停靠！
+        
+        //只有在可视范围内才显示地图缩略图
+        isShowing.value = !!(
+            props.picLng >= southWestLnglat[0] && 
+            props.picLng <= northEastLnglat[0] &&
+            props.picLat >= southWestLnglat[1] &&
+            props.picLat <= northEastLnglat[1]
+        );
     });
 </script>
 
@@ -155,12 +172,12 @@
         top: 0;
         z-index: 8888;
         width: 4rem;
-        height: 8rem;
+        height: 6.4rem;
         background-position: 0% 0%;
         background-size: 100% 100%;
         background-repeat: no-repeat;
         background-image: var(--bg-map-canal-thumbnail);
-        box-shadow: 0 0 0.5rem 0 #ccc;
+        box-shadow: 0 0 0.3rem 0 #aaa;
         border-radius: 0.3rem;
         cursor: grab;
     }
@@ -180,9 +197,8 @@
         display: block;
         position: absolute;
         inset: 0.2rem 0.2rem auto auto;
-        width: 0.8rem;
-        height: 0.8rem;
-        padding: 0.1rem;
+        width: 0.6rem;
+        height: 0.6rem;
         z-index: 8;
         background-position: 0% 0%;
         background-size: 100% 100%;

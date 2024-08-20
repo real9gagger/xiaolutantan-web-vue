@@ -7,7 +7,7 @@
 <script setup name="TestMapDev">
     import { onMounted, onUnmounted, getCurrentInstance } from "vue";
     import { getCanalGeoJSON, combineCanalGeoJSON } from "@/assets/data/canalGeo.js";
-    import { toBMapPoints, getPolylineColorList, gcj02ToBD09, bd09ToGCJ02 } from "@/utils/maphelper.js";
+    import { toBMapPoints, getPolylineColorList, gcj02ToBD09, bd09ToGCJ02, gcj02ToMapPoint } from "@/utils/maphelper.js";
     import { appMainColor } from "@/assets/data/constants.js";
     
     import axios from "axios";
@@ -33,14 +33,19 @@
         //mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加缩放控件
         //mapInstance.addControl(new BMapGL.NavigationControl3D({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加导航控件
         mapInstance.setMapStyleV2(bdMapStyle);
-        mapInstance.setViewport([ //默认视图款
-            (new BMapGL.Point(108.415365, 22.817497)), //镇
-            (new BMapGL.Point(109.375871, 21.592572))
-            /* (new BMapGL.Point(108.170678, 23.149844)), //县
-            (new BMapGL.Point(109.640205, 21.562765)) */
-            /* (new BMapGL.Point(107.078087, 24.154377)), //市
-            (new BMapGL.Point(110.108998, 21.483755)) */
-        ]);
+        mapInstance.setViewport(
+            combineCanalGeoJSON().map(gcj02ToMapPoint)
+            //[ //默认视图款
+                /* (new BMapGL.Point(108.415365, 22.817497)), //镇
+                (new BMapGL.Point(109.375871, 21.592572)) */
+                /* (new BMapGL.Point(108.170678, 23.149844)), //县
+                (new BMapGL.Point(109.640205, 21.562765)) */
+                /* (new BMapGL.Point(107.078087, 24.154377)), //市
+                (new BMapGL.Point(110.108998, 21.483755)) */
+            //]
+        );
+        
+        console.log(mapInstance.getCenter());
     }
     
     onMounted(() => {
@@ -106,11 +111,15 @@
             console.log(bd09ToGCJ02(bds.getSouthWest()), bd09ToGCJ02(bds.getNorthEast()));
         });
         mapInstance.addEventListener("dragging", function(){
-            const idx = canalPoints.length - 3;
+            const idx1 = canalPoints.length - 3;
+            const idx2 = canalPoints.length - 1;
             const p1 = mapInstance.pointToPixel(new BMapGL.Point(canalPoints[0][0], canalPoints[0][1]));
-            const p2 = mapInstance.pointToPixel(new BMapGL.Point(canalPoints[idx][0], canalPoints[idx][1]));
+            const p2 = mapInstance.pointToPixel(new BMapGL.Point(canalPoints[idx1][0], canalPoints[idx2][1]));
             
-            console.log(400 - p1.x, p1.y, "::::", p2.x, 800 - p2.y);
+            console.log(500 - p1.x, p1.y, "::::", p2.x, 800 - p2.y);
+        });
+        mapInstance.addEventListener("zoomend", function(){
+            mapInstance.panTo(new BMapGL.Point(108.8165719411708, 22.19572696949766));
         });
         
         /* const dddd = getCanalGeoJSON();
@@ -146,7 +155,7 @@
 
 <style scoped="scoped">
     .map-dev-box{
-        width: 20rem;
+        width: 25rem;
         height: 40rem;
     }
     :deep(.anchorBL){display:none !important;}
