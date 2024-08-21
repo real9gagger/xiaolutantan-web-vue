@@ -5,7 +5,7 @@
         @touchstart="onBoxPointerDown"
         @mousedown="onBoxPointerDown"
         @transitionend="onBoxTransitionEnd"
-        @dblclick="toggleZoomIn">
+        @click="toggleZoomIn">
         <a class="mct-view-close" @click="toggleShowing"></a>
         <img ref="imgBox" class="mct-view-pin" draggable="false" :src="publicAssets.iconSharePictureRed" :style="imgStyle" />
     </div>
@@ -34,6 +34,7 @@
     const limitYM = [0, 0]; //可滑动的 minY ~ maxY
     
     const BOX_MARGIN_PX = 10; //距离屏幕边缘的像素
+    const R_D_RATIO = (Math.PI / 180); //弧度（R）除以角度（D）
     
     const isShowing = ref(true);
     const isGrabbing = ref(false);
@@ -44,19 +45,22 @@
         boxHeight: 0,
         imgWidth: 0,
         imgHeight: 0,
+        mercatorNE: 0,
         pxPerLnglatX: 0,
         pxPerLnglatY: 0,
     });
-    const posXY = reactive([0, 0, 0]); //第一、二元素指定当前位置，第三个元素指示是靠左（0）还是靠右（1）停靠
+    const posXY = reactive([0, 0, 100, 0]); //第一、二元素指定当前位置，第三、四个元素指定变换原点。
     const divStyle = computed(() => ({
         transition: (needTransition.value ? "transform 200ms ease-out 0s" : "none"),
         transform: `translate(${posXY[0]}px, ${posXY[1]}px) scale(${isZoomIn.value ? 4 : 1})`,
-        transformOrigin: (!posXY[2] ? "0% 0%" : "100% 0%")
+        transformOrigin: `${posXY[2]}% ${posXY[3]}%`
     }));
-    const imgStyle = computed(() => ({
-        left: Math.round((props.picLng - southWestLnglat[0]) * boxRect.pxPerLnglatX - boxRect.imgWidth / 2) + "px",
-        top: Math.round((props.picLat - northEastLnglat[1]) * boxRect.pxPerLnglatY - boxRect.imgHeight) + "px",
-    }));
+    const imgStyle = computed(() => {
+        return {
+            left: Math.round((props.picLng - southWestLnglat[0]) * boxRect.pxPerLnglatX - boxRect.imgWidth / 2) + "px",
+            top: Math.round((getMercatorY(props.picLat) - boxRect.mercatorNE) * boxRect.pxPerLnglatY - boxRect.imgHeight) + "px",
+        }
+    });
     
     function getNumberBetween(num, min, max){//介于两个数之间的数
         if(num < min){
@@ -67,12 +71,16 @@
             return num;
         }
     }
-    function toggleShowing(){
+    function toggleShowing(evt){
+        evt.preventDefault();
+        evt.stopPropagation();
         isShowing.value = !isShowing.value;
     }
     function toggleZoomIn(){
-        needTransition.value = true;
-        isZoomIn.value = !isZoomIn.value;
+        if(!needTransition.value){
+            needTransition.value = true;
+            isZoomIn.value = !isZoomIn.value;
+        }
     }
     function onBoxPointerDown(evt){
         //console.log("指针按下…", evt);
@@ -125,10 +133,13 @@
             const wiw = window.innerWidth;
             const wih = window.innerHeight;
             const olds = [...posXY];
+            const temp1 = (wiw - boxRect.boxWidth - BOX_MARGIN_PX);
+            const temp2 = (wih - boxRect.boxHeight - BOX_MARGIN_PX);
             
-            posXY[0] = (posXY[0] > (wiw / 2) ? (wiw - boxRect.boxWidth - BOX_MARGIN_PX) : BOX_MARGIN_PX);
-            posXY[1] = getNumberBetween(posXY[1], BOX_MARGIN_PX, wih - boxRect.boxHeight - BOX_MARGIN_PX);
-            posXY[2] = (posXY[0] === BOX_MARGIN_PX ? 0 : 1);
+            posXY[0] = (posXY[0] > (wiw / 2) ? temp1 : BOX_MARGIN_PX);
+            posXY[1] = getNumberBetween(posXY[1], BOX_MARGIN_PX, temp2);
+            posXY[2] = (posXY[0] === BOX_MARGIN_PX ? 0 : 100);
+            posXY[3] = (posXY[1] === BOX_MARGIN_PX ? 0 : (posXY[1] / temp2 * 100));
             
             needTransition.value = (olds[0] !== posXY[0] || olds[1] !== posXY[1]);
 
@@ -140,21 +151,28 @@
         //console.log("过渡结束…", evt);
         needTransition.value = false;
     }
+    function getMercatorY(lat){
+        //参见：https://stackoverflow.com/questions/14329691/convert-latitude-longitude-point-to-a-pixels-x-y-on-mercator-projection
+        const latRad = lat * R_D_RATIO; //转成弧度！
+        const mercatorNorth = Math.log(Math.tan((Math.PI / 4) + (latRad / 2)));
+        const tempR = 6400; //地球半径（模拟值）
+        return (tempR / 2) - (tempR * mercatorNorth / (2 * Math.PI));
+    }
     
     nextTick(() => {
         boxRect.boxWidth = $instance.proxy.$el.clientWidth;
         boxRect.boxHeight = $instance.proxy.$el.clientHeight;
         boxRect.imgWidth = $instance.refs.imgBox.clientWidth;
         boxRect.imgHeight = $instance.refs.imgBox.clientHeight;
+        boxRect.mercatorNE = getMercatorY(northEastLnglat[1]);
         boxRect.pxPerLnglatX = boxRect.boxWidth / (northEastLnglat[0] - southWestLnglat[0]);
-        boxRect.pxPerLnglatY = boxRect.boxHeight / (southWestLnglat[1] - northEastLnglat[1]);
-        
+        boxRect.pxPerLnglatY = boxRect.boxHeight / (getMercatorY(southWestLnglat[1]) - boxRect.mercatorNE);
+
         limitXM[1] = (window.innerWidth - boxRect.boxWidth);
         limitYM[1] = (window.innerHeight - boxRect.boxHeight);
         posXY[0] = limitXM[1] - BOX_MARGIN_PX;
         posXY[1] = BOX_MARGIN_PX;
-        posXY[2] = 1;// 默认靠右停靠！
-        
+
         //只有在可视范围内才显示地图缩略图
         isShowing.value = !!(
             props.picLng >= southWestLnglat[0] && 
@@ -180,6 +198,7 @@
         box-shadow: 0 0 0.3rem 0 #aaa;
         border-radius: 0.3rem;
         cursor: grab;
+        overflow: hidden;
     }
     .mct-view-container.grabbing{
         box-shadow: 0 0 0.5rem 0 #aaa;
@@ -196,7 +215,7 @@
     .mct-view-close{
         display: block;
         position: absolute;
-        inset: 0.2rem 0.2rem auto auto;
+        inset: 0.1rem 0.1rem auto auto;
         width: 0.6rem;
         height: 0.6rem;
         z-index: 8;
