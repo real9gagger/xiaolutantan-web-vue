@@ -63,7 +63,7 @@ function upload_picture(){
     }
     
     //保存缩略图
-    $thumbnail_width = 100; //压缩宽度（像素）
+    $thumbnail_width = 200; //压缩宽度（像素）
     $thumbnail_height = floor($thumbnail_width * $image_info[1] / $image_info[0]); //高度根据比例缩小
     switch($image_info[2]){
         case IMAGETYPE_JPEG: 

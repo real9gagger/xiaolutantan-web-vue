@@ -83,6 +83,10 @@
             isZoomIn.value = !isZoomIn.value;
         }
     }
+    function disabledZoomIn(){
+        needTransition.value = true;
+        isZoomIn.value = false;
+    }
     function onBoxPointerDown(evt){
         //console.log("指针按下…", evt);
         if(evt.type === "touchstart"){
@@ -181,6 +185,10 @@
             props.picLat >= southWestLnglat[1] &&
             props.picLat <= northEastLnglat[1]
         );
+    });
+    
+    defineExpose({
+        disabledZoomIn
     });
 </script>
 

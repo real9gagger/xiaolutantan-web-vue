@@ -21,7 +21,9 @@
     width: 100%;
     user-select: none;
 }
-.btn-box:active{opacity: 0.75;}
+.btn-box:active{
+    opacity: 0.75;
+}
 .btn-box.ajaxing{
     background-image:repeating-linear-gradient(135deg, rgba(167,209,41,0.0) 0%, rgba(167,209,41,0.7) 25%, rgba(167,209,41,0.0) 50%);
     background-size:200% 100%;

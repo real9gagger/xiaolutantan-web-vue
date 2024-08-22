@@ -6,7 +6,7 @@
                 <span class="msa-input-remaining">{{inputRemainingLength}}</span>
             </div>
             <div class="mg-b-rem5 bd-t-f0"><!-- 分隔线 --></div>
-            <picture-uploader ref="puBox" />
+            <picture-uploader ref="puBox" @pictap="gotoImagePreview" />
             <div class="mg-t-rem25 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoAddressPicker">
                 <template v-if="!captureAddress">
@@ -42,6 +42,7 @@
     import { ref, getCurrentInstance, computed } from "vue";
     import { useRouter } from "vue-router";
     import { useStore } from "vuex";
+    import { setPageTempData } from "@/utils/pagehelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import pictureUploader from "@/components/pictureUploader.vue";
     import ajaxRequest from "@/request/index.js";
@@ -62,6 +63,10 @@
     }
     function gotoUserPicker(){
         $router.push("/userpicker");
+    }
+    function gotoImagePreview(arg0){
+        setPageTempData(arg0);
+        $router.push("/imagepreview");
     }
     function onTextAreaInput(evt){
         evt.target.style.height = "20px";

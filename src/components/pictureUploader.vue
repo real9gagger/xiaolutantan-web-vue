@@ -34,7 +34,7 @@
 </template>
 
 <script setup name="PictureUploader">
-    import { ref, reactive, computed, defineExpose, getCurrentInstance, onMounted, onUnmounted } from "vue";
+    import { ref, reactive, computed, defineEmits, defineExpose, getCurrentInstance, onMounted, onUnmounted } from "vue";
     import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
     import { uploadStatusCode } from "@/assets/data/constants.js";
     import fileUploader from "@/utils/fileuploader.js";
@@ -46,6 +46,7 @@
     const PIC_WIDTH_AND_MARGIN = (5.25 * window.pxOf1rem); /* （宽度加上外边距）乘以（1rem有多少像素） */
     
     const $instance = getCurrentInstance();
+    const emits = defineEmits(["pictap"]);
     const uploadFileList = reactive([]); //待上传的图片信息
     const dragTransXY = reactive([0, 0]);//第〇、一索引用来保存当前位置
     const chooseType = ref(0x9); //0x9 - 图片，0x1 - 视频。（值表示最多可以上传的文件数量！）
@@ -78,6 +79,7 @@
     const pointerXY = [0, 0];
     const nonRVs = { //非响应式变量（non Responsive Variables）
         numberOfColumns: 3, //每行最多可以放多少张照片
+        clickIndex: -1, //用户点击了哪张图片
     };
     const picFU = new fileUploader(); //图片文件上传器
     
@@ -96,14 +98,6 @@
                 document.ontouchmove = onItemPointerMove;
                 document.ontouchend = onItemPointerUp;
                 document.ontouchcancel = onItemPointerUp;
-                
-                //移动端需要长按才生效
-                needDebounce(function(dom){
-                    navigator.vibrate(30);
-                    dragTransXY[0] = dom.offsetLeft;
-                    dragTransXY[1] = dom.offsetTop;
-                    dragIndex.value = (+dom.getAttribute("data-picindex") || 0);
-                }, 200, theElem);
             } else {
                 if(evt.button !== 0){//非鼠标左键按下时无效：https://developer.mozilla.org/zh-CN/docs/Web/API/MouseEvent/button
                     return;
@@ -113,11 +107,17 @@
                 document.onmousemove = onItemPointerMove;
                 document.onmouseup = onItemPointerUp;
                 document.onmouseleave = onItemPointerUp;
-                
-                dragTransXY[0] = theElem.offsetLeft;
-                dragTransXY[1] = theElem.offsetTop;
-                dragIndex.value = (+theElem.getAttribute("data-picindex") || 0);
             }
+            
+            nonRVs.clickIndex = (+theElem.getAttribute("data-picindex") || 0);
+            
+            //需要长按才生效
+            needDebounce(function(dom){
+                navigator.vibrate(30);
+                dragTransXY[0] = dom.offsetLeft;
+                dragTransXY[1] = dom.offsetTop;
+                dragIndex.value = nonRVs.clickIndex;
+            }, 200, theElem);
         }
     }
     function onItemPointerMove(evt){
@@ -175,6 +175,9 @@
             }
         } else {
             console.log("执行了回调函数，因为无法判断插入哪个位置...");
+            if(dragIndex.value < 0 && nonRVs.clickIndex >= 0){//用户一直没有拖动图片，则说明是点击的动作
+                emits("pictap", uploadFileList[nonRVs.clickIndex].base64Src);
+            }
             onDragBoxTransitionEnd();
         }
     }
@@ -202,6 +205,7 @@
         isReleaseHand.value = false;
         dragIndex.value = -1;
         insertIndex.value = -1;
+        nonRVs.clickIndex = -1;
         pointerXY[0] = 0;
         pointerXY[1] = 0;
         dragTransXY[0] = 0;

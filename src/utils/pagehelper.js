@@ -1,6 +1,19 @@
 /*
     import { toggleFullScreen } from "@/utils/pagehelper.js";
 */
+//页面临时数据，用于临时保存几十至上百 MB 的数据。
+//这类数据本地存储无法保存，也不建议用 Vuex 保存，只能保存在内存里了！
+let pageTempData = null;
+
+//设置临时数据
+export function setPageTempData(dat){
+    pageTempData = dat;
+}
+
+//获取临时数据
+export function getPageTempData(){
+    return pageTempData;
+}
 
 //来回切换全屏浏览
 export function toggleFullScreen(){

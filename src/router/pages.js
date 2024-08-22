@@ -75,6 +75,14 @@ export default [
         }
     },
     {
+    	path: "/imagepreview",
+    	name: "预览图片",
+    	component: () => import("@/views/index/map3dImagePreview"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/login",
     	name: "用户登录",
     	component: () => import("@/views/login/index"),

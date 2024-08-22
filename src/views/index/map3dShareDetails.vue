@@ -31,7 +31,7 @@
             <div class="fixed-limit-width msd-bottom-box fx-c fx-je" :class="{'hidden': isHideText}">
                 <span class="dp-bk">{{shareInfos.title}}</span>
             </div>
-            <map3d-canal-thumbnail :pic-lng="shareInfos.longitude" :pic-lat="shareInfos.latitude" />
+            <map3d-canal-thumbnail ref="mctBox" :pic-lng="shareInfos.longitude" :pic-lat="shareInfos.latitude" />
         </template>
         <template v-else >
             <div class="content-cage" style="padding-top:15vh">
@@ -44,7 +44,7 @@
 </template>
 
 <script setup name="IndexMap3DShareDetails">
-    import { ref } from "vue";
+    import { ref, getCurrentInstance } from "vue";
     import { useRoute, useRouter } from "vue-router";
     import { needThrottle } from "@/utils/cocohelper.js";
     import myStorage from "@/utils/mystorage.js";
@@ -55,6 +55,7 @@
     //swiper开发文档：https://www.swiper.com.cn/api/index.html
     //swiper属性大全：https://swiperjs.com/swiper-api
     
+    const $instance = getCurrentInstance();
     const $route = useRoute();
     const $router = useRouter();
     const shareInfos = myStorage.onceObject("user_sharepic_infos");
@@ -67,6 +68,7 @@
     }
     function toggleHideText(){
         needThrottle(() => (isHideText.value = !isHideText.value), 500);
+        $instance.refs.mctBox.disabledZoomIn();
     }
     function goBackToHomePage(){
         $router.replace("/");
