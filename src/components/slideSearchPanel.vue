@@ -15,9 +15,15 @@
             <img v-show="!isSearchFocus" :src="publicAssets.iconMapRestoreGrey" alt="还原地图视图" class="ssp-my-location" @click="onMapZoomRestore" />
             <img v-show="!isSearchFocus" :src="publicAssets.iconUpOrDown" alt="面板展开或收起" class="ssp-my-location" @click="onPanelUpOrDown" />
             <img v-show="!isSearchFocus" :src="isPositionning ? publicAssets.iconMapLocationPosition : publicAssets.iconMapLocationGrey" alt="定位到我的位置" class="ssp-my-location" :class="{'positionning': isPositionning}" @click="onPositionMyLocation" />
+            <a v-show="!isSearchFocus" class="ssp-btn-done" :class="{'disabled': !poiList?.length}" @click="onSelectedConfirm">完成</a>
         </div>
 
-        <div v-if="isSearchFocus" class="fx-g1"><!-- 占位专用 --></div>
+        <div v-if="isSearchFocus" class="fx-g1 pd-lr-rem5">
+            <p class="tc-66">热门地点</p>
+            <ul class="fx-r fx-wp mg-t-rem25">
+                <li v-for="hk in hotKeywords" :key="hk" :data-hk="hk" class="ssp-hk-item" @click="onInputKeydownEnter">{{hk}}</li>
+            </ul>
+        </div>
         <div v-else-if="!poiList" class="pd-1rem ta-c fx-g1">
             <img :src="publicAssets.imageLoadingGif" alt="正在加载" draggable="false" class="dp-ib wh-2rem" />
             <p class="mg-t-rem5 tc-mc">正在加载…</p>
@@ -33,12 +39,8 @@
                 <p v-else class="fs-rem6 tc-99">{{item.distance}} | {{item.address}}</p>
                 <img v-if="poiIndex===idx" :src="publicAssets.iconCheckV" alt="选中打勾" draggable="false" class="ssp-poi-checked" />
             </li>
-            <li class="pd-t-1rem pd-b-rem5 ta-c tc-aa fs-rem6">{{isLoadingMore ? "正在加载更多…" : "没有更多了~"}}</li>
+            <li class="pd-tb-1rem ta-c tc-aa fs-rem6">{{isLoadingMore ? "正在加载更多…" : "没有更多了~"}}</li>
         </ul>
-
-        <div v-show="!isSearchFocus" class="pd-rem5">
-            <button type="button" class="btn-box" :class="{'disabled': !poiList?.length}" @click="onSelectedConfirm">确 定</button>
-        </div>
     </div>
 </template>
 
@@ -56,7 +58,7 @@
     const props = defineProps({
         minHeight: {
             type: Number,
-            default: 40 /*单位：%，相对于父元素*/
+            default: 50 /*单位：%，相对于父元素*/
         },
         maxHeight: {
             type: Number,
@@ -70,8 +72,9 @@
     const SCROLLER_BOX_ID = "sspSearchResultListBox";
     const AUTO_SLIDE_THRESHOLD = 40;
     const PULL_UP_THRESHOLD = 40;
+    const hotKeywords = ["平陆运河", "南宁市" ,"钦州市", "陆屋镇", "平塘江口", "马道枢纽", "企石枢纽", "青年枢纽"]; //热门关键字
     
-    const panelHeight = ref(40);
+    const panelHeight = ref(props.minHeight);
     const isSearchFocus = ref(false);
     const isPositionning = ref(false); //是否正在定位
     const isLoadingMore = ref(false); //是否正在加载更多
@@ -152,10 +155,20 @@
     	nonRVs.isRunTransition = false;
     }
     function onInputFocusOrBlur(evt){
-        isSearchFocus.value = (evt.type === "focus");
+        if(evt.type === "focus"){
+            isSearchFocus.value = true;
+        } else {
+            //延迟一点时间，防止点击热门关键字时无法触发 “点击事件”！
+            setTimeout(() => (isSearchFocus.value = false), 200);
+        }
     }
     function onInputKeydownEnter(evt){//关键字搜索
-        evt.target.blur();
+        if(evt.target.hasAttribute("data-hk")){
+            searchKeywords.value = evt.target.getAttribute("data-hk")
+        } else {
+            evt.target.blur();
+        }
+        
         if(searchKeywords.value){
             if(!poiList.value){
                 return; //正在加载
@@ -163,7 +176,7 @@
                 poiList.value = null;
             }
             
-            nonRVs.pageIndex = 1; //因为是拖动搜索的，所以需要重置为 0
+            nonRVs.pageIndex = 1; //默认第一页
             nonRVs.mapSearcher.clearResults();
             nonRVs.mapSearcher.search(searchKeywords.value.trim());
         }
@@ -270,7 +283,7 @@
         } else {
             poiList.value = null;
         }
-        
+        searchKeywords.value = ""; //重置
         nonRVs.pageIndex = 0; //因为是拖动搜索的，所以需要重置为 0
         nonRVs.mapGeocoder.getLocation(thePoint, searchCompleteCallback, { poiRadius: 1000, numPois: 20 });
     }
@@ -308,8 +321,8 @@
         z-index: 99;
         background-color: #fff;
         user-select: none;
-        transition: height 300ms;
-        box-shadow: 0 0 0.2rem 0 #eee;
+        transition: height 200ms ease-out 0s;
+        box-shadow: 0 0 0.2rem 0 #e0e0e0;
         cursor: grab;
     }
     .ssp-search-input{
@@ -356,5 +369,24 @@
     }
     .ssp-my-location.positionning{
         animation: mcv-location-positionning-kf 1s ease infinite; /* 动画帧在控件 “map3dControlVertical” 里定义 */
+    }
+    .ssp-btn-done{
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 2.5rem;
+        font-size: 0.8rem;
+        color: #fff;
+        background-color: var(--main-color);
+        background-image: linear-gradient(90deg, rgba(167,209,41,0.0) 0%, rgba(167,209,41,0.5) 100%);
+        margin-left: 0.5rem;
+        line-height: 1;
+    }
+    .ssp-hk-item{
+        margin: 0 0.25rem 0.25rem 0;
+        padding: 0.4rem 0.8rem;
+        background-color: #eee;
+        font-size: 0.7rem;
+        border-radius: 2rem;
+        cursor: pointer;
     }
 </style>

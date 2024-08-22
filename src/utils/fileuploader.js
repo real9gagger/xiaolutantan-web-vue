@@ -99,13 +99,15 @@ fileUploder.prototype.queue = function(picList){
         this.progressTimer = 0;
         this.progressCallback && this.progressCallback(100, this.uploadFileIndex);
         setTimeout(this.successCallback, 200, dat, this.uploadFileIndex); //延迟一点时间
-        this.queue(picList, ++this.uploadFileIndex);
+        this.uploadFileIndex++;
+        this.queue(picList);
     }).catch(msg => {
         clearInterval(this.progressTimer);
         this.progressPercentage = 0;
         this.progressTimer = 0;
         this.errorCallback && this.errorCallback(msg, this.uploadFileIndex);
-        this.queue(picList, ++this.uploadFileIndex);
+        this.uploadFileIndex++;
+        this.queue(picList);
     });
 }
 
@@ -130,7 +132,7 @@ fileUploder.prototype.abort = function(){
         myAbortController.abort("用户取消上传");
         myAbortController = null;
     }
-    this.uploadFileIndex = -1;
+    this.uploadFileIndex = -8888;
     return this;
 }
 

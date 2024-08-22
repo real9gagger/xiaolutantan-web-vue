@@ -61,7 +61,7 @@
 	},
     {
     	"id": 20000,
-    	"title": "平塘江入口",
+    	"title": "平塘江口",
     	"createTime": "2024/07/10 17:48:00",
     	"authorNickname": "平平",
     	"authorAvatarUrl": "",
@@ -72,7 +72,7 @@
     	"pictureList": [
     		{
                 "id": 1,
-    			"description": "平塘江入口鸟瞰图",
+    			"description": "平塘江口鸟瞰图",
     			"picPath": "sharepics/pingtangjiang_entrance_1.jpg",
                 "thumbnailPath": "sharepics/pingtangjiang_entrance_1.jpg",
                 "width": 1920,

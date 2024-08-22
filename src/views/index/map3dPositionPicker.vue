@@ -1,6 +1,6 @@
 <template>
     <div class="hi-cwh">
-        <div id="positionPickerMapBox" class="wi-f" style="height:60%"></div>
+        <div id="positionPickerMapBox" class="wi-f" style="height:50%"></div>
         <div class="mpp-pin-box">
             <img class="mpp-pin-icon" alt="地图中心点"
                 :src="publicAssets.iconMapPositionPin" 
@@ -112,7 +112,7 @@
     .mpp-pin-box{
         position: fixed;
         left: 50%;
-        top: 30%;
+        top: 25%;
         transform: translate(-50%, -2.5rem);
         z-index: 88;
     }

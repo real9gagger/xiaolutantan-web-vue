@@ -6,6 +6,7 @@
         @mousedown="onBoxPointerDown"
         @transitionend="onBoxTransitionEnd"
         @click="toggleZoomIn">
+        <p class="mct-view-title">拍摄地点</p>
         <a class="mct-view-close" @click="toggleShowing"></a>
         <img ref="imgBox" class="mct-view-pin" draggable="false" :src="publicAssets.iconSharePictureRed" :style="imgStyle" />
     </div>
@@ -51,7 +52,7 @@
     });
     const posXY = reactive([0, 0, 100, 0]); //第一、二元素指定当前位置，第三、四个元素指定变换原点。
     const divStyle = computed(() => ({
-        transition: (needTransition.value ? "transform 200ms ease-out 0s" : "none"),
+        transition: (needTransition.value ? "transform 200ms cubic-bezier(0, 0, 0, 0.8) 0s" : "none"),
         transform: `translate(${posXY[0]}px, ${posXY[1]}px) scale(${isZoomIn.value ? 4 : 1})`,
         transformOrigin: `${posXY[2]}% ${posXY[3]}%`
     }));
@@ -202,6 +203,11 @@
     }
     .mct-view-container.grabbing{
         box-shadow: 0 0 0.5rem 0 #aaa;
+    }
+    .mct-view-title{
+        font-size: 0.5rem;
+        color: #ccc;
+        padding: 0 0.25rem;
     }
     .mct-view-pin{
         display: block;

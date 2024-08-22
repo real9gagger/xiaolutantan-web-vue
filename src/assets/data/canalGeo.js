@@ -49,7 +49,7 @@ const canalSingleLine = [];
 const canalPOIList = [
     {
         lngLat: [109.074643,22.643351],
-        title: "平塘江入口",
+        title: "平塘江口",
         iconName1: "iconPingtangjiangEntrance",
         iconName2: "iconPingtangjiangEntranceWhite",
         iconAnchor: {x:0.866667,y:1.0}
