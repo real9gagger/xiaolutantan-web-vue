@@ -1,6 +1,6 @@
 <template>
     <div class="page-limit-width">
-        <ul class="content-cage no-tbpd">
+        <ul class="content-cage" style="padding:0 1rem">
             <li v-for="item,idx in userList" :key="item.nickName" class="fx-hc pd-tb-rem5 bd-b-f0 tp-op6" @click="onItemClicked(idx)">
                 <img :src="item.avatarUrl" alt="用户头像" class="upk-avatar-box" />
                 <b class="pd-l-1rem" :class="{'tc-mc': selectedIndex===idx}">{{item.nickName}}</b>

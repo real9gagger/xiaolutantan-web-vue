@@ -1,7 +1,7 @@
 <template>
     <div class="page-limit-width">
-        <div class="content-cage" style="padding:0;overflow:hidden;">
-            <gesture-image alt="预览图片" :src="picUrl || publicAssets.imageImgError" onerror="onImageLoadingError()" />
+        <div class="content-cage fx-vm" style="padding:0;overflow:hidden;touch-action:none;">
+            <gesture-image alt="预览图片" :src="picUrl || publicAssets.imageImgError" :threshold="0" onerror="onImageLoadingError()" />
         </div>
     </div>
 </template>

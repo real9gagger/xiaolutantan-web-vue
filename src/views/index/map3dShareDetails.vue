@@ -28,7 +28,7 @@
                     <gesture-image :alt="item.description" :src="item.picPath" />
                 </swiper-slide>
             </swiper-container>
-            <div class="fixed-limit-width msd-bottom-box fx-c fx-je" :class="{'hidden': isHideText}">
+            <div @click="toggleHideText" class="fixed-limit-width msd-bottom-box fx-c fx-je" :class="{'hidden': isHideText}">
                 <span class="dp-bk">{{shareInfos.title}}</span>
             </div>
             <map3d-canal-thumbnail ref="mctBox" :pic-lng="shareInfos.longitude" :pic-lat="shareInfos.latitude" />
