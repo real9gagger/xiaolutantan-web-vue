@@ -34,6 +34,32 @@ function get_new_name($old_name){
     return md5(hrtime(true).$old_name) . $file_ext;
 }
 
+//旋转用户拍摄的照片
+function image_rotation($file_path){
+    $exif = exif_read_data($file_path);
+    if($exif && $exif['Orientation'] && $exif['MimeType'] === 'image/jpeg'){
+        switch ($exif['Orientation']){
+            case 3: $degrees = 180; break;// Need to rotate 180 deg
+            case 6: $degrees = -90; break;// Need to rotate 90 deg clockwise
+            case 8: $degrees =  90; break;// Need to rotate 90 deg counter clockwise
+            default: return null;
+        }
+        
+        //只处理用户拍摄的照片，一般是JPG/JPEG格式！
+        $image_source = imagecreatefromjpeg($file_path);
+        $image_rotated = imagerotate($image_source, $degrees, 0);
+        $res = imagejpeg($image_rotated, $file_path, 100);
+        
+        imagedestroy($image_source); //free up the memory
+        imagedestroy($image_rotated); //free up the memory
+        
+        return $res;
+    }
+    
+    return null;
+}
+
+/* ======================================== 对外开放的的接口 ======================================== */
 //上传一张图片
 function upload_picture(){
     $my_file = $_FILES['my_file'];
@@ -55,6 +81,8 @@ function upload_picture(){
     $upload_result = move_uploaded_file($my_file['tmp_name'], $root_dir.$path_original.$new_name);
     if(!$upload_result){
         ajax_error('上传文件失败');
+    } else {
+        image_rotation($root_dir.$path_original.$new_name);
     }
     
     $image_info = getimagesize($root_dir.$path_original.$new_name);
@@ -69,7 +97,7 @@ function upload_picture(){
         case IMAGETYPE_JPEG: 
             $src_pic = imagecreatefromjpeg($root_dir.$path_original.$new_name);
             $img_resized = imagescale($src_pic, $thumbnail_width, $thumbnail_height);
-            imagejpeg($img_resized, $root_dir.$path_thumbnail.$new_name);
+            imagejpeg($img_resized, $root_dir.$path_thumbnail.$new_name, 60);
             break;
         case IMAGETYPE_PNG: 
             $src_pic = imagecreatefrompng($root_dir.$path_original.$new_name);
@@ -80,7 +108,6 @@ function upload_picture(){
         case IMAGETYPE_GIF: 
             $src_pic = imagecreatefromgif($root_dir.$path_original.$new_name);
             //$img_resized = imagescale($src_pic, $thumbnail_width, $thumbnail_height); //无法保存背景透明色，弃用
-            
             $img_resized = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
             $transparent_bg = imagecolorallocatealpha($img_resized, 255, 255, 255, 127); //默认透明背景
             imagecolortransparent($img_resized, $transparent_bg);
@@ -110,11 +137,13 @@ function upload_picture(){
         'thumbnailPath' => $path_thumbnail.$new_name,
         'width'         => $image_info[0],
         'height'        => $image_info[1],
+        'status'        => 1, //1-有效，0-失效
         'sort'          => 0,
         'longitude'     => 0,
         'latitude'      => 0,
         'mimeType'      => $image_info['mime'],
-        'captureTime'   => date('Y/m/d H:i:s') //拍摄时间戳（不准确）
+        'captureTime'   => date('Y/m/d H:i:s'), //拍摄时间戳（不准确）
+        //'exifData'     => exif_read_data($root_dir.$path_thumbnail.$new_name)
     );
     
     ajax_success($output_data);
@@ -161,9 +190,9 @@ function save_share_pics(){
 
 //调用函数
 $call_action = $_GET['action'];
-if(function_exists($call_action)){
+if(in_array($call_action, ['upload_picture', 'save_share_pics'])){
     date_default_timezone_set('Asia/Shanghai');
     $call_action();
 } else {
-    ajax_error('未知的操作');
+    ajax_error('未知的操作：'.$call_action);
 }

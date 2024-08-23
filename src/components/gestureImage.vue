@@ -56,7 +56,7 @@
         },
         clickable: {
             type: Boolean,
-            default: false
+            default: true
         }
     });
     const needTransition = ref(false); //是否需要动画支持
