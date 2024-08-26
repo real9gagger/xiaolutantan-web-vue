@@ -9,5 +9,7 @@
 ************************************/
 
 export default {
-    saveUserSharePics: "/xlttapi?__RM__=POST&action=save_share_pics", //保存用户分享额照片信息
+    saveUserSharePics: "/xlttapi?__RM__=POST&action=save_share_pics", //保存用户分享的照片信息
+    toggleMyPostStatus: "/xlttapi?__RM__=POST&action=toggle_my_post_status", //将我的帖子设为仅自己可见或全部人可见
+    deleteMyPost: "/xlttapi?__RM__=POST&action=delete_my_post", //删除我的帖子
 }

@@ -411,7 +411,7 @@
         //2024年7月16日，获取用户分享的照片
         axios.get(publicAssets.sharePicsData + $store.getters.thereAreNewPostsTs).then(res1 => {
             for(const item of res1.data){
-                if(item.pictureList?.length){//有图片的才显示
+                if(item.status === 1 && item.pictureList?.length){//有效和有图片的才显示
                     const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
                         point: gcj02ToMapPoint([item.longitude, item.latitude]),
                         properties: item,

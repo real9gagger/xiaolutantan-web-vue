@@ -4,7 +4,9 @@
             <div class="fx-g1 wi-f" @click="onClose"><!-- 点我关闭层 --></div>
             <div class="ppx-box-dialog">
                 <p v-if="props.title" class="ta-c tc-66 mg-1rem lh-1x of-lc1">{{props.title}}</p>
-                <button v-for="item in props.buttons" :key="item.key" @click="onButtonClick(item.key)" type="button" class="ppx-btn-box fw-b">{{item.name}}</button>
+                <template v-for="item in props.buttons">
+                    <button v-if="!item.hidden" :key="item.key" @click="onButtonClick(item.key)" type="button" class="ppx-btn-box fw-b">{{item.name}}</button>
+                </template>
                 <button type="button" class="ppx-btn-box" @click="onClose">取消</button>
             </div>
         </div>

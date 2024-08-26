@@ -51,7 +51,7 @@ export default function commonRequest(apiName, postData){
     const reqUrl = apis[apiName];
     const matchList = reqUrl?.match(regexpRM); //提取请求方式
     const reqMethod = (matchList && matchList.length >= 2 ? matchList[1] : "");
-    const accessToken = "";
+    const accessToken = "Xltt-Token";
     const methodType = [];
     
     switch(reqMethod){

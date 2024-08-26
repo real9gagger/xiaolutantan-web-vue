@@ -137,7 +137,6 @@ function upload_picture(){
         'thumbnailPath' => $path_thumbnail.$new_name,
         'width'         => $image_info[0],
         'height'        => $image_info[1],
-        'status'        => 1, //1-有效，0-失效
         'sort'          => 0,
         'longitude'     => 0,
         'latitude'      => 0,
@@ -162,7 +161,8 @@ function save_share_pics(){
         ajax_error('保存失败，数据不全');
     }
     
-    $path_dataset = $_SERVER['DOCUMENT_ROOT'] . '/sharepics/dataset.json';
+    $root_dir = $_SERVER['DOCUMENT_ROOT'];
+    $path_dataset = $root_dir . '/sharepics/dataset.json';
     $dat_list = json_decode(file_get_contents($path_dataset), true);
     $new_id = count($dat_list) + 1;
     
@@ -177,6 +177,7 @@ function save_share_pics(){
         'coordinateSystem'  => 'BD09', //经纬度坐标系系统类型：BD09、GCJ02、WGS84
         'locationAddress'   => $posts['locationAddress'],
         'pictureList'       => $posts['pictureList'],
+        'status'            => 1, //1-有效，0-失效
         'likesCount'        => 0, //点赞数量
         'commentCount'      => 0, //评论数量
         'shareCount'        => 0, //分享次数
@@ -188,9 +189,77 @@ function save_share_pics(){
     ajax_success($new_id);
 }
 
+//将我的帖子设为 “仅自己可见” 或 “全部人可见”
+function toggle_my_post_status(){
+    $posts = json_decode(file_get_contents('php://input'), true);
+    $post_id = intval($posts['postId']);
+    
+    if($post_id){
+        $root_dir = $_SERVER['DOCUMENT_ROOT'];
+        $path_dataset = $root_dir . '/sharepics/dataset.json';
+        $post_index = -1;
+        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        
+        foreach($dat_list as $ix => $vx){
+            if($vx['id'] === $post_id){
+                $post_index = $ix;
+                break;
+            }
+        }
+        
+        if($post_index >= 0){
+            $dat_list[$post_index]['status'] = ($posts['newStatus'] == 1 ? 1 : 0);
+            file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+            ajax_success($post_index);
+        }
+    }
+    
+    ajax_error('无此帖子');
+}
+
+//删除我的帖子
+function delete_my_post(){
+    $posts = json_decode(file_get_contents('php://input'), true);
+    $post_id = intval($posts['postId']);
+    
+    if($post_id){
+        $root_dir = $_SERVER['DOCUMENT_ROOT'];
+        $path_dataset = $root_dir . '/sharepics/dataset.json';
+        $post_index = -1;
+        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        
+        foreach($dat_list as $ix => $vx){
+            if($vx['id'] === $post_id){
+                $post_index = $ix;
+                break;
+            }
+        }
+        
+        if($post_index >= 0){
+            $subitems = array_splice($dat_list, $post_index, 1);
+            file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+            
+            //删除关联的图片
+            foreach($subitems[0]['pictureList'] as $pic){
+                unlink($root_dir.$pic['picPath']);
+                unlink($root_dir.$pic['thumbnailPath']);
+            }
+            
+            ajax_success($post_index);
+        }
+    }
+    
+    ajax_error('无此帖子');
+}
 //调用函数
 $call_action = $_GET['action'];
-if(in_array($call_action, ['upload_picture', 'save_share_pics'])){
+$headers = getallheaders();
+
+if($headers['Authorization'] !== 'Bearer Xltt-Token'){
+    ajax_error('登录已超时：'.$call_action);
+}
+
+if(in_array($call_action, ['upload_picture', 'save_share_pics', 'toggle_my_post_status', 'delete_my_post'])){
     date_default_timezone_set('Asia/Shanghai');
     $call_action();
 } else {
