@@ -12,9 +12,9 @@
                 </div>
                 <lulu-bg-bubble />
             </header>
-            <ul v-if="postList.length" class="pd-lr-rem5" @touchstart="preventContextMenu">
-                <li v-for="item in postList" :key="item.id" class="pd-tb-rem5 bd-b-f0 tp-op6">
-                    <div class="fx-r" @pointerdown="onItemPointerDown(item)" @pointerup="onItemPointerUp(item)" @pointercancel="clearTimer" @pointerleave="clearTimer">
+            <ul v-if="postList.length" @touchstart="preventContextMenu">
+                <li v-for="item,index in postList" :key="item.id" class="ps-r pd-rem5 bd-b-f0" @pointerdown="onItemPointerDown(index)" @pointerup="onItemPointerUp(index)" @pointercancel="clearTimer" @pointerleave="clearTimer">
+                    <div class="fx-r ps-r zi-1">
                         <p class="mni-share-pic">
                             <img :src="item.pictureList[0].thumbnailPath" class="hi-f" onerror="onImageLoadingError()" />
                             <span v-if="item.pictureList.length > 1" class="mni-pic-count">+{{item.pictureList.length - 1}}</span>
@@ -27,6 +27,7 @@
                             <span class="dp-bk fs-rem6 tc-o0 lh-1x ps-a po-bl-0 pd-l-rem5" v-if="item.status !== 1">仅自己可见</span>
                         </p>
                     </div>
+                    <div v-show="activeIndex===index" class="mni-item-bg"><!-- 背景 --></div>
                 </li>
             </ul>
             <section v-if="isLoading" class="ta-c pd-1rem">
@@ -67,6 +68,7 @@
     const isNoMore = ref(false); //是否还有更多数据
     const pageIndex = ref(0); //第几页
     const errMsg = ref(null); //加载时的错误文本信息
+    const activeIndex = ref(-1); //当前点击的项
     const popupVisible = ref(false);
     const popupTitle = ref("");
     const popupButtons = reactive([
@@ -125,8 +127,11 @@
         postList.splice(0);
         getPostList();
     }
-    function onItemPointerDown(item){
+    function onItemPointerDown(idx){
+        const item = postList[idx];
+        
         nonRVs.pointerDownTS = Date.now();
+        activeIndex.value = idx;
         
         needDebounce(() => {
             
@@ -144,16 +149,19 @@
             nonRVs.selectItemID = item.id;
         }, 600);
     }
-    function onItemPointerUp(item){
+    function onItemPointerUp(idx){
         const delta = (Date.now() - nonRVs.pointerDownTS);
         
         clearTimer(true);
-        
-        if(delta < 300){ //点击事件
+
+        if(delta < 300 && window.event.button === 0){ //点击事件。鼠标左键按下时才有效
+            const item = postList[idx];
             //数据量有点大，保存在临时存储里
             myStorage.onceObject("user_sharepic_infos", item);
             $router.push("/map3ddetails?sid=" + item.id);
         }
+        
+        activeIndex.value = -1;
     }
     function preventContextMenu(evt){
         evt.preventDefault(); //阻止浏览器弹出 “翻译、全选、复制、搜索...” 菜单
@@ -239,5 +247,11 @@
         font-size: 0.6rem;
         color: #fff;
         font-weight: 500;
+    }
+    .mni-item-bg{
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-color: rgba(240, 240, 240, 1);
     }
 </style>

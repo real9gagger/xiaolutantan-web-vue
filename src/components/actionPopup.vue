@@ -53,10 +53,12 @@
         background-color: rgba(0, 0, 0, 0.5);
         display: flex;
         flex-direction: column;
+        align-items: center;
         padding: 0.5rem;
     }
     .ppx-box-dialog{
         width: 100%;
+        max-width: 600px;
         background-color: #fff;
         padding: 0;
         border-radius: 1rem;
