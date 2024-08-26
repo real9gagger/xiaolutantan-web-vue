@@ -47,14 +47,14 @@
 .alert-confirm-container{
     position: fixed;
     inset: 0;
-    z-index: 9999;
-    background-color: rgba(0,0,0,0.6);
+    z-index: 99999999;
+    background-color: rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity 200ms;
+    transition: opacity 300ms cubic-bezier(0, 0, 0, 1) 0s;
 }
 .alert-confirm-container.showup{
     opacity: 1;
@@ -71,7 +71,7 @@
     overflow: hidden;
     transform: scale(0.8) translate(0, 20%);
     transform-origin: 50% 0%;
-    transition: transform 300ms;
+    transition: transform 300ms cubic-bezier(0, 0, 0, 1) 0s;
 }
 .alert-confirm-msg{
     padding:1.5rem 1rem;
@@ -81,9 +81,12 @@
     width: 100%;
     padding: 0.7rem;
     font-weight: bold;
-    border-top: 0.05rem solid #f3f3f3;
+    border-top: 0.05rem solid #f6f6f6;
     background-color: transparent;
     font-size: inherit;
+}
+.alert-confirm-yes.attention{
+    color: red;
 }
 .alert-confirm-yes:active{
     background-color: #f6f6f6;

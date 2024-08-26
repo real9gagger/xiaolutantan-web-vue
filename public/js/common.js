@@ -83,11 +83,13 @@ function appToast(msg, duration){
 	}
 }
 
-function alertConfirm(msg){
+function alertConfirm(msg, yesText, isAttention){
     return new Promise(function (resolve, reject) {
-        let $alertbox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button class="alert-confirm-yes">好</button></div></div>`).appendTo(document.body);
+        let btnText = (yesText || "好");
+        let attentionCss = (isAttention ? " attention" : ""); //按钮文字是否为红色
+        let $alertBox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button class="alert-confirm-yes${attentionCss}">${btnText}</button></div></div>`).appendTo(document.body);
         
-        $alertbox.on("click", function(evt){
+        $alertBox.on("click", function(evt){
             if(evt.target.classList.contains("alert-confirm-container")){
                 $(evt.currentTarget).removeClass("showup");
                 reject();
@@ -101,6 +103,6 @@ function alertConfirm(msg){
             }
         });
         
-        setTimeout($alertbox.addClass.bind($alertbox), 50, "showup");
+        setTimeout($alertBox.addClass.bind($alertBox), 50, "showup");
     });
 }

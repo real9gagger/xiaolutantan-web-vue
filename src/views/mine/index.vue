@@ -12,11 +12,12 @@
                 </div>
                 <lulu-bg-bubble />
             </header>
-            <ul v-if="postList.length" class="pd-lr-rem5">
+            <ul v-if="postList.length" class="pd-lr-rem5" @touchstart="preventContextMenu">
                 <li v-for="item in postList" :key="item.id" class="pd-tb-rem5 bd-b-f0 tp-op6">
-                    <div class="fx-r" @click="onItemClick(item)">
+                    <div class="fx-r" @pointerdown="onItemPointerDown(item)" @pointerup="onItemPointerUp(item)" @pointercancel="clearTimer" @pointerleave="clearTimer">
                         <p class="mni-share-pic">
                             <img :src="item.pictureList[0].thumbnailPath" class="hi-f" onerror="onImageLoadingError()" />
+                            <span v-if="item.pictureList.length > 1" class="mni-pic-count">+{{item.pictureList.length - 1}}</span>
                         </p>
                         <p class="fx-g1 pd-l-rem5 fx-c">
                             <span class="dp-bk fw-b">{{item.title}}</span>
@@ -40,7 +41,8 @@
                 <span v-else class="tc-99">你还没有分享过照片~</span>
             </section>
         </div>
-    </div>
+        <action-popup v-model="isPopupVisible" :title="popupTitle" :buttons="actionButtons" @action="onPopupAction" />
+    </div>    
 </template>
 
 <script setup name="MineIndex">
@@ -48,11 +50,13 @@
     import { useRouter } from "vue-router";
     import { useStore } from "vuex";
     import { appWebName } from "@/assets/data/constants.js"
+    import { needDebounce, clearTimer } from "@/utils/cocohelper.js";
     
     import axios from "axios";
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import luluBgBubble from "@/components/luluBgBubble.vue";
+    import actionPopup from "@/components/actionPopup.vue";
     
     const $router = useRouter();
     const $store = useStore();
@@ -61,6 +65,21 @@
     const isNoMore = ref(false); //是否还有更多数据
     const pageIndex = ref(0); //第几页
     const errMsg = ref(null); //加载时的错误文本信息
+    const isPopupVisible = ref(false);
+    const popupTitle = ref("");
+    const actionButtons = [
+        {
+            name: "仅自己可见",
+            key: 0x007
+        },
+        {
+            name: "删除",
+            key: 0x008
+        }
+    ];
+    const nonRVs = { //非响应式变量（non Responsive Variables）
+        pointerDownTS: 0
+    };
     
     function gotoShareAdd(){
         $router.push("/shareadd");
@@ -96,16 +115,40 @@
         postList.splice(0);
         getPostList();
     }
-    function onItemClick(item){
-        //数据量有点大，保存在临时存储里
-        myStorage.onceObject("user_sharepic_infos", item);
-        $router.push("/map3ddetails?sid=" + item.id);
+    function onItemPointerDown(item){
+        nonRVs.pointerDownTS = Date.now();
+        
+        needDebounce(() => {
+            navigator.vibrate(30);
+            popupTitle.value= item.title;
+            isPopupVisible.value = true;
+        }, 600);
+    }
+    function onItemPointerUp(item){
+        const delta = (Date.now() - nonRVs.pointerDownTS);
+        
+        clearTimer(true);
+        
+        if(delta < 300){ //点击事件
+            //数据量有点大，保存在临时存储里
+            myStorage.onceObject("user_sharepic_infos", item);
+            $router.push("/map3ddetails?sid=" + item.id);
+        }
+    }
+    function preventContextMenu(evt){
+        evt.preventDefault(); //阻止浏览器弹出 “翻译、全选、复制、搜索...” 菜单
     }
     function onLogout(){
-        alertConfirm("退出登录").then(() => {
+        alertConfirm("退出登录", "确定").then(() => {
             $store.dispatch("setUserInfo", null);
             $router.replace("/");
         }).catch(() => 0);
+    }
+    function onPopupAction(key){
+        switch(key){
+            case 0x007: break;
+            case 0x008: break;
+        }
     }
     
     watch(() => $store.getters.thereAreNewPostsTs, onRetry);
@@ -138,5 +181,16 @@
         overflow: hidden;
         background-color: #eee;
         text-align: center;
+        position: relative;
+    }
+    .mni-pic-count{
+        display: block;
+        position: absolute;
+        right: 0.2rem;
+        bottom: 0.2rem;
+        z-index: 9;
+        font-size: 0.6rem;
+        color: #fff;
+        font-weight: 500;
     }
 </style>

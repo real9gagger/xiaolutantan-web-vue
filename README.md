@@ -1,6 +1,7 @@
 # xiaolutantan-web-vue
 NodeJS版本：14.17.6
-
+后端未完成，暂时用： PHP
+服务器：nginx
 ## Project setup
 ```
 yarn install
