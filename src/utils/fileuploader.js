@@ -10,7 +10,8 @@ const instance = axios.create({
     baseURL: location.origin,
     timeout: 15000,
     headers: {
-        "Content-Type": "multipart/form-data"
+        "Content-Type": "multipart/form-data",
+        "Authorization": "Bearer Xltt-Token"
     },
     /* onUploadProgress: function (progressEvent) { //上传进度
         console.log(progressEvent);
