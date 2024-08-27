@@ -80,7 +80,16 @@ function upload_picture(){
     
     $upload_result = move_uploaded_file($my_file['tmp_name'], $root_dir.$path_original.$new_name);
     if(!$upload_result){
-        ajax_error('上传文件失败');
+        /* 如果没有权限，请在 linux 系统执行以下几个步骤：
+        
+        1、  运行PHP命令： <?php echo exec('whoami'); ?> 看看得到的用户名是什么，我得到的是 “apache”。
+        2、  打开命令行工具运行两个命令：（“apache”为第一步得到的用户名，“/mnt/web3/xltt_web_vue” 是网站所在的目录）
+                chown -R apache /mnt/web3/xltt_web_vue
+                chmod -R 755 /mnt/web3/xltt_web_vue
+        
+        参见：https://stackoverflow.com/questions/8103860/move-uploaded-file-gives-failed-to-open-stream-permission-denied-error
+        */
+        ajax_error('上传文件失败：无权读写');
     } else {
         image_rotation($root_dir.$path_original.$new_name);
     }
@@ -251,6 +260,7 @@ function delete_my_post(){
     
     ajax_error('无此帖子');
 }
+
 //调用函数
 $call_action = $_GET['action'];
 $headers = getallheaders();
