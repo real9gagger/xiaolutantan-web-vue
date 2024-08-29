@@ -63,9 +63,9 @@ function appToast(msg, duration){
 		if($msgbox.length){
 			clearTimeout($msgbox.data("appToastTimerID1"));
 			clearTimeout($msgbox.data("appToastTimerID2"));
-			$msgbox.html(msg);
+			$msgbox.children("span").html(msg);
 		} else {
-			$msgbox = $(`<div class="app-toast-box">${msg}</div>`).appendTo(document.body);
+			$msgbox = $(`<div class="app-toast-box"><img src="../icons/toast_info.png" alt="提示信息" class="app-toast-icon" /><span>${msg}</span></div>`).appendTo(document.body);
 		}
 		
 		let tid1 = setTimeout(function(){
