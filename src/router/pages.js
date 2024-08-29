@@ -91,6 +91,14 @@ export default [
         }
     },
     {
+    	path: "/privacypolicy",
+    	name: "法律条款和隐私政策",
+    	component: () => import("@/views/login/privacyPolicy"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/mine",
     	name: "个人中心",
     	component: () => import("@/views/mine/index"),

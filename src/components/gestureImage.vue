@@ -16,7 +16,6 @@
         @click="onImgClick"
         @transitionend="onImgTransitionEnd"
         @load="onImgLoad"
-        @pointerdown="onPointerHandler"
         @pointermove="onPointerHandler"
         class="gti-img-box"
         draggable="false"
@@ -79,6 +78,7 @@
         lastDIS: 0, //双指移到时的前一次距离
         moveTS: 0, //移动时的时间戳
         startTS: 0, //开始触摸时的时间戳
+        canPropagateClickEvent: true, //点击事件是否可以冒泡
     };
     
     const imageStyle = computed(() => ({
@@ -165,6 +165,7 @@
             }
         }
         
+        nonRVs.canPropagateClickEvent = true;
         nonRVs.moveTS = nonRVs.startTS = evt.timeStamp;
     }
     function onImgTouchMove(evt){
@@ -230,6 +231,7 @@
             resetXY(moveXY, pointerCenterXY);
         }
         
+        nonRVs.canPropagateClickEvent = false;
         nonRVs.moveTS = evt.timeStamp;
     }
     function onImgTouchEnd(evt){
@@ -261,7 +263,8 @@
             resetXY(moveXY, [0x88]); //设为非零数即可！！！
         }
         
-        nonRVs.moveTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
+        nonRVs.canPropagateClickEvent = true;
+        nonRVs.moveTS = nonRVs.startTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
     }
     function onImgMouseMove(evt){
         //console.log("鼠标移到…", evt);
@@ -288,6 +291,8 @@
             }
             moveVelocityXY[0] = (evt.movementX / disTS);
             moveVelocityXY[1] = (evt.movementY / disTS);
+            
+            nonRVs.canPropagateClickEvent = false;
             nonRVs.moveTS = evt.timeStamp; //属性返回一个毫秒时间戳，表示事件发生的时间。它是相对于网页加载成功开始计算的。
         }
     }
@@ -353,7 +358,8 @@
         resetXY(transXY, getTransXY(evt));
     }
     function onImgClick(evt){
-        if(!props.clickable){
+        //console.log("点击…", evt);
+        if(!props.clickable || !nonRVs.canPropagateClickEvent){
             evt.preventDefault();
             evt.stopPropagation();
         }
@@ -383,9 +389,10 @@
     }
     function onPointerHandler(evt){
         //console.log("指针事件…", evt);
-        if(isHandleEvent.value){
-            //evt.preventDefault();
-            evt.stopPropagation();;
+        //处理和 Swiper 滑动冲突问题！
+        if(isHandleEvent.value && imageScale.value !== 1){
+            //evt.preventDefault(); 不注释掉的话，图片放大后无法滑动的问题！
+            evt.stopPropagation();
         }
     }
     

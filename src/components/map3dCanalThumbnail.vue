@@ -37,10 +37,11 @@
     const BOX_MARGIN_PX = 10; //距离屏幕边缘的像素
     const R_D_RATIO = (Math.PI / 180); //弧度（R）除以角度（D）
     
-    const isShowing = ref(true);
-    const isGrabbing = ref(false);
+    const isShowing = ref(true); //是否正在展示
+    const isGrabbing = ref(false); //是否正在拖动
     const needTransition = ref(false); //是否需要动画支持
-    const isZoomIn = ref(false); //缩略图是否放大显示
+    const isZoomIn = ref(false); //是否放大显示缩略图
+    const isSideHidden = ref(false); //是否在侧边隐藏
     const boxRect = reactive({
         boxWidth: 0,
         boxHeight: 0,
@@ -51,11 +52,15 @@
         pxPerLnglatY: 0,
     });
     const posXY = reactive([0, 0, 100, 0]); //第一、二元素指定当前位置，第三、四个元素指定变换原点。
-    const divStyle = computed(() => ({
-        transition: (needTransition.value ? "transform 200ms cubic-bezier(0, 0, 0, 0.8) 0s" : "none"),
-        transform: `translate(${posXY[0]}px, ${posXY[1]}px) scale(${isZoomIn.value ? 4 : 1})`,
-        transformOrigin: `${posXY[2]}% ${posXY[3]}%`
-    }));
+    const divStyle = computed(() => {
+        const sa = (isZoomIn.value ? 4 : 1);
+        const xo = posXY[0] + (isSideHidden.value ? (!posXY[2] ? -boxRect.boxWidth - BOX_MARGIN_PX : boxRect.boxWidth + BOX_MARGIN_PX) : 0);
+        return {
+            transition: (needTransition.value ? "transform 300ms cubic-bezier(0, 0, 0, 0.8) 0s" : "none"),
+            transform: (`translate(${xo}px, ${posXY[1]}px) scale(${sa})`),
+            transformOrigin: `${posXY[2]}% ${posXY[3]}%`
+        };
+    });
     const imgStyle = computed(() => {
         return {
             left: Math.round((props.picLng - southWestLnglat[0]) * boxRect.pxPerLnglatX - boxRect.imgWidth / 2) + "px",
@@ -81,11 +86,13 @@
         if(!needTransition.value){
             needTransition.value = true;
             isZoomIn.value = !isZoomIn.value;
+            isSideHidden.value = false;
         }
     }
     function disabledZoomIn(){
         needTransition.value = true;
         isZoomIn.value = false;
+        isSideHidden.value = !isSideHidden.value;
     }
     function onBoxPointerDown(evt){
         //console.log("指针按下…", evt);

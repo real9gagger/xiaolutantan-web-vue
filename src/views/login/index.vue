@@ -34,7 +34,7 @@
         </div>
         <div class="fixed-limit-width po-br-0 pd-rem5 ta-c fs-rem7">
             <p><a class="tc-b0" @click="$router.back">返回上一页</a></p>
-            <p class="mg-t-rem5"><a class="tc-b0">《法律条款和隐私政策》</a></p>
+            <p class="mg-t-rem5"><a class="tc-b0" @click="gotoPrivacyPolicy">《法律条款和隐私政策》</a></p>
         </div>
     </div>
 </template>
@@ -90,6 +90,8 @@
     function onSendSms(){
         if(phoneNumber.value.length !== pnMaxLength){
             return !appToast("请填写手机号码");
+        } else {
+            return !appToast("功能未开放，暂不可用");
         }
         
         if(waitSeconds.value > 0){
@@ -139,6 +141,9 @@
     function onChangeRegion(){
         //待完成
         //$router.push("/test");
+    }
+    function gotoPrivacyPolicy(){
+        $router.push("/privacypolicy");
     }
     
     onUnmounted(() => {

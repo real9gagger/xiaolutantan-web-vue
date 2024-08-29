@@ -190,7 +190,8 @@ function save_share_pics(){
         'likesCount'        => 0, //点赞数量
         'commentCount'      => 0, //评论数量
         'shareCount'        => 0, //分享次数
-        'viewCount'         => 0 //查看次数
+        'viewCount'         => 0, //查看次数
+        'collectCount'      => 0  //收藏次数
     );
     
     file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));

@@ -17,6 +17,7 @@
                 :zoom="false"
                 :max-ratio="4"
                 @swiperslidechange="onSlideChange"
+                @swiperdoubletap="onSwiperDblclick"
                 @click="toggleHideText"
                 effect="slide"
                 class="content-cage"
@@ -46,7 +47,7 @@
 <script setup name="IndexMap3DShareDetails">
     import { ref, getCurrentInstance } from "vue";
     import { useRoute, useRouter } from "vue-router";
-    import { needThrottle } from "@/utils/cocohelper.js";
+    import { needDebounce } from "@/utils/cocohelper.js";
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import gestureImage from "@/components/gestureImage.vue";
@@ -62,13 +63,24 @@
     const shareID = (+$route.query.sid || 0);
     const picIndex = ref(0);
     const isHideText = ref(false);
+    const nonRVs = { //非响应式变量（non Responsive Variables）
+        hasDblClicked: false, //是否双击过了
+    };
     
     function onSlideChange(evt){
         picIndex.value = evt.target.swiper.realIndex;
     }
+    function onSwiperDblclick(evt){
+        nonRVs.hasDblClicked = true;
+    }
     function toggleHideText(){
-        needThrottle(() => (isHideText.value = !isHideText.value), 500);
-        $instance.refs.mctBox.disabledZoomIn();
+        needDebounce(() => {
+            if(!nonRVs.hasDblClicked){ //处理双击时触发连个点击事件的问题
+                isHideText.value = !isHideText.value;
+                $instance.refs.mctBox.disabledZoomIn();
+            }
+            nonRVs.hasDblClicked = false;
+        }, 300);
     }
     function goBackToHomePage(){
         $router.replace("/");

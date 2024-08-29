@@ -68,7 +68,7 @@
     
     //定位我的位置成功后
     function onPositionSuccess(res) {
-        const iconSize = new BMapGL.Size(44, 44);
+        const iconSize = new BMapGL.Size(60, 60);
         const iconOptions = {
             anchor: new BMapGL.Size(iconSize.width / 2, iconSize.height)
         };

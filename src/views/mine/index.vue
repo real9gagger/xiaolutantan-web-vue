@@ -23,7 +23,7 @@
                             <span class="of-lc1 fw-b">{{item.title}}</span>
                             <span class="of-lc1 fs-rem6 tc-99">{{item.locationAddress}}</span>
                             <span class="dp-bk fs-rem6 tc-99 fx-g1">{{item.authorNickname}}&ensp;{{item.createTime}}</span>
-                            <span class="dp-bk fs-rem6 tc-99 ta-r lh-1x">浏览&nbsp;{{item.viewCount}}&emsp;点赞&nbsp;{{item.likesCount}}&emsp;评论&nbsp;{{item.commentCount}}&emsp;分享&nbsp;{{item.shareCount}}</span>
+                            <span class="dp-bk fs-rem6 tc-99 ta-r lh-1x">浏览 {{item.viewCount}}&emsp;点赞 {{item.likesCount}}&emsp;评论 {{item.commentCount}}&emsp;收藏 {{item.collectCount}}<!-- &emsp;分享 {{item.shareCount}} --></span>
                             <span class="dp-bk fs-rem6 tc-o0 lh-1x ps-a po-bl-0 pd-l-rem5" v-if="item.status !== 1">仅自己可见</span>
                         </p>
                     </div>
