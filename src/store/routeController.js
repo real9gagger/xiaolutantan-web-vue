@@ -49,6 +49,8 @@ export default {
                 //console.log(idxF, idxT);
                 //临时保存起来防止刷新后切换效果失效！
                 myStorage.onceObject(KAI_KEY_NAME, state.keepAliveIncludes);
+            } else {
+                console.warn("检测到路由堆栈异常：目标路由没有名称，可能无法实现视图切换动画和视图缓存功能！");
             }
         },
         CLEAR_KEEP_ALIVE_INCLUDES(state){//清空包含项
