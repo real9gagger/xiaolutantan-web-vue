@@ -124,5 +124,13 @@ export default [
             showPageTitle: true,
             loginRequired: true
         }
+    },
+    {
+    	path: "/aboutcanal",
+    	name: "关于平陆运河",
+    	component: () => import("@/views/help/aboutCanal"),
+    	meta: {
+            showPageTitle: true
+        }
     }
 ];

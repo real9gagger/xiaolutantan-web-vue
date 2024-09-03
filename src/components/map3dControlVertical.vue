@@ -1,5 +1,8 @@
 <template>
     <div class="mcv-box-container">
+        <div @click="onGotoAboutCanal" class="mcv-action-box" title="关于平陆运河">
+            <img class="dp-bk wh-f" :src="publicAssets.iconHelpAboutCanal" />
+        </div>
         <div @click="onPositionMyLocation" class="mcv-action-box" :class="{'mcv-positionning-ani': isPositionning}" title="定位到我的位置">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapLocationPosition" />
         </div>
@@ -14,7 +17,7 @@
             <img v-if="isSatelliteMap" class="dp-bk wh-f" :src="publicAssets.iconMapToggleLayers" />
             <img v-else class="dp-bk wh-f" :src="publicAssets.iconMapSatelliteFill" />
         </div>
-        <div @click="onShowOrHideRegion" class="mcv-action-box" title="显示行政区域">
+        <div @click="onShowOrHideRegion" class="mcv-action-box" title="地图展示设置">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapAdministrativeRegion" />
         </div>
         <div @click="onGotoMyAccount" class="mcv-action-box user-avatar" title="转到个人中心">
@@ -32,6 +35,7 @@
     const isPositionning = ref(false); //是否正在定位
 
     const emits = defineEmits([
+        "onaboutcanal",
         "positionlocation",
         "restoreperspective",
         "togglecallout",
@@ -40,6 +44,10 @@
         "gotoaccount",
     ]);
 
+    function onGotoAboutCanal(){
+        emits("onaboutcanal", true);
+    }
+    
     function onPositionMyLocation() {
         if (isPositionning.value) {
             return;

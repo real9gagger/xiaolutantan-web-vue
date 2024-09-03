@@ -14,6 +14,8 @@ const AssetsPathMap = {
     
     //用户分享的照片数据：测试环境可用：sharepics/index.json 文件，必须带时间戳，防止缓存！
     sharePicsData: "sharepics/dataset.json?ts=", 
+    pictureMadaoHinge3: "sharepics/madao_hinge_3.jpg",
+    picturePlyhMap: "sharepics/plyh_map_thumb.jpg",
     
     //图标
     iconDefaultUserAvatar: "icons/default_user_avatar.png",
@@ -62,6 +64,7 @@ const AssetsPathMap = {
     iconTrashOpenWhite: "icons/trash_open_white.png",
     iconThePostAuthor: "icons/the_post_author.png",
     iconPublishPost: "icons/publish_post.png",
+    iconHelpAboutCanal: "icons/help_about_canal.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

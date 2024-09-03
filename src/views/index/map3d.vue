@@ -1,8 +1,9 @@
 <template>
     <div class="hi-cwh of-h">
         <div id="IndexMap3DBox" class="wh-f"></div>
-        <div class="map3d-zoom-level-box">缩放&nbsp;{{mapZoomLevel}}级</div>
+        <div class="map3d-zoom-level-box" :style="`min-width:${zlBoxWidth}px`">缩放&nbsp;{{mapZoomLevel}}级</div>
         <map3d-control-vertical
+            @onaboutcanal="onGotoAboutCanal"
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
             @togglemaptype="onToggleMapType"
@@ -57,6 +58,11 @@
     const mapZoomLevel = ref(8); //当前地图缩放级别
     const iwLnglats = ref([]);
     const iwTitle = ref("");
+    const zlBoxWidth = ref(0);
+    
+    function onGotoAboutCanal(){
+        $router.push("/aboutcanal");
+    }
     
     //还原默认视图
     function onRestorePerspective(){
@@ -125,8 +131,11 @@
     
     //监听地图缩放
     function onMapZoomInOut(evt){
-        const bdmap = (evt?.target || mapInstance);
-        mapZoomLevel.value = Math.floor(bdmap.getZoom());
+        nextTick(() => {
+            const bdmap = (evt?.target || mapInstance);
+            zlBoxWidth.value = (+$(bdmap.container).children(".BMap_scaleCtrl").width() || 80);
+            mapZoomLevel.value = Math.floor(bdmap.getZoom());
+        });
     }
     
     //监听地图点击
@@ -210,7 +219,7 @@
         //2024年7月9日 弃用，改成自定义导航控件 mapInstance.addControl(new BMapGL.NavigationControl3D({ anchor: BMAP_ANCHOR_BOTTOM_RIGHT }));//添加导航控件
         mapInstance.addEventListener("zoomend", onMapZoomInOut);
         mapInstance.addEventListener("click", onMapClicked);
-        
+
         if(mapInstance.logoCtrl){ /* 隐藏百度地图 LOGO */
             $(mapInstance.logoCtrl._container).addClass("bdMapLogo");
         }
@@ -410,6 +419,10 @@
         
         //2024年7月16日，获取用户分享的照片
         axios.get(publicAssets.sharePicsData + $store.getters.thereAreNewPostsTs).then(res1 => {
+            if(!res1.data.length){
+                return !appToast("还没有用户分享过照片~");
+            }
+            
             for(const item of res1.data){
                 if(item.status === 1 && item.pictureList?.length){//有效和有图片的才显示
                     const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
