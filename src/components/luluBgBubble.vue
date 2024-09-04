@@ -16,7 +16,7 @@
     const $instance = getCurrentInstance();
     let timerID = 0;
 
-    onMounted(() => {
+    onMounted(() => setTimeout(() => {
         const canvasList = $($instance.proxy.$el).children("canvas");
         const config = {
             circle: {
@@ -219,9 +219,9 @@
         });
         
         createItems();
-        createAF(startAnimate);
         drawBackground();
-    });
+        createAF(startAnimate);
+    }, 200));
     
     onUnmounted(() => {
         if(window.cancelAnimationFrame){
@@ -247,6 +247,7 @@
         position: relative;
         width: 100%;
         height: 100%;
+        background-color: rgb(0, 26, 77);
     }
 
     .lbb-ani-container > canvas {

@@ -43,7 +43,7 @@
     .dnt-pic-box{
         display: block;
         margin: 0 auto;
-        width: 16rem;
+        width: min(15rem, 500px);
         height: auto;
     }
 </style>

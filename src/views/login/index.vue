@@ -1,12 +1,12 @@
 <template>
     <div class="page-limit-width">
         <!-- 两个隐藏的输入框 -->
-        <input id="pnInputBox" type="tel" class="ps-f po-tl-0 op-0 zi-10"
+        <input id="pnInputBox" type="tel" class="ps-f po-tl-0 op-0 zi-10 hi-0"
             :maxlength="pnMaxLength" 
             @focus="onPnFocus" 
             @blur="onPnFocus"
             @input="onPnInput" />
-        <input id="vcInputBox" type="number" class="ps-f po-tl-0 op-0"
+        <input id="vcInputBox" type="number" class="ps-f po-tl-0 op-0 hi-0"
             :maxlength="vcMaxLength" 
             @focus="onVcFocus" 
             @blur="onVcFocus"

@@ -4,7 +4,7 @@
             <header class="mni-user-bg">
                 <div class="mni-user-profile fx-hc">
                     <img :src="$store.getters.currentUserAvatarUrl || publicAssets.iconDefaultUserAvatar" @click="onLogout" class="mni-user-avatar" alt="用户头像" />
-                    <div class="pd-lr-rem5 fx-g1 tc-ff">
+                    <div class="pd-lr-rem5 fx-g1 tc-ff" @click="onLogout">
                         <h4 class="dp-bk fs-1rem">{{$store.getters.currentUserNickName || appWebName}}</h4>
                         <p class="mg-t-rem25 fs-rem7">帖子&nbsp;<b>{{postList.length}}</b>&emsp;</p>
                     </div>
