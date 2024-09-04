@@ -86,6 +86,8 @@ const AssetsPathMap = {
     imageAvatarTantan: "images/avatar_tantan.jpeg",
     imageAvatarLulu: "images/avatar_lulu.jpeg",
     imageAboutUsBg: "images/about_us_bg.jpg",
+    imageDonateByWechatpay: "images/donate_by_wechatpay.jpg",
+    imageDonateByAlipay: "images/donate_by_alipay.jpg",
 };
 
 if(THE_BU){

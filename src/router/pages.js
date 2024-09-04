@@ -140,5 +140,13 @@ export default [
     	meta: {
             showPageTitle: true
         }
+    },
+    {
+    	path: "/donate",
+    	name: "捐助",
+    	component: () => import("@/views/help/donate"),
+    	meta: {
+            showPageTitle: true
+        }
     }
 ];

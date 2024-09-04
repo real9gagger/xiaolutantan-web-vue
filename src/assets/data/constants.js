@@ -27,3 +27,9 @@ export const uploadStatusCode = {
     success: 0x64, //上传成功
     failed: -0x5124, //上传失败
 };
+
+//捐助说明语
+export const donateWords = "您的捐款将帮助我们持续改善和发展";
+
+//联系邮箱
+export const contactEmail = "3259833818@qq.com";
