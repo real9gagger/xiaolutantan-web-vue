@@ -1,12 +1,12 @@
 <template>
     <div class="hi-cwh fx-vm">
-        <h4 class="tc-red fs-1rem2">SERVER ERROR</h4>
+        <h4 class="tc-r1 fs-1rem2">SERVER ERROR</h4>
         <img :src="publicAssets.imageServerError" style="width:10rem;height:10rem;margin:1rem 0;" />
         <div class="fw-b fs-1rem">
             <a @click="goHome" class="tc-mc">返回主页</a>
             <a @click="backPage" class="tc-mc mg-l-2rem">返回上一页</a>
         </div>
-        <div class="error-copy-right">{{appWebName}}@2024</div>
+        <div class="error-copy-right">{{appWebName}}@{{theYear}}</div>
     </div>
 </template>
 
@@ -16,6 +16,7 @@
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const $router = useRouter();
+    const theYear = new Date().getFullYear();
     
     function backPage() {
         $router.go(-1);

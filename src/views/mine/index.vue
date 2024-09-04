@@ -35,7 +35,7 @@
             </section>
             <section v-else-if="errMsg" class="ta-c pd-1rem">
                 <b class="tc-o0">加载出错：</b>
-                <b class="tc-red">{{errMsg}}</b>
+                <b class="tc-r0">{{errMsg}}</b>
                 <a class="tc-b0 fw-b" @click="onRetry">&emsp;重试</a>
             </section>
             <section v-else-if="isNoMore" class="ta-c pd-1rem">

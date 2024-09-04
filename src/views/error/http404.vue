@@ -1,8 +1,8 @@
 <template>
   <div class="error404">
     <div class="error404-body-con">
-		<div class="tc-red ta-c fs-1rem5 fw-b">ERROR</div>
-		<div class="fw-b ta-c tc-red mg-t-rem25">页面 “{{theUrl}}” 不存在</div>
+		<div class="tc-r1 ta-c fw-b fs-1rem5">ERROR</div>
+		<div class="tc-r1 ta-c fw-b mg-t-rem25">页面 “{{theUrl}}” 不存在</div>
         <div class="error404-body-con-title">4<span>0</span>4</div>
         <div class="error404-body-con-message">
 			<p>找不到此页面</p>
@@ -13,7 +13,7 @@
           <a @click="backPage" class="tc-mc mg-l-2rem">返回上一页</a>
         </div>
     </div>
-	<div class="error404-copy-right">{{appWebName}}@2024</div>
+	<div class="error404-copy-right">{{appWebName}}@{{theYear}}</div>
   </div>
 </template>
 
@@ -25,7 +25,8 @@
     const $route = useRoute();
     const $router = useRouter();
     const theUrl = ref("/unkownpage");
-
+    const theYear = new Date().getFullYear();
+    
     function backPage() {
         $router.go(-1);
     }

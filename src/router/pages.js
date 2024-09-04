@@ -132,5 +132,13 @@ export default [
     	meta: {
             showPageTitle: true
         }
+    },
+    {
+    	path: "/aboutus",
+    	name: "关于我们",
+    	component: () => import("@/views/help/aboutUs"),
+    	meta: {
+            showPageTitle: true
+        }
     }
 ];

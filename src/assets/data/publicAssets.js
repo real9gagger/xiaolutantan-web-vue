@@ -16,6 +16,7 @@ const AssetsPathMap = {
     sharePicsData: "sharepics/dataset.json?ts=", 
     pictureMadaoHinge3: "sharepics/madao_hinge_3.jpg",
     picturePlyhMap: "sharepics/plyh_map_thumb.jpg",
+    picturePlyhSketch: "sharepics/plyh_sketch.jpg",
     
     //图标
     iconDefaultUserAvatar: "icons/default_user_avatar.png",
@@ -84,6 +85,7 @@ const AssetsPathMap = {
     imageAvatarPingping: "images/avatar_pingping.jpeg",
     imageAvatarTantan: "images/avatar_tantan.jpeg",
     imageAvatarLulu: "images/avatar_lulu.jpeg",
+    imageAboutUsBg: "images/about_us_bg.jpg",
 };
 
 if(THE_BU){
