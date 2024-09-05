@@ -47,7 +47,7 @@
     import pictureUploader from "@/components/pictureUploader.vue";
     import ajaxRequest from "@/request/index.js";
     
-    const MAX_TEXT_LENGTH = 200;
+    const MAX_TEXT_LENGTH = 800;
     
     const $instance = getCurrentInstance();
     const $router = useRouter();

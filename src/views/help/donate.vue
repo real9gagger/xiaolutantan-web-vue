@@ -44,6 +44,7 @@
         display: block;
         margin: 0 auto;
         width: min(15rem, 500px);
-        height: auto;
+        min-height: min(15rem, 500px);
+        background-color: #f0f0f0;
     }
 </style>

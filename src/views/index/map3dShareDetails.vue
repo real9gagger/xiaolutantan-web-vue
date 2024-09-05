@@ -1,7 +1,7 @@
 <template>
     <div class="page-limit-width">
         <template v-if="shareInfos && shareInfos.id===shareID">
-            <div class="fixed-limit-width msd-userinfo-box" :class="{'hidden': isHideText}">
+            <div class="fixed-limit-width msd-userinfo-box" :class="{'hidden': isHideText}" @click="gotoUserPage">
                 <img class="msd-user-avatar" :src="shareInfos.authorAvatarUrl || publicAssets.iconDefaultUserAvatar" />
                 <div class="mg-l-rem25 fx-g1">
                     <span class="dp-bk fw-b" title="分享这张照片的用户的名称">{{shareInfos.authorNickname}}</span>
@@ -55,7 +55,7 @@
     
     //swiper开发文档：https://www.swiper.com.cn/api/index.html
     //swiper属性大全：https://swiperjs.com/swiper-api
-    
+
     const $instance = getCurrentInstance();
     const $route = useRoute();
     const $router = useRouter();
@@ -84,6 +84,9 @@
     }
     function goBackToHomePage(){
         $router.replace("/");
+    }
+    function gotoUserPage(){
+        $router.push("/user?uid=" + shareInfos.authorNickname);
     }
 </script>
 

@@ -108,6 +108,14 @@ export default [
         }
     },
     {
+    	path: "/user",
+    	name: "用户中心",
+    	component: () => import("@/views/mine/user"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/shareadd",
     	name: "分享照片",
     	component: () => import("@/views/mine/shareAdd"),

@@ -44,7 +44,7 @@
             </section>
         </div>
         <action-popup v-model="popupVisible" :title="popupTitle" :buttons="popupButtons" @action="onPopupAction" />
-    </div>    
+    </div>
 </template>
 
 <script setup name="MineIndex">
@@ -143,7 +143,7 @@
             }
             
             navigator.vibrate(30);
-            popupTitle.value= item.title;
+            popupTitle.value= item.title.substr(0, 50);
             popupVisible.value = true;
             
             nonRVs.selectItemID = item.id;
@@ -169,7 +169,7 @@
     function onLogout(){
         alertConfirm("退出登录", "确定").then(() => {
             $store.dispatch("setUserInfo", null);
-            $router.replace("/");
+            $router.back();
         }).catch(() => 0);
     }
     function onPopupAction(key){

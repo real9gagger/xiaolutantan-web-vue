@@ -262,6 +262,26 @@ function delete_my_post(){
     ajax_error('无此帖子');
 }
 
+//根据用户ID获取用户发布的帖子
+function get_user_post_by_uid(){
+    $uid = $_GET['uid'];
+    $output = [];
+    
+    if($uid){
+        $root_dir = $_SERVER['DOCUMENT_ROOT'];
+        $path_dataset = $root_dir . '/sharepics/dataset.json';
+        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        
+        foreach($dat_list as $vx){
+            if($vx['authorNickname'] === $uid && $vx['status'] === 1){
+                $output[] = $vx;
+            }
+        }
+    }
+    
+    ajax_success($output);
+}
+
 //调用函数
 $call_action = $_GET['action'];
 $headers = getallheaders();
@@ -270,7 +290,7 @@ if($headers['Authorization'] !== 'Bearer Xltt-Token'){
     ajax_error('登录已超时：'.$call_action);
 }
 
-if(in_array($call_action, ['upload_picture', 'save_share_pics', 'toggle_my_post_status', 'delete_my_post'])){
+if(in_array($call_action, ['upload_picture', 'save_share_pics', 'toggle_my_post_status', 'delete_my_post', 'get_user_post_by_uid'])){
     date_default_timezone_set('Asia/Shanghai');
     $call_action();
 } else {
