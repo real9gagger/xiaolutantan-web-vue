@@ -52,6 +52,7 @@
     import publicAssets from "@/assets/data/publicAssets.js";
     import gestureImage from "@/components/gestureImage.vue";
     import map3dCanalThumbnail from "@/components/map3dCanalThumbnail.vue";
+    import ajaxRequest from "@/request/index.js";
     
     //swiper开发文档：https://www.swiper.com.cn/api/index.html
     //swiper属性大全：https://swiperjs.com/swiper-api
@@ -94,6 +95,8 @@
         if(dat){
             shareID.value = dat.id;
             Object.assign(shareInfos, dat);
+            //更新帖子查看次数
+            ajaxRequest("updatePostViewCount", { postId: dat.id });
         } else {
             shareID.value = 0;
         }

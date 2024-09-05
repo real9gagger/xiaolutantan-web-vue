@@ -15,4 +15,5 @@ export default {
     getUserPostByUid: "/xlttapi?__RM__=GET&action=get_user_post_by_uid", //根据用户ID获取用户发布的帖子
     getUserPostList: "/xlttapi?__RM__=GET&action=get_user_post_list", //获取用户分享的帖子
     getMyPostList: "/xlttapi?__RM__=GET&action=get_my_post_list", //获取我分享的帖子
+    updatePostViewCount: "/xlttapi?__RM__=POST&action=update_post_view_count", //更新帖子查看数量
 }

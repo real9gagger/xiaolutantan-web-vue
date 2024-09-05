@@ -420,7 +420,7 @@
         
         //2024年7月16日，获取用户分享的照片
         ajaxRequest("getUserPostList").then(res1 => {
-            if(!res1.length){
+            if(!res1 || !res1.length){
                 return !appToast("还没有用户分享过照片~");
             }
             

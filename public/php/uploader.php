@@ -290,7 +290,7 @@ function get_user_post_list(){
     
     //要求：获取 50 条浏览量最高的数据，30条最新发布的数据，20贴点赞最多的数据。需要去重，累计获取100条数据！
     //2024年9月5日 功能未完善，暂时返回所有的帖子吧
-    ajax_success($output);
+    ajax_success($dat_list);
 }
 
 //获取我分享的帖子
@@ -301,7 +301,35 @@ function get_my_post_list(){
     
     //要求：支持上滑加载更多数据
     //2024年9月5日 功能未完善，暂时返回所有的帖子吧
-    ajax_success($output);
+    ajax_success($dat_list);
+}
+
+//更新帖子查看次数
+function update_post_view_count(){
+    $posts = json_decode(file_get_contents('php://input'), true);
+    $post_id = intval($posts['postId']);
+    
+    if($post_id){
+        $root_dir = $_SERVER['DOCUMENT_ROOT'];
+        $path_dataset = $root_dir . '/sharepics/dataset.json';
+        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        $post_index = -1;
+        
+        foreach($dat_list as $ix => $vx){
+            if($vx['id'] === $post_id){
+                $post_index = $ix;
+                break;
+            }
+        }
+        
+        if($post_index >= 0){
+            //浏览次数 +1
+            $dat_list[$post_index]['viewCount'] = ($dat_list[$post_index]['viewCount'] + 1);
+            file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+        }
+    }
+    
+    ajax_success($post_id);
 }
 
 //调用函数
@@ -319,7 +347,8 @@ $api_actions = [
     'delete_my_post', 
     'get_user_post_by_uid',
     'get_user_post_list',
-    'get_my_post_list'
+    'get_my_post_list',
+    'update_post_view_count'
 ];
 
 if(in_array($call_action, $api_actions)){

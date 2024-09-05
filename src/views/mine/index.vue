@@ -106,8 +106,8 @@
         
         //2024年8月16日，获取用户分享的照片
         ajaxRequest("getMyPostList").then(res => {
-            if(res.data && res.data.length){
-                postList.push(...res.data);
+            if(res && res.length){
+                postList.push(...res);
             }
             isLoading.value = false;
             isNoMore.value = true;
