@@ -13,4 +13,6 @@ export default {
     toggleMyPostStatus: "/xlttapi?__RM__=POST&action=toggle_my_post_status", //将我的帖子设为仅自己可见或全部人可见
     deleteMyPost: "/xlttapi?__RM__=POST&action=delete_my_post", //删除我的帖子
     getUserPostByUid: "/xlttapi?__RM__=GET&action=get_user_post_by_uid", //根据用户ID获取用户发布的帖子
+    getUserPostList: "/xlttapi?__RM__=GET&action=get_user_post_list", //获取用户分享的帖子
+    getMyPostList: "/xlttapi?__RM__=GET&action=get_my_post_list", //获取我分享的帖子
 }

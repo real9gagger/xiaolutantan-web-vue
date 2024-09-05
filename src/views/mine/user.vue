@@ -71,8 +71,8 @@
         
         //2024年8月16日，获取用户分享的照片
         ajaxRequest("getUserPostByUid", { uid: $route.query.uid }).then(res => {
-            if(res.data && res.data.length){
-                postList.push(...res.data);
+            if(res && res.length){
+                postList.push(...res);
             }
             isLoading.value = false;
             isNoMore.value = true;
@@ -95,7 +95,7 @@
         const item = postList[idx];
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos", item);
-        $router.push("/map3ddetails?sid=" + item.id);
+        $router.back();
     }
     
     onMounted(getPostList);

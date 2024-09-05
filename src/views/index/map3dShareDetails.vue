@@ -45,7 +45,7 @@
 </template>
 
 <script setup name="IndexMap3DShareDetails">
-    import { ref, getCurrentInstance } from "vue";
+    import { ref, reactive, getCurrentInstance, onActivated } from "vue";
     import { useRoute, useRouter } from "vue-router";
     import { needDebounce } from "@/utils/cocohelper.js";
     import myStorage from "@/utils/mystorage.js";
@@ -59,8 +59,8 @@
     const $instance = getCurrentInstance();
     const $route = useRoute();
     const $router = useRouter();
-    const shareInfos = myStorage.onceObject("user_sharepic_infos");
-    const shareID = (+$route.query.sid || 0);
+    const shareInfos = reactive({});
+    const shareID = ref(+$route.query.sid || 0);
     const picIndex = ref(0);
     const isHideText = ref(false);
     const nonRVs = { //非响应式变量（non Responsive Variables）
@@ -88,6 +88,16 @@
     function gotoUserPage(){
         $router.push("/user?uid=" + shareInfos.authorNickname);
     }
+    
+    onActivated(() => {
+        const dat = myStorage.onceObject("user_sharepic_infos");
+        if(dat){
+            shareID.value = dat.id;
+            Object.assign(shareInfos, dat);
+        } else {
+            shareID.value = 0;
+        }
+    });
 </script>
 
 <style scoped="scoped">

@@ -282,6 +282,28 @@ function get_user_post_by_uid(){
     ajax_success($output);
 }
 
+//获取用户分享的帖子
+function get_user_post_list(){
+    $root_dir = $_SERVER['DOCUMENT_ROOT'];
+    $path_dataset = $root_dir . '/sharepics/dataset.json';
+    $dat_list = json_decode(file_get_contents($path_dataset), true);
+    
+    //要求：获取 50 条浏览量最高的数据，30条最新发布的数据，20贴点赞最多的数据。需要去重，累计获取100条数据！
+    //2024年9月5日 功能未完善，暂时返回所有的帖子吧
+    ajax_success($output);
+}
+
+//获取我分享的帖子
+function get_my_post_list(){
+    $root_dir = $_SERVER['DOCUMENT_ROOT'];
+    $path_dataset = $root_dir . '/sharepics/dataset.json';
+    $dat_list = json_decode(file_get_contents($path_dataset), true);
+    
+    //要求：支持上滑加载更多数据
+    //2024年9月5日 功能未完善，暂时返回所有的帖子吧
+    ajax_success($output);
+}
+
 //调用函数
 $call_action = $_GET['action'];
 $headers = getallheaders();
@@ -290,7 +312,17 @@ if($headers['Authorization'] !== 'Bearer Xltt-Token'){
     ajax_error('登录已超时：'.$call_action);
 }
 
-if(in_array($call_action, ['upload_picture', 'save_share_pics', 'toggle_my_post_status', 'delete_my_post', 'get_user_post_by_uid'])){
+$api_actions = [
+    'upload_picture', 
+    'save_share_pics', 
+    'toggle_my_post_status', 
+    'delete_my_post', 
+    'get_user_post_by_uid',
+    'get_user_post_list',
+    'get_my_post_list'
+];
+
+if(in_array($call_action, $api_actions)){
     date_default_timezone_set('Asia/Shanghai');
     $call_action();
 } else {

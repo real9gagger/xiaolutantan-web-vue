@@ -26,6 +26,7 @@
     import { needDebounce } from "@/utils/cocohelper.js";
     
     import axios from "axios";
+    import ajaxRequest from "@/request/index.js";
     import myStorage from "@/utils/mystorage.js";
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
@@ -418,12 +419,12 @@
         }
         
         //2024年7月16日，获取用户分享的照片
-        axios.get(publicAssets.sharePicsData + $store.getters.thereAreNewPostsTs).then(res1 => {
-            if(!res1.data.length){
+        ajaxRequest("getUserPostList").then(res1 => {
+            if(!res1.length){
                 return !appToast("还没有用户分享过照片~");
             }
             
-            for(const item of res1.data){
+            for(const item of res1){
                 if(item.status === 1 && item.pictureList?.length){//有效和有图片的才显示
                     const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
                         point: gcj02ToMapPoint([item.longitude, item.latitude]),
@@ -435,8 +436,6 @@
                     customOverlay.addEventListener("click", onSharePictureClicked);
                 }
             }
-        }).catch(err => {
-            appToast(err.message);
         });
     }
     

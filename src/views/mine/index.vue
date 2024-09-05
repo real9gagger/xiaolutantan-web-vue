@@ -54,7 +54,6 @@
     import { appWebName } from "@/assets/data/constants.js"
     import { needDebounce, clearTimer } from "@/utils/cocohelper.js";
     
-    import axios from "axios";
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import luluBgBubble from "@/components/luluBgBubble.vue";
@@ -106,7 +105,7 @@
         pageIndex.value++;
         
         //2024年8月16日，获取用户分享的照片
-        axios.get(publicAssets.sharePicsData + $store.getters.thereAreNewPostsTs).then(res => {
+        ajaxRequest("getMyPostList").then(res => {
             if(res.data && res.data.length){
                 postList.push(...res.data);
             }
