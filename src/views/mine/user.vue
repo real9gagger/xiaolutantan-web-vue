@@ -94,8 +94,8 @@
     function onItemClick(idx){
         const item = postList[idx];
         //数据量有点大，保存在临时存储里
-        myStorage.onceObject("user_sharepic_infos", item);
-        $router.back();
+        myStorage.onceObject("user_sharepic_infos_" + item.id, item);
+        $router.push("/map3ddetails?ogpg=USER_CENTER&sid=" + item.id);
     }
     
     onMounted(getPostList);

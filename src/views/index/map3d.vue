@@ -170,12 +170,14 @@
     
     //点击用户分享的照片时触发
     function onSharePictureClicked(evt){
+        const dat = evt.target.properties;
+        
         mapIgnoreClicked = true;
         needDebounce(resetSomeData, 100);
         
         //数据量有点大，保存在临时存储里
-        myStorage.onceObject("user_sharepic_infos", evt.target.properties);
-        $router.push("/map3ddetails?sid=" + evt.target.properties.id);
+        myStorage.onceObject("user_sharepic_infos_" + dat.id, dat);
+        $router.push("/map3ddetails?sid=" + dat.id);
 
         mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(mapActivitingCallout, false);
         mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(evt.target.div.firstChild, true);

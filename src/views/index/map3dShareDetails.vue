@@ -1,6 +1,6 @@
 <template>
     <div class="page-limit-width">
-        <template v-if="shareInfos && shareInfos.id===shareID">
+        <template v-if="shareInfos && shareInfos.id">
             <div class="fixed-limit-width msd-userinfo-box" :class="{'hidden': isHideText}" @click="gotoUserPage">
                 <img class="msd-user-avatar" :src="shareInfos.authorAvatarUrl || publicAssets.iconDefaultUserAvatar" />
                 <div class="mg-l-rem25 fx-g1">
@@ -34,6 +34,11 @@
             </div>
             <map3d-canal-thumbnail ref="mctBox" :pic-lng="shareInfos.longitude" :pic-lat="shareInfos.latitude" />
         </template>
+        <template v-else-if="isLoading">
+            <div class="content-cage fx-vm">
+                <img :src="publicAssets.imageLoadingGif" alt="正在加载" class="dp-ib wh-3rem" />
+            </div>
+        </template>
         <template v-else >
             <div class="content-cage" style="padding-top:15vh">
                 <h4 class="fs-1rem tc-33 ta-c">照片已失效</h4>
@@ -61,7 +66,7 @@
     const $route = useRoute();
     const $router = useRouter();
     const shareInfos = reactive({});
-    const shareID = ref(+$route.query.sid || 0);
+    const isLoading = ref(true);
     const picIndex = ref(0);
     const isHideText = ref(false);
     const nonRVs = { //非响应式变量（non Responsive Variables）
@@ -87,19 +92,24 @@
         $router.replace("/");
     }
     function gotoUserPage(){
-        $router.push("/user?uid=" + shareInfos.authorNickname);
+        //if original page is from user center
+        if($route.query.ogpg === "USER_CENTER"){
+            $router.back();
+        } else {
+            $router.push("/user?uid=" + shareInfos.authorNickname);
+        }
     }
     
     onActivated(() => {
-        const dat = myStorage.onceObject("user_sharepic_infos");
+        const sid = (+$route.query.sid || 0);
+        const dat = myStorage.onceObject("user_sharepic_infos_" + sid);
+        
         if(dat){
-            shareID.value = dat.id;
             Object.assign(shareInfos, dat);
-            //更新帖子查看次数
-            ajaxRequest("updatePostViewCount", { postId: dat.id });
-        } else {
-            shareID.value = 0;
+            ajaxRequest("updatePostViewCount", { postId: sid }); //更新帖子查看次数
         }
+        
+        isLoading.value = false;
     });
 </script>
 

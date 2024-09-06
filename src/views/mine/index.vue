@@ -113,7 +113,7 @@
             isNoMore.value = true;
             errMsg.value = null;
         }).catch(err => {
-            errMsg.value = err.message;
+            errMsg.value = err;
             isLoading.value = false;
             isNoMore.value = false;
         });
@@ -156,8 +156,8 @@
         if(delta < 300 && window.event.button === 0){ //点击事件。鼠标左键按下时才有效
             const item = postList[idx];
             //数据量有点大，保存在临时存储里
-            myStorage.onceObject("user_sharepic_infos", item);
-            $router.push("/map3ddetails?sid=" + item.id);
+            myStorage.onceObject("user_sharepic_infos_" + item.id, item);
+            $router.push("/map3ddetails?ogpg=USER_CENTER&sid=" + item.id);
         }
         
         activeIndex.value = -1;
