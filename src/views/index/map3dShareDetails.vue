@@ -96,7 +96,7 @@
         if($route.query.ogpg === "USER_CENTER"){
             $router.back();
         } else {
-            $router.push("/user?uid=" + shareInfos.authorNickname);
+            $router.push("/user?uid=" + encodeURIComponent(shareInfos.authorNickname));
         }
     }
     

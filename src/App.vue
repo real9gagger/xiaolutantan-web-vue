@@ -5,7 +5,7 @@
             @enter="onPageEnter" 
             @after-enter="onPageAfterEnter" 
             @leave="onPageLeave" :css="false">
-            <keep-alive :include="keepAliveIncludes" :max="32">
+            <keep-alive :include="$store.getters.keepAliveIncludes" :max="32">
                 <component :is="$scope.Component" />
             </keep-alive>
         </transition>
@@ -13,11 +13,10 @@
 </template>
 
 <script setup name="XlttApp">
-    import { onMounted, computed } from "vue";
+    import { onMounted } from "vue";
     import { useStore } from "vuex";
 
     const $store = useStore();
-    const keepAliveIncludes = computed(() => $store.getters.keepAliveIncludes);
 
     function onPageBeforeEnter(elem){//进入页面时要固定定位
     	//等于null表示首次加载，此时不需要页面切换动画

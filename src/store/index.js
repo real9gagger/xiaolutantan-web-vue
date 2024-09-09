@@ -4,6 +4,11 @@ import routeController from "./routeController";
 import moduleSettings from "./moduleSettings";
 import userInfo from "./userInfo";
 
+//获取组件名称
+function getComponentName(item){
+    return item[0];
+}
+
 const myModules = {
     routeController,
     moduleSettings,
@@ -12,7 +17,7 @@ const myModules = {
 
 const myGetters = {
     isRouterBack: (state) => state.routeController.isRouterBack,
-    keepAliveIncludes: (state) => state.routeController.keepAliveIncludes,
+    keepAliveIncludes: (state) => state.routeController.historyRouteList.map(getComponentName),
     
     mapAdministrativeType: (state) => state.moduleSettings.mapAdministrativeType,
     canalDisplayType: (state) => state.moduleSettings.canalDisplayType,

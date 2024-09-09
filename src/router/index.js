@@ -19,8 +19,10 @@ myRouter.beforeEach(function(to, from){
 
 myRouter.afterEach(function(to, from){
     vuexStore.dispatch("updateKeepAliveIncludes", {
-        toComponentName: (to.matched.length ? to.matched[0].components.default.name : null),
-        fromComponentName: (from.matched.length ? from.matched[0].components.default.name : null)
+        toName: (to.matched.length ? to.matched[0].components.default.name : null),
+        toPath: to.fullPath,
+        fromName: (from.matched.length ? from.matched[0].components.default.name : null),
+        fromPath: from.fullPath
     });
 
     if(to.meta.showPageTitle){
