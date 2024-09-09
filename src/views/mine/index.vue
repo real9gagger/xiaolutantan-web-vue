@@ -95,7 +95,7 @@
     function gotoShareAdd(){
         $router.push("/shareadd");
     }
-    function getPostList(){
+    function getPostList(cached){
         if(isLoading.value || isNoMore.value){
             return;
         } else {
@@ -105,7 +105,7 @@
         pageIndex.value++;
         
         //2024年8月16日，获取用户分享的照片
-        ajaxRequest("getMyPostList").then(res => {
+        ajaxRequest("getMyPostList", { isAllowCache: cached !== false }).then(res => {
             if(res && res.length){
                 postList.push(...res);
             }
@@ -124,7 +124,7 @@
         pageIndex.value = 0;
         errMsg.value = null;
         postList.splice(0);
-        getPostList();
+        getPostList(false);
     }
     function onItemPointerDown(idx){
         const item = postList[idx];

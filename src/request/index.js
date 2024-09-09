@@ -1,8 +1,10 @@
 import axios from "axios";
 import apis from "./apis";
+import md5 from "crypto-js/md5";
 
 //用于检查是那种请求方式
 const regexpRM = /\?__RM__=([A-Z_]+)\b/;
+const apiCaches = {};
 
 //参考文档 https://github.com/axios/axios
 const instance = axios.create({
@@ -26,6 +28,9 @@ instance.interceptors.response.use(function (response) {
     const resData = response.data;
     const resCode = (resData.code || 999);
     if (resCode === 200) {
+        if(response.config.cacheKey){
+            apiCaches[response.config.cacheKey] = resData.data;
+        }
         return (resData.data/* || resData */);
     } else {
         //是否显示错误提示
@@ -48,6 +53,11 @@ instance.interceptors.response.use(function (response) {
 //通用请求: 集 GET/POST/PUT/DELETE/HEAD 于一体
 //使用方式：$request(api, data);
 export default function commonRequest(apiName, postData){
+    const cacheKey = (postData?.isAllowCache ? md5(apiName + JSON.stringify(postData)).toString() : null);
+    if(cacheKey && apiCaches[cacheKey]){
+        Promise.resolve(apiCaches[cacheKey]);
+    }
+    
     const reqUrl = apis[apiName];
     const matchList = reqUrl?.match(regexpRM); //提取请求方式
     const reqMethod = (matchList && matchList.length >= 2 ? matchList[1] : "");
@@ -97,6 +107,7 @@ export default function commonRequest(apiName, postData){
             "Content-Type": methodType[1],
             "Authorization": (accessToken ? `Bearer ${accessToken}` : "")
         },
+        cacheKey: cacheKey,
         data: (!methodType[2] ? postData : undefined),
         params: (!methodType[2] ? undefined : postData)
     });
