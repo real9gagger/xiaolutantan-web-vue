@@ -55,7 +55,7 @@ instance.interceptors.response.use(function (response) {
 export default function commonRequest(apiName, postData){
     const cacheKey = (postData?.isAllowCache ? md5(apiName + JSON.stringify(postData)).toString() : null);
     if(cacheKey && apiCaches[cacheKey]){
-        Promise.resolve(apiCaches[cacheKey]);
+        return Promise.resolve(apiCaches[cacheKey]);
     }
     
     const reqUrl = apis[apiName];
