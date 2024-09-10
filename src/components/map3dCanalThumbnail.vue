@@ -6,7 +6,7 @@
         @mousedown="onBoxPointerDown"
         @transitionend="onBoxTransitionEnd"
         @click="toggleZoomIn">
-        <p class="mct-view-title">拍摄地点</p>
+        <p class="mct-view-title">{{props.picAddress}}</p>
         <a class="mct-view-close" @click="toggleShowing"></a>
         <img ref="imgBox" class="mct-view-pin" draggable="false" :src="publicAssets.iconSharePictureRed" :style="imgStyle" />
     </div>
@@ -24,6 +24,10 @@
         picLat: {
             type: Number,
             default: 0
+        },
+        picAddress: {
+            type: String,
+            default: "拍摄地点缩略图"
         }
     });
     const $instance = getCurrentInstance();
@@ -81,6 +85,8 @@
         evt.preventDefault();
         evt.stopPropagation();
         isShowing.value = !isShowing.value;
+        isZoomIn.value = false;
+        isSideHidden.value = false;
     }
     function toggleZoomIn(){
         if(!needTransition.value){
@@ -89,10 +95,14 @@
             isSideHidden.value = false;
         }
     }
+    function toggleSideHidden(){
+        needTransition.value = true;
+        isSideHidden.value = !isSideHidden.value;
+    }
     function disabledZoomIn(){
         needTransition.value = true;
+        isSideHidden.value = false;
         isZoomIn.value = false;
-        isSideHidden.value = !isSideHidden.value;
     }
     function onBoxPointerDown(evt){
         //console.log("指针按下…", evt);
@@ -170,6 +180,9 @@
         const tempR = 6400; //地球半径（模拟值）
         return (tempR / 2) - (tempR * mercatorNorth / (2 * Math.PI));
     }
+    function checkZoomIn(){
+        return isZoomIn.value;
+    }
     
     nextTick(() => {
         boxRect.boxWidth = $instance.proxy.$el.clientWidth;
@@ -195,7 +208,9 @@
     });
     
     defineExpose({
-        disabledZoomIn
+        disabledZoomIn,
+        toggleSideHidden,
+        checkZoomIn
     });
 </script>
 
@@ -220,9 +235,9 @@
         box-shadow: 0 0 0.5rem 0 #aaa;
     }
     .mct-view-title{
-        font-size: 0.5rem;
+        font-size: 0.4rem;
         color: #ccc;
-        padding: 0 0.25rem;
+        padding: 0.1rem 0.2rem;
     }
     .mct-view-pin{
         display: block;
@@ -231,7 +246,7 @@
         position: absolute;
         left: 0;
         top: 0;
-        z-index: 1;
+        z-index: 6;
     }
     .mct-view-close{
         display: block;

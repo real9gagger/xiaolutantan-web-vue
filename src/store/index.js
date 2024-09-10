@@ -35,12 +35,13 @@ const myGetters = {
     isUserLogined: (state) => !!state.userInfo.authToken,
     currentUserNickName: (state) => state.userInfo.nickName,
     currentUserAvatarUrl: (state) => state.userInfo.avatarUrl,
+    currentReadPostIds: (state) => state.userInfo.readPostIds, //用户当前已经浏览过的帖子的ID
 };
 
 const dataState = createPersistedState({//持久化存储
     storage: window.localStorage,
     key: "xlttweb_vuex_storage",
-    paths: ["userInfo"] 
+    paths: ["userInfo"]
 });
 
 const vuexStore = createStore({

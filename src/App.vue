@@ -82,6 +82,9 @@
         	}
         }
         window.onresize();
+        
+        //清空我已浏览过的帖子ID
+        $store.dispatch("clearReadPostId", null);
     });
 </script>
 

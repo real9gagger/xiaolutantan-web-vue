@@ -52,6 +52,7 @@
 <script setup name="IndexMap3DShareDetails">
     import { ref, reactive, getCurrentInstance, onActivated } from "vue";
     import { useRoute, useRouter } from "vue-router";
+    import { useStore } from "vuex";
     import { needDebounce } from "@/utils/cocohelper.js";
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -65,6 +66,7 @@
     const $instance = getCurrentInstance();
     const $route = useRoute();
     const $router = useRouter();
+    const $store = useStore();
     const shareInfos = reactive({});
     const isLoading = ref(true);
     const picIndex = ref(0);
@@ -80,13 +82,18 @@
         nonRVs.hasDblClicked = true;
     }
     function toggleHideText(){
-        needDebounce(() => {
-            if(!nonRVs.hasDblClicked){ //处理双击时触发连个点击事件的问题
-                isHideText.value = !isHideText.value;
-                $instance.refs.mctBox.disabledZoomIn();
-            }
+        if($instance.refs.mctBox.checkZoomIn()){
+            $instance.refs.mctBox.disabledZoomIn();
             nonRVs.hasDblClicked = false;
-        }, 300);
+        } else {
+            needDebounce(() => {
+                if(!nonRVs.hasDblClicked){ //处理双击时触发连个点击事件的问题
+                    isHideText.value = !isHideText.value;
+                    $instance.refs.mctBox.toggleSideHidden();
+                }
+                nonRVs.hasDblClicked = false;
+            }, 300);
+        }
     }
     function goBackToHomePage(){
         $router.replace("/");
@@ -106,7 +113,12 @@
         
         if(dat){
             Object.assign(shareInfos, dat);
-            ajaxRequest("updatePostViewCount", { postId: sid }); //更新帖子查看次数
+            if($store.getters.currentReadPostIds.indexOf(sid) < 0){
+                //更新帖子查看次数
+                ajaxRequest("updatePostViewCount", { postId: sid }).then(() => {
+                    $store.dispatch("addReadPostId", sid)
+                });
+            }
         }
         
         isLoading.value = false;
