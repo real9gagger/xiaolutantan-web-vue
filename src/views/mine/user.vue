@@ -70,7 +70,7 @@
         pageIndex.value++;
         
         //2024年8月16日，获取用户分享的照片
-        ajaxRequest("getUserPostByUid", { uid: $route.query.uid, isAllowCache: true }).then(res => {
+        ajaxRequest("getUserPostByUid", { uid: $route.query.uid }, true).then(res => {
             if(res && res.length){
                 postList.push(...res);
             }

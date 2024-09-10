@@ -105,7 +105,7 @@
         pageIndex.value++;
         
         //2024年8月16日，获取用户分享的照片
-        ajaxRequest("getMyPostList", { isAllowCache: cached !== false }).then(res => {
+        ajaxRequest("getMyPostList", null, cached !== false).then(res => {
             if(res && res.length){
                 postList.push(...res);
             }

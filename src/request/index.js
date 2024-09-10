@@ -52,10 +52,15 @@ instance.interceptors.response.use(function (response) {
 
 //通用请求: 集 GET/POST/PUT/DELETE/HEAD 于一体
 //使用方式：$request(api, data);
-export default function commonRequest(apiName, postData){
-    const cacheKey = (postData?.isAllowCache ? md5(apiName + JSON.stringify(postData)).toString() : null);
-    if(cacheKey && apiCaches[cacheKey]){
+export default function commonRequest(apiName, postData, allowCache){
+    const needMD5 = (typeof allowCache === "boolean");
+    const dataString = (needMD5 && postData ? JSON.stringify(postData) : "");
+    const cacheKey = (needMD5 ? md5(apiName + dataString).toString() : "");
+    
+    if(allowCache && apiCaches[cacheKey]){
         return Promise.resolve(apiCaches[cacheKey]);
+    } else {
+        delete apiCaches[cacheKey];
     }
     
     const reqUrl = apis[apiName];
