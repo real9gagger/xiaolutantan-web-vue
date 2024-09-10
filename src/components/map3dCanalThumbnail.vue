@@ -68,7 +68,7 @@
     const imgStyle = computed(() => {
         return {
             left: Math.round((props.picLng - southWestLnglat[0]) * boxRect.pxPerLnglatX - boxRect.imgWidth / 2) + "px",
-            top: Math.round((getMercatorY(props.picLat) - boxRect.mercatorNE) * boxRect.pxPerLnglatY - boxRect.imgHeight) + "px",
+            top: Math.round((getMercatorY(props.picLat) - boxRect.mercatorNE) * boxRect.pxPerLnglatY - boxRect.imgHeight * 0.93) + "px", /* 0.93 = 1 - 气泡最底下小尖角到图标底部的距离（14像素） / 图标高度（200像素） */
         }
     });
     
@@ -196,7 +196,7 @@
         limitXM[1] = (window.innerWidth - boxRect.boxWidth);
         limitYM[1] = (window.innerHeight - boxRect.boxHeight);
         posXY[0] = limitXM[1] - BOX_MARGIN_PX;
-        posXY[1] = BOX_MARGIN_PX;
+        posXY[1] = BOX_MARGIN_PX + 60;
 
         //只有在可视范围内才显示地图缩略图
         isShowing.value = !!(
@@ -237,12 +237,13 @@
     .mct-view-title{
         font-size: 0.4rem;
         color: #ccc;
-        padding: 0.1rem 0.2rem;
+        padding: 0.2rem 0.1rem;
+        writing-mode: vertical-lr;
     }
     .mct-view-pin{
         display: block;
-        width: 1rem;
-        height: 1rem;
+        width: 0.6rem;
+        height: 0.6rem;
         position: absolute;
         left: 0;
         top: 0;
