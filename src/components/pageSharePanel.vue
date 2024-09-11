@@ -6,19 +6,19 @@
                 <h4>分享此页面到</h4>
                 <ul class="fx-r fx-wp mg-tb-1rem">
                     <li class="fx-vm wh-4rem pd-rem5 tp-ee hv-f0 br-rem5 cs-p" @click="onShareToWechatFriend">
-                        <img src="/photoshop/微信好友.svg" class="psp-li-pic" />
+                        <img :src="publicAssets.svgWxFriend" class="psp-li-pic" />
                         <span class="fs-rem6 tc-66">微信好友</span>
                     </li>
                     <li class="fx-vm wh-4rem pd-rem5 tp-ee hv-f0 br-rem5 cs-p" @click="onShareToWechatCircle">
-                        <img src="/photoshop/朋友圈.svg" class="psp-li-pic" />
+                        <img :src="publicAssets.svgWxCircle" class="psp-li-pic" />
                         <span class="fs-rem6 tc-66">朋友圈</span>
                     </li>
                     <li class="fx-vm wh-4rem pd-rem5 tp-ee hv-f0 br-rem5 cs-p" @click="onShareToDouyin">
-                        <img src="/photoshop/抖音.svg" class="psp-li-pic" />
+                        <img :src="publicAssets.svgDouyinLogo" class="psp-li-pic" />
                         <span class="fs-rem6 tc-66">抖音</span>
                     </li>
                     <li class="fx-vm wh-4rem pd-rem5 tp-ee hv-f0 br-rem5 cs-p" @click="onCopyLink">
-                        <img src="/photoshop/复制链接.svg" class="psp-li-pic" />
+                        <img :src="publicAssets.svgCopyLink" class="psp-li-pic" />
                         <span class="fs-rem6 tc-66">复制链接</span>
                     </li>
                 </ul>
@@ -30,6 +30,7 @@
 
 <script setup name="PageSharePanel">
     import { defineProps, defineModel } from "vue";
+    import publicAssets from "@/assets/data/publicAssets.js";
     
     const isVisible = defineModel({
         type: Boolean,

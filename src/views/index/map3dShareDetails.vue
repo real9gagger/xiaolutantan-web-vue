@@ -36,7 +36,7 @@
         </template>
         <template v-else-if="isLoading">
             <div class="content-cage fx-vm">
-                <img :src="publicAssets.imageLoadingGif" alt="正在加载" class="dp-ib wh-3rem" />
+                <img :src="publicAssets.svgLoadingGif" alt="正在加载" class="dp-ib wh-3rem" />
             </div>
         </template>
         <template v-else >

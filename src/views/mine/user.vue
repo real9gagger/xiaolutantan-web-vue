@@ -27,7 +27,7 @@
                 </li>
             </ul>
             <section v-if="isLoading" class="ta-c pd-1rem">
-                <img :src="publicAssets.imageLoadingGif" alt="正在加载" class="dp-ib wh-2rem" />
+                <img :src="publicAssets.svgLoadingGif" alt="正在加载" class="dp-ib wh-2rem" />
             </section>
             <section v-else-if="errMsg" class="ta-c pd-1rem">
                 <b class="tc-o0">加载出错：</b>

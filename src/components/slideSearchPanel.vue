@@ -25,7 +25,7 @@
             </ul>
         </div>
         <div v-else-if="!poiList" class="pd-1rem ta-c fx-g1">
-            <img :src="publicAssets.imageLoadingGif" alt="正在加载" draggable="false" class="dp-ib wh-2rem" />
+            <img :src="publicAssets.svgLoadingGif" alt="正在加载" draggable="false" class="dp-ib wh-2rem" />
             <p class="mg-t-rem5 tc-mc">正在加载…</p>
         </div>
         <div v-else-if="!poiList.length" class="pd-1rem ta-c fx-g1">
