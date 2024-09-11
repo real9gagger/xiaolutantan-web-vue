@@ -59,6 +59,18 @@ function image_rotation($file_path){
     return null;
 }
 
+//获取数据集
+function get_data_set(){
+    $path_dataset = $_SERVER['DOCUMENT_ROOT'] . '/sharepics/dataset.json';
+    return json_decode(file_get_contents($path_dataset), true);
+}
+
+//保存数据集
+function save_data_set($new_data){
+    $path_dataset = $_SERVER['DOCUMENT_ROOT'] . '/sharepics/dataset.json';
+    file_put_contents($path_dataset, json_encode($new_data, JSON_UNESCAPED_UNICODE));
+}
+
 /* ======================================== 对外开放的的接口 ======================================== */
 //上传一张图片
 function upload_picture(){
@@ -170,9 +182,7 @@ function save_share_pics(){
         ajax_error('保存失败，数据不全');
     }
     
-    $root_dir = $_SERVER['DOCUMENT_ROOT'];
-    $path_dataset = $root_dir . '/sharepics/dataset.json';
-    $dat_list = json_decode(file_get_contents($path_dataset), true);
+    $dat_list = get_data_set();
     $new_id = count($dat_list) + 1;
     
     $dat_list[] = array(
@@ -194,7 +204,7 @@ function save_share_pics(){
         'collectCount'      => 0  //收藏次数
     );
     
-    file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+    save_data_set($dat_list);
     
     ajax_success($new_id);
 }
@@ -205,10 +215,8 @@ function toggle_my_post_status(){
     $post_id = intval($posts['postId']);
     
     if($post_id){
-        $root_dir = $_SERVER['DOCUMENT_ROOT'];
-        $path_dataset = $root_dir . '/sharepics/dataset.json';
         $post_index = -1;
-        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        $dat_list = get_data_set();
         
         foreach($dat_list as $ix => $vx){
             if($vx['id'] === $post_id){
@@ -219,7 +227,7 @@ function toggle_my_post_status(){
         
         if($post_index >= 0){
             $dat_list[$post_index]['status'] = ($posts['newStatus'] == 1 ? 1 : 0);
-            file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+            save_data_set($dat_list);
             ajax_success($post_index);
         }
     }
@@ -233,10 +241,9 @@ function delete_my_post(){
     $post_id = intval($posts['postId']);
     
     if($post_id){
-        $root_dir = $_SERVER['DOCUMENT_ROOT'];
-        $path_dataset = $root_dir . '/sharepics/dataset.json';
         $post_index = -1;
-        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        $dat_list = get_data_set();
+        $root_dir = $_SERVER['DOCUMENT_ROOT'];
         
         foreach($dat_list as $ix => $vx){
             if($vx['id'] === $post_id){
@@ -247,7 +254,8 @@ function delete_my_post(){
         
         if($post_index >= 0){
             $subitems = array_splice($dat_list, $post_index, 1);
-            file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+            
+            save_data_set($dat_list);
             
             //删除关联的图片
             foreach($subitems[0]['pictureList'] as $pic){
@@ -262,57 +270,13 @@ function delete_my_post(){
     ajax_error('无此帖子');
 }
 
-//根据用户ID获取用户发布的帖子
-function get_user_post_by_uid(){
-    $uid = $_GET['uid'];
-    $output = [];
-    
-    if($uid){
-        $root_dir = $_SERVER['DOCUMENT_ROOT'];
-        $path_dataset = $root_dir . '/sharepics/dataset.json';
-        $dat_list = json_decode(file_get_contents($path_dataset), true);
-        
-        foreach($dat_list as $vx){
-            if($vx['authorNickname'] === $uid && $vx['status'] === 1){
-                $output[] = $vx;
-            }
-        }
-    }
-    
-    ajax_success($output);
-}
-
-//获取用户分享的帖子
-function get_user_post_list(){
-    $root_dir = $_SERVER['DOCUMENT_ROOT'];
-    $path_dataset = $root_dir . '/sharepics/dataset.json';
-    $dat_list = json_decode(file_get_contents($path_dataset), true);
-    
-    //要求：获取 50 条浏览量最高的数据，30条最新发布的数据，20贴点赞最多的数据。需要去重，累计获取100条数据！
-    //2024年9月5日 功能未完善，暂时返回所有的帖子吧
-    ajax_success($dat_list);
-}
-
-//获取我分享的帖子
-function get_my_post_list(){
-    $root_dir = $_SERVER['DOCUMENT_ROOT'];
-    $path_dataset = $root_dir . '/sharepics/dataset.json';
-    $dat_list = json_decode(file_get_contents($path_dataset), true);
-    
-    //要求：支持上滑加载更多数据
-    //2024年9月5日 功能未完善，暂时返回所有的帖子吧
-    ajax_success($dat_list);
-}
-
 //更新帖子查看次数
 function update_post_view_count(){
     $posts = json_decode(file_get_contents('php://input'), true);
     $post_id = intval($posts['postId']);
     
     if($post_id){
-        $root_dir = $_SERVER['DOCUMENT_ROOT'];
-        $path_dataset = $root_dir . '/sharepics/dataset.json';
-        $dat_list = json_decode(file_get_contents($path_dataset), true);
+        $dat_list = get_data_set();
         $post_index = -1;
         
         foreach($dat_list as $ix => $vx){
@@ -325,31 +289,91 @@ function update_post_view_count(){
         if($post_index >= 0){
             //浏览次数 +1
             $dat_list[$post_index]['viewCount'] = ($dat_list[$post_index]['viewCount'] + 1);
-            file_put_contents($path_dataset, json_encode($dat_list, JSON_UNESCAPED_UNICODE));
+            save_data_set($dat_list);
         }
     }
     
     ajax_success($post_id);
 }
 
+//根据用户ID获取用户发布的帖子
+function get_user_post_by_uid(){
+    $userId = $_GET['userId'];
+    $output = [];
+    
+    if($userId){
+        $dat_list = get_data_set();
+        
+        foreach($dat_list as $vx){
+            if($vx['authorNickname'] === $userId && $vx['status'] === 1){
+                $output[] = $vx;
+            }
+        }
+    }
+    
+    ajax_success($output);
+}
+
+//获取用户分享的帖子
+function get_user_post_list(){
+    $dat_list = get_data_set();
+    
+    //要求：获取 50 条浏览量最高的数据，30条最新发布的数据，20贴点赞最多的数据。需要去重，累计获取100条数据！
+    //2024年9月5日 功能未完善，暂时返回所有的帖子吧
+    ajax_success($dat_list);
+}
+
+//获取我分享的帖子
+function get_my_post_list(){
+    $dat_list = get_data_set();
+    
+    //要求：支持上滑加载更多数据
+    //2024年9月5日 功能未完善，暂时返回所有的帖子吧
+    ajax_success($dat_list);
+}
+
+//根据帖子ID获取帖子信息
+function get_post_by_id(){
+    $post_id = intval($_GET['postId']);
+    $post_index = -1;
+    
+    if($post_id){
+        $dat_list = get_data_set();
+        
+        foreach($dat_list as $ix => $vx){
+            if($vx['id'] === $post_id){
+                $post_index = $ix;
+                break;
+            }
+        }
+    }
+    
+    if($post_index >= 0){
+        ajax_success($dat_list[$post_index]);
+    } else {
+        ajax_error("帖子不存在");
+    }
+}
+
 //调用函数
-$call_action = $_GET['action'];
 $headers = getallheaders();
 
 if($headers['Authorization'] !== 'Bearer Xltt-Token'){
-    ajax_error('登录已超时：'.$call_action);
+    ajax_error('登录已超时！');
 }
 
 $api_actions = [
-    'upload_picture', 
-    'save_share_pics', 
-    'toggle_my_post_status', 
-    'delete_my_post', 
+    'upload_picture',
+    'save_share_pics',
+    'toggle_my_post_status',
+    'delete_my_post',
+    'update_post_view_count',
     'get_user_post_by_uid',
     'get_user_post_list',
     'get_my_post_list',
-    'update_post_view_count'
+    'get_post_by_id',
 ];
+$call_action = $_GET['action'];
 
 if(in_array($call_action, $api_actions)){
     date_default_timezone_set('Asia/Shanghai');

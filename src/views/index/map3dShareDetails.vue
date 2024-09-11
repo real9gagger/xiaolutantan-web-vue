@@ -108,7 +108,7 @@
     }
     
     onActivated(() => {
-        const sid = (+$route.query.sid || 0);
+        const sid = (+$route.query.sid || 0); //share id
         const dat = myStorage.onceObject("user_sharepic_infos_" + sid);
         
         if(dat){
@@ -119,9 +119,16 @@
                     $store.dispatch("addReadPostId", sid)
                 });
             }
+            isLoading.value = false;
+        } else {//如果本地没有缓存数据，就到服务器加载！
+            ajaxRequest("getPostById", { postId: sid }, true).then(res => {
+                Object.assign(shareInfos, res);
+                myStorage.onceObject("user_sharepic_infos_" + sid, res);
+                isLoading.value = false;
+            }).catch(() => {
+                isLoading.value = false;
+            });
         }
-        
-        isLoading.value = false;
     });
 </script>
 
