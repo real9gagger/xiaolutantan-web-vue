@@ -66,6 +66,8 @@ const AssetsPathMap = {
     iconThePostAuthor: "icons/the_post_author.png",
     iconPublishPost: "icons/publish_post.png",
     iconHelpAboutCanal: "icons/help_about_canal.png",
+    iconShareGreen: "icons/share_green.png",
+    iconHelpQuestion: "icons/help_question.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

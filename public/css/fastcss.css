@@ -53,12 +53,14 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 
 .hv-mc:hover{color:var(--main-color)}
 .hv-red:hover{color:red}
+.hv-f0:hover{background-color: #f0f0f0}
 
 .us-n{user-select:none}
 
 /* tap */
 .tp-dim:active{background-image:linear-gradient(0deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.1) 100%)}
 .tp-f0:active{background-color: #f0f0f0}
+.tp-ee:active{background-color: #eee}
 .tp-op6:active{opacity:0.6}
 
 /***************************************************** HTML基准字体大小 20 像素 **************************************************************/

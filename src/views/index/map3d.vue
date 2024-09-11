@@ -3,6 +3,7 @@
         <div id="IndexMap3DBox" class="wh-f"></div>
         <div class="map3d-zoom-level-box" :style="`min-width:${zlBoxWidth}px`">缩放&nbsp;{{mapZoomLevel}}级</div>
         <map3d-control-vertical
+            @onshare="onClickShare"
             @onaboutcanal="onGotoAboutCanal"
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
@@ -13,6 +14,7 @@
         />
         <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="OnMapPlacePins" />
         <map3d-share-picture-callout ref="mspcBox" />
+        <page-share-panel v-model="isShowSharePanel" />
     </div>
 </template>
 
@@ -31,6 +33,7 @@
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
     import map3dSharePictureCallout from "@/components/map3dSharePictureCallout.vue";
+    import pageSharePanel from "@/components/pageSharePanel.vue";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
     import bdMapStyleForSatellite from "@/assets/json/bdMapStyleForSatellite.json";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -60,7 +63,14 @@
     const iwLnglats = ref([]);
     const iwTitle = ref("");
     const zlBoxWidth = ref(0);
+    const isShowSharePanel = ref(false);
     
+    //点击了分享
+    function onClickShare(){
+        isShowSharePanel.value = true;
+    }
+    
+    //转到运河简介
     function onGotoAboutCanal(){
         $router.push("/aboutcanal");
     }
