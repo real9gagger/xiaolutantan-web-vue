@@ -71,6 +71,93 @@ function save_data_set($new_data){
     file_put_contents($path_dataset, json_encode($new_data, JSON_UNESCAPED_UNICODE));
 }
 
+//2024年9月11日：暂时使用文件来缓存数据
+function get_cache($key){
+    $md5key = md5($key);
+    $path_cache = $_SERVER['DOCUMENT_ROOT'] . "/sharepics/{$md5key}.cache";
+    $dat_cache = json_decode(file_get_contents($path_cache), true);
+    return $dat_cache;
+}
+
+//2024年9月11日：暂时使用文件来缓存数据
+function set_cache($key, $dat){
+    $md5key = md5($key);
+    $path_cache = $_SERVER['DOCUMENT_ROOT'] . "/sharepics/{$md5key}.cache";
+    
+    if(!$dat){
+        unlink($path_cache);
+    } else {
+        file_put_contents($path_cache, json_encode($dat, JSON_UNESCAPED_UNICODE));
+    }
+}
+
+//获取微信 Access Token 用于加密签名
+function fetch_wx_access_token(){
+    //参见：https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
+    $appId = 'wx4569df80bda178d0'; //小鹿坦坦小程序ID
+    $appSecret = '280b9264680025e9c16dc4cc9bc3eba3'; //小鹿坦坦小程序密钥
+    $cacheDat = get_cache($appId);
+    $nowTs = time();
+    if($cacheDat && $cacheDat['expiresAfter'] > $nowTs){
+        return $cacheDat;
+    }
+    
+    $cHttp = curl_init("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appId}&secret={$appSecret}");
+    
+    curl_setopt($cHttp, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($cHttp, CURLOPT_TIMEOUT, 15);
+    curl_setopt($cHttp, CURLOPT_HEADER, 0); //不要 http header 加快效率
+    curl_setopt($cHttp, CURLOPT_SSL_VERIFYPEER, FALSE); // https 请求不验证证书和 hosts
+    curl_setopt($cHttp, CURLOPT_SSL_VERIFYHOST, FALSE);
+    
+    $response = curl_exec($cHttp);
+    $errormsg = curl_error($cHttp);
+    
+    curl_close($cHttp);
+    
+    $output = (!$errormsg ? json_decode($response, true) : array('errcode' => 12345, 'errmsg' => $errormsg));
+    
+    if(!$output['errcode']){
+        $output['appId'] = $appId;
+        $output['expiresAfter'] = ($nowTs + $output['expires_in']);
+        set_cache($appId, $output);
+    }
+    
+    return $output;
+}
+
+//获取微信接口凭据
+function fetch_wx_jsapi_ticket($accessToken){
+    $cacheKey = 'wx_jsapi_ticket_cache';
+    $cacheDat = get_cache($cacheKey);
+    $nowTs = time();
+    if($cacheDat && $cacheDat['expiresAfter'] > $nowTs){
+        return $cacheDat;
+    }
+    
+    $cHttp = curl_init("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={$accessToken}&type=jsapi");
+    
+    curl_setopt($cHttp, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($cHttp, CURLOPT_TIMEOUT, 15);
+    curl_setopt($cHttp, CURLOPT_HEADER, 0); //不要 http header 加快效率
+    curl_setopt($cHttp, CURLOPT_SSL_VERIFYPEER, FALSE); // https 请求不验证证书和 hosts
+    curl_setopt($cHttp, CURLOPT_SSL_VERIFYHOST, FALSE);
+    
+    $response = curl_exec($cHttp);
+    $errormsg = curl_error($cHttp);
+    
+    curl_close($cHttp);
+    
+    $output = (!$errormsg ? json_decode($response, true) : array('errcode' => 12345, 'errmsg' => $errormsg));
+    
+    if(!$output['errcode']){
+        $output['expiresAfter'] = ($nowTs + $output['expires_in']);
+        set_cache($cacheKey, $output);
+    }
+    
+    return $output;
+}
+
 /* ======================================== 对外开放的的接口 ======================================== */
 //上传一张图片
 function upload_picture(){
@@ -296,6 +383,47 @@ function update_post_view_count(){
     ajax_success($post_id);
 }
 
+//生成微信签名
+function generate_wx_signature(){
+    
+    //参见：https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62
+    
+    $posts = json_decode(file_get_contents('php://input'), true);
+    
+    if(!$posts['pageUrl']){
+        ajax_error('参数不完整');
+    }
+    
+    $tokenInfo = fetch_wx_access_token();
+    if($tokenInfo['errcode']){
+        ajax_error($tokenInfo['errmsg']);
+    }
+    
+    $ticketInfo = fetch_wx_jsapi_ticket($tokenInfo['access_token']);
+    if($ticketInfo['errcode']){
+        ajax_error($ticketInfo['errmsg']);
+    }
+    
+    //【！！！键名必须全部小写！！！】
+    $params = array(
+        'timestamp' => time(),
+        'noncestr' => 'XLTT88888888',
+        'jsapi_ticket' => $ticketInfo['ticket'],
+        'url' => $posts['pageUrl']
+    );
+    
+    ksort($params, SORT_STRING);
+    
+    $urlStr = urldecode(http_build_query($params));
+    
+    ajax_success(array(
+        'signature' => sha1($urlStr),
+        'appId' => $tokenInfo['appId'],
+        'timestamp' => $params['timestamp'],
+        'nonceStr' => $params['noncestr'],
+    ));
+}
+
 //根据用户ID获取用户发布的帖子
 function get_user_post_by_uid(){
     $userId = $_GET['userId'];
@@ -351,7 +479,7 @@ function get_post_by_id(){
     if($post_index >= 0){
         ajax_success($dat_list[$post_index]);
     } else {
-        ajax_error("帖子不存在");
+        ajax_error('帖子不存在');
     }
 }
 
@@ -359,7 +487,7 @@ function get_post_by_id(){
 $headers = getallheaders();
 
 if($headers['Authorization'] !== 'Bearer Xltt-Token'){
-    ajax_error('登录已超时！');
+    ajax_error('登录已超时');
 }
 
 $api_actions = [
@@ -372,6 +500,7 @@ $api_actions = [
     'get_user_post_list',
     'get_my_post_list',
     'get_post_by_id',
+    'generate_wx_signature',
 ];
 $call_action = $_GET['action'];
 

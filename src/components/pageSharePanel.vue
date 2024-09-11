@@ -45,19 +45,19 @@
     }
     
     function onShareToWechatFriend(){
-        
+        appToast("分享给微信好友失败");
         isVisible.value = false;
         emits("finished", 0x11);
     }
     
     function onShareToWechatCircle(){
-        
+        appToast("分享到微信朋友圈失败");
         isVisible.value = false;
         emits("finished", 0x22);
     }
     
     function onShareToDouyin(){
-        
+        appToast("分享到抖音失败");
         isVisible.value = false;
         emits("finished", 0x33);
     }

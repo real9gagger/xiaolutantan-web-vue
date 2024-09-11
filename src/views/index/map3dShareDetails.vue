@@ -116,7 +116,7 @@
             if($store.getters.currentReadPostIds.indexOf(sid) < 0){
                 //更新帖子查看次数
                 ajaxRequest("updatePostViewCount", { postId: sid }).then(() => {
-                    $store.dispatch("addReadPostId", sid)
+                    $store.dispatch("addReadPostId", sid);
                 });
             }
             isLoading.value = false;

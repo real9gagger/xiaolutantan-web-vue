@@ -67,7 +67,16 @@
     
     //点击了分享
     function onClickShare(){
-        isShowSharePanel.value = true;
+        if(navigator.share){
+            navigator.share({
+                url: location.href,
+                text: "",
+                title: "平陆运河最新图集",
+                files: undefined
+            });
+        } else {
+            isShowSharePanel.value = true;
+        }
     }
     
     //转到运河简介
