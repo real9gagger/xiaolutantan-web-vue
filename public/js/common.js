@@ -4,7 +4,7 @@ function onImageLoadingError(){
 	var img = (evt.target || evt.srcElement);
 	if(evt.type === "error" && img.tagName === "IMG"){
 		img.onerror = null;
-		img.src = "../images/img_error.png?errorcode=LOADING_FAILED";
+		img.src = "./images/img_error.png?errorcode=LOADING_FAILED";
 	}
 }
 
@@ -65,7 +65,7 @@ function appToast(msg, duration){
 			clearTimeout($msgbox.data("appToastTimerID2"));
 			$msgbox.children("span").html(msg);
 		} else {
-			$msgbox = $(`<div class="app-toast-box"><img src="../icons/toast_info.png" alt="提示信息" class="app-toast-icon" /><span>${msg}</span></div>`).appendTo(document.body);
+			$msgbox = $(`<div class="app-toast-box"><img src="./icons/toast_info.png" alt="提示信息" class="app-toast-icon" /><span>${msg}</span></div>`).appendTo(document.body);
 		}
 		
 		let tid1 = setTimeout(function(){

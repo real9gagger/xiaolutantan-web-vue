@@ -14,7 +14,7 @@
             <text-with-border class="mg-t-2rem fs-1rem tc-b1" content="捐助»" @click="gotoDonatePage" bdcolor="#fff" />
             <text-with-border class="fs-1rem tc-b1" :content="donateWords"  @click="gotoDonatePage" bdcolor="#fff" />
         </div>
-        <div class="abu-copyright-box">{{appWebName}}@{{theYear}}</div>
+        <div class="abu-copyright-box" @click="gotoTestPage">{{appWebName}}@{{theYear}}</div>
     </div>
 </template>
 
@@ -30,6 +30,10 @@
     
     function gotoDonatePage(){
         $router.push("/donate");
+    }
+    
+    function gotoTestPage(){
+        $router.push("/test");
     }
 </script>
 

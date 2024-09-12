@@ -5,7 +5,7 @@ import routerList from "./pages.js"
 
 const myRouter = createRouter({
 	routes: routerList,
-    history: createWebHistory(),
+    history: createWebHistory(process.env.BASE_URL),
 	//scrollBehavior: function(to, from, savedPosition){}
 });
 

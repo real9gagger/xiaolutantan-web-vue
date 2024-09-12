@@ -89,6 +89,7 @@ const AssetsPathMap = {
     imageAboutUsBg: "images/about_us_bg.jpg",
     imageDonateByWechatpay: "images/donate_by_wechatpay.jpg",
     imageDonateByAlipay: "images/donate_by_alipay.jpg",
+    imagePictureForShare: "images/picture_for_share.png",
     
     //SVG图片
     svgLoadingGif: "svgs/loading_gif.svg",
@@ -96,6 +97,7 @@ const AssetsPathMap = {
     svgDouyinLogo: "svgs/douyin_logo.svg",
     svgWxCircle: "svgs/wx_circle.svg",
     svgWxFriend: "svgs/wx_friend.svg",
+    svgScanQRcode: "svgs/scan_qrcode.svg",
 };
 
 if(THE_BU){

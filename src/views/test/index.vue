@@ -3,11 +3,10 @@
         <div class="content-cage">
             <h4 class="ta-c pd-rem5">测试中心</h4>
             <div class="mg-t-1rem ta-c">
-                <button type="button" class="btn-box wi-f" @click="gotoMapDev">地图开发测试 {{aliveTimes}}</button>
+                <button type="button" class="btn-box wi-f" @click="gotoMapDev">地图开发测试</button>
             </div>
             <div class="mg-t-1rem ta-c">
-                <input type="file" class="dp-hd" id="fileToUploadBox" name="my_file" @change="startUploadFile" />
-                <button type="button" class="btn-box wi-f" @click="testServer">测试服务器情况</button>
+                <button type="button" class="btn-box wi-f" @click="checkPageName">检查页面是否都有 “name” 属性</button>
             </div>
         </div>
     </div>
@@ -16,31 +15,28 @@
 <script setup name="TestIndex">
     import { ref } from "vue";
     import { useRouter } from "vue-router";
-    import fileUploader from "@/utils/fileuploader.js";
+    import routerList from "@/router/pages.js"
     
     const $router = useRouter();
-    const aliveTimes = ref(90);
-
+    
     function gotoMapDev() {
-        aliveTimes.value += 10;
         $router.push("/testmapdev");
     }
 
-    function testServer() {
-        document.getElementById("fileToUploadBox").click();
-    }
-
-    function startUploadFile(evt) {
-        //console.log(evt)
-        const fud = new fileUploader();
-        console.log(fud);
-        fud.reset().progress(function(arg){
-            console.log("上传进度::::", arguments);
-        }).success(function(arg){
-            console.log("上传成功::::", arguments);
-        }).error(function(arg){
-            console.log("上传出错::::", arguments);
-        }).upload(evt.target.files[0]);
+    function checkPageName() {
+        let noNameCount = 0;
+        for(const item of routerList){
+            if(item.component){
+                item.component().then(res => {
+                    if(!res.default?.name){
+                        console.log("页面 " + item.path + " 没有 “name” 属性！");
+                        noNameCount++;
+                    }
+                }).catch(console.warn);
+            }
+        }
+        setTimeout(() => console.log("检查完毕：" + noNameCount + " 个页面有问题。"), 800);
+        appToast("检查结果已打印在控制台...");
     }
 </script>
 

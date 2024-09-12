@@ -17,6 +17,10 @@
                         <img :src="publicAssets.svgDouyinLogo" class="psp-li-pic" />
                         <span class="fs-rem6 tc-66">抖音</span>
                     </li>
+                    <li class="fx-vm wh-4rem pd-rem5 tp-ee hv-f0 br-rem5 cs-p" @click="onScanQRcode">
+                        <img :src="publicAssets.svgScanQRcode" class="psp-li-pic" />
+                        <span class="fs-rem6 tc-66">扫码分享</span>
+                    </li>
                     <li class="fx-vm wh-4rem pd-rem5 tp-ee hv-f0 br-rem5 cs-p" @click="onCopyLink">
                         <img :src="publicAssets.svgCopyLink" class="psp-li-pic" />
                         <span class="fs-rem6 tc-66">复制链接</span>
@@ -24,13 +28,18 @@
                 </ul>
                 <a class="dp-bk br-1rem tc-66" @click="onClose">取消</a>
             </div>
+            <div v-if="qrDataURL" class="psp-qrcode-box" @click="onClose">
+                <img :src="qrDataURL" alt="扫码分享" class="psp-qrcode-pic" />
+                <span class="tc-66">请使用手机扫码</span>
+            </div>
         </div>
     </transition>
 </template>
 
 <script setup name="PageSharePanel">
-    import { defineProps, defineModel } from "vue";
+    import { defineProps, defineModel, ref } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
+    import qrcode from "qrcode";
     
     const isVisible = defineModel({
         type: Boolean,
@@ -38,28 +47,64 @@
     });
     
     const emits = defineEmits(["finished"]); //结束时调用函数
+    const qrDataURL = ref(null);
+    const isMobile = (navigator.userAgent.indexOf("Mobile") >= 0);
     
     function onClose(){
         isVisible.value = false;
+        qrDataURL.value = null;
         emits("finished", 0x00);
     }
     
     function onShareToWechatFriend(){
-        appToast("分享给微信好友失败");
+        if(isMobile){
+            appToast("分享给微信好友失败");
+        } else {
+            appToast("当前设备不支持此分享方式");
+        }
         isVisible.value = false;
+        qrDataURL.value = null;
         emits("finished", 0x11);
     }
     
     function onShareToWechatCircle(){
-        appToast("分享到微信朋友圈失败");
+        if(isMobile){
+            appToast("分享到微信朋友圈失败");
+        } else {
+            appToast("当前设备不支持此分享方式");
+        }
         isVisible.value = false;
+        qrDataURL.value = null;
         emits("finished", 0x22);
     }
     
     function onShareToDouyin(){
-        appToast("分享到抖音失败");
+        if(isMobile){
+            appToast("分享到抖音失败");
+        } else {
+            appToast("当前设备不支持此分享方式");
+        }
         isVisible.value = false;
+        qrDataURL.value = null;
         emits("finished", 0x33);
+    }
+    
+    function onScanQRcode(){
+        if(qrDataURL.value){
+            qrDataURL.value = null;
+            return;
+        }
+        
+        //参见：https://github.com/soldair/node-qrcode
+        const txt = location.href + (location.search ? "&link_type=SHARED_PAGE" : "?link_type=SHARED_PAGE");
+        qrcode.toDataURL(txt, { 
+            errorCorrectionLevel: "M",
+            margin: 0,
+        }).then(url => {
+            qrDataURL.value = url;
+        }).catch(err => {
+            appToast("生成二维码失败：" + err.message);
+        });
     }
     
     function onCopyLink(){
@@ -93,6 +138,7 @@
         }
         
         isVisible.value = false;
+        qrDataURL.value = null;
         emits("finished", 0xFF);
     }
 </script>
@@ -128,6 +174,22 @@
         width: 1.5rem;
         height: 1.5rem;
         margin-bottom: 0.25rem;
+    }
+    .psp-qrcode-box{
+        position: absolute;
+        top: 10vh;
+        left: calc(50% - 5.5rem);
+        z-index: 1;
+        padding: 1rem 1rem 0.5rem  1rem;
+        background-color: #fff;
+        text-align: center;
+        border-radius: 0.5rem;
+    }
+    .psp-qrcode-pic{
+        display: block;
+        width: 9rem;
+        height: 9rem;
+        margin-bottom: 0.5rem;
     }
     
     .psp-slide-out-enter-from{opacity:0}
