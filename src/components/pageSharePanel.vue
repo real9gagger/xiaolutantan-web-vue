@@ -54,8 +54,8 @@
     const qrDataURL = ref(null);
     const isDrawEnd = ref(false);
     const isMobile = (navigator.userAgent.indexOf("Mobile") >= 0);
-    const canvasSize = window.pxOf1rem * 9; /* 等于二维码图片的宽高 */
-    const rectSize = 9; //像素。二维码中小块的宽高
+    const canvasSize = Math.round(window.pxOf1rem * 10); /* 等于二维码图片的宽高 */
+    const rectSize = 20; //像素。二维码中小块的宽高
     const rectRows = Math.ceil(canvasSize / rectSize); //二维码有多少行
     const rectCount = rectRows * rectRows;
     const nonRVs = { //非响应式变量（non Responsive Variables）
@@ -111,8 +111,12 @@
         //参见：https://github.com/soldair/node-qrcode
         const txt = location.href + (location.search ? "&link_type=SHARED_PAGE" : "?link_type=SHARED_PAGE");
         qrcode.toDataURL(txt, { 
-            errorCorrectionLevel: "M",
+            errorCorrectionLevel: "H",
             margin: 0,
+            type: "image/jpeg",
+            quality: 1,
+            scale: 5, //每个小黑点的宽度
+            //width: canvasSize
         }).then(url => {
             qrDataURL.value = url;
             if(nonRVs.drawIndex < rectCount){
@@ -174,6 +178,7 @@
         nonRVs.ctx2D.fillStyle = "#FFFFFF";
         nonRVs.ctx2D.fillRect(0, 0, canvasSize, canvasSize);
         
+        //逐行绘制
         nonRVs.ctx2D.clearRect(0, 0, canvasSize, endY);
         nonRVs.ctx2D.clearRect(0, endY, endX, rectSize);
         
@@ -223,7 +228,7 @@
     .psp-qrcode-box{
         position: absolute;
         top: 5vh;
-        left: calc(50% - 5.5rem);
+        left: calc(50% - 6rem);
         z-index: 1;
         padding: 1rem 1rem 0.5rem  1rem;
         background-color: #fff;
@@ -232,8 +237,8 @@
     }
     .psp-qrcode-pic{
         display: block;
-        width: 9rem;
-        height: 9rem;
+        width: 10rem;
+        height: 10rem;
         margin-bottom: 0.5rem;
     }
     .psp-qrcode-canvas{
@@ -242,8 +247,8 @@
         left: 1rem;
         top: 1rem;
         z-index: 8;
-        width: 9rem;
-        height: 9rem;
+        width: 10rem;
+        height: 10rem;
     }
     
     .psp-slide-out-enter-from{opacity:0}
@@ -259,7 +264,7 @@
     .psp-slide-out-leave-to > .psp-box-dialog{transform:translateY(30%)}
     
     .psp-pull-down-enter-from{opacity:0;transform:translateY(-50%)}
-    .psp-pull-down-enter-active{transition:all 300ms cubic-bezier(0, 0, 0, 1) 0s}
+    .psp-pull-down-enter-active{transition:all 300ms cubic-bezier(0, 0, 0, 1) 0s} /* 取值网站 https://cubic-bezier.com */
     .psp-pull-down-enter-to{opacity:1;transform:translateY(0%)}
     .psp-pull-down-leave-from{opacity:1;transform:translateY(0%)}
     .psp-pull-down-leave-active{transition:all 300ms cubic-bezier(0, 0, 0, 1) 0s}

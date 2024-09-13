@@ -93,10 +93,16 @@ function set_cache($key, $dat){
 
 //获取微信 Access Token 用于加密签名
 function fetch_wx_access_token(){
-    //参见：https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
-    $appId = 'wx4569df80bda178d0'; //小鹿坦坦小程序ID
-    $appSecret = '280b9264680025e9c16dc4cc9bc3eba3'; //小鹿坦坦小程序密钥
-    $cacheDat = get_cache($appId);
+    //算法参见：https://developers.weixin.qq.com/doc/offiaccount/Basic_Information/Get_access_token.html
+    
+    //本地调试方式参见（测试 AppID 和密钥申请）：
+    //https://developers.weixin.qq.com/community/develop/doc/00084c8365c3485d71d1d60a66b400
+    //https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login
+    
+    $appId = 'wx646b627028cf2aef';//'wx4569df80bda178d0'; //小鹿坦坦小程序ID
+    $appSecret = '84662fe1c50486714db3074c591e5ac4';//'280b9264680025e9c16dc4cc9bc3eba3'; //小鹿坦坦小程序密钥
+    $cacheKey = 'wx_access_token_' . $appId;
+    $cacheDat = get_cache($cacheKey);
     $nowTs = time();
     if($cacheDat && $cacheDat['expiresAfter'] > $nowTs){
         return $cacheDat;
@@ -120,15 +126,15 @@ function fetch_wx_access_token(){
     if(!$output['errcode']){
         $output['appId'] = $appId;
         $output['expiresAfter'] = ($nowTs + $output['expires_in']);
-        set_cache($appId, $output);
+        set_cache($cacheKey, $output);
     }
     
     return $output;
 }
 
 //获取微信接口凭据
-function fetch_wx_jsapi_ticket($accessToken){
-    $cacheKey = 'wx_jsapi_ticket_cache';
+function fetch_wx_jsapi_ticket($accessToken, $appId){
+    $cacheKey = 'wx_jsapi_ticket_' . $appId;
     $cacheDat = get_cache($cacheKey);
     $nowTs = time();
     if($cacheDat && $cacheDat['expiresAfter'] > $nowTs){
@@ -399,7 +405,7 @@ function generate_wx_signature(){
         ajax_error($tokenInfo['errmsg']);
     }
     
-    $ticketInfo = fetch_wx_jsapi_ticket($tokenInfo['access_token']);
+    $ticketInfo = fetch_wx_jsapi_ticket($tokenInfo['access_token'], $tokenInfo['appId']);
     if($ticketInfo['errcode']){
         ajax_error($ticketInfo['errmsg']);
     }
