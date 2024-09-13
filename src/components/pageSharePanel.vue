@@ -31,9 +31,8 @@
             <transition name="psp-pull-down">
                 <div v-if="qrDataURL" class="psp-qrcode-box" @click="onClose">
                     <img :src="qrDataURL" alt="扫码分享" class="psp-qrcode-pic" />
-                    <span class="tc-66">请使用手机扫码</span>
-                    <canvas ref="canvasBox" class="psp-qrcode-canvas" :width="canvasSize" :height="canvasSize" />
-                    <!-- <span v-for="nth in dotCount" :key="nth" class="psp-rect-dot" :style="getDotStyle(nth)"></span> -->
+                    <span class="tc-66">{{isDrawEnd ? "请使用手机扫码" : "正在生成二维码…"}}</span>
+                    <canvas v-if="!isDrawEnd" ref="canvasBox" class="psp-qrcode-canvas" :width="canvasSize" :height="canvasSize" />
                 </div>
             </transition>
         </div>
@@ -53,11 +52,16 @@
     const $instance = getCurrentInstance();
     const emits = defineEmits(["finished"]); //结束时调用函数
     const qrDataURL = ref(null);
+    const isDrawEnd = ref(false);
     const isMobile = (navigator.userAgent.indexOf("Mobile") >= 0);
-    const dotCount = 900;
     const canvasSize = window.pxOf1rem * 9; /* 等于二维码图片的宽高 */
-    const rectSize = 6; //像素。二维码中小块的宽高
+    const rectSize = 9; //像素。二维码中小块的宽高
     const rectRows = Math.ceil(canvasSize / rectSize); //二维码有多少行
+    const rectCount = rectRows * rectRows;
+    const nonRVs = { //非响应式变量（non Responsive Variables）
+        drawIndex: 0,
+        ctx2D: null
+    };
     
     function onClose(){
         isVisible.value = false;
@@ -111,7 +115,14 @@
             margin: 0,
         }).then(url => {
             qrDataURL.value = url;
-            nextTick(generateCanvasQrcode);
+            if(nonRVs.drawIndex < rectCount){
+                isDrawEnd.value = false;
+                nextTick(() => {
+                    nonRVs.drawIndex = 0;
+                    nonRVs.ctx2D = $instance.refs.canvasBox.getContext("2d");
+                    window.requestAnimationFrame(generateCanvasQrcode);
+                });
+            }
         }).catch(err => {
             appToast("生成二维码失败：" + err.message);
         });
@@ -153,40 +164,31 @@
     }
     
     function generateCanvasQrcode(){
-        const ctx2d = $instance.refs.canvasBox.getContext("2d");
-        ctx2d.fillStyle = "#FFFFFF";
-        ctx2d.fillRect(0, 0, canvasSize, canvasSize);
-    }
-    
-    function getDotStyle(nth){
-        const idx = nth - 1;
-        const transX = 20 + Math.floor(idx % 30) * 6;
-        const transY = 20 + Math.floor(idx / 30) * 6;
-        const delay = 400 + nth * 5;
-        return `left:${transX}px;top:${transY}px;animation: psp-dot-fade-out 0ms ease ${delay}ms 1 forwards;`;
-        //return `transform:translate(${transX}px,${transY}px);animation: psp-dot-fade-out 0ms ease ${delay}ms 1 forwards;`;
+        if(!qrDataURL.value){
+            return;
+        }
+        
+        const endX = Math.floor(nonRVs.drawIndex % rectRows) * rectSize;
+        const endY = Math.floor(nonRVs.drawIndex / rectRows) * rectSize;
+        
+        nonRVs.ctx2D.fillStyle = "#FFFFFF";
+        nonRVs.ctx2D.fillRect(0, 0, canvasSize, canvasSize);
+        
+        nonRVs.ctx2D.clearRect(0, 0, canvasSize, endY);
+        nonRVs.ctx2D.clearRect(0, endY, endX, rectSize);
+        
+        nonRVs.drawIndex++;
+        
+        if(nonRVs.drawIndex < rectCount){
+            window.requestAnimationFrame(generateCanvasQrcode);
+        } else {
+            nonRVs.ctx2D = null;
+            isDrawEnd.value = true;
+        }
     }
 </script>
 
 <style>
-    @keyframes psp-qrcode-blur-kf{
-        from {
-            filter: blur(1rem);
-        }
-        to {
-            filter: blur(0);
-        }
-    }
-    
-    @keyframes psp-dot-fade-out{
-        from {
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
-        }
-    }
-    
     .psp-box-container{
         position: fixed;
         left: 0;
@@ -233,8 +235,6 @@
         width: 9rem;
         height: 9rem;
         margin-bottom: 0.5rem;
-        /* filter: blur(1rem);
-        animation: psp-qrcode-blur-kf 400ms ease 200ms 1 forwards; */
     }
     .psp-qrcode-canvas{
         display: block;
@@ -244,16 +244,6 @@
         z-index: 8;
         width: 9rem;
         height: 9rem;
-    }
-    .psp-rect-dot{
-        display: block;
-        position: absolute;
-        left: 1rem;
-        top: 1rem;
-        z-index: 8;
-        width: 6px;
-        height: 6px;
-        background-color: #fff;
     }
     
     .psp-slide-out-enter-from{opacity:0}
