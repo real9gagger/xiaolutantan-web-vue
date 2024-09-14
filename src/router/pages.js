@@ -27,13 +27,17 @@ export default [
     	path: "/test",
     	name: "测试中心",
     	component: () => import("@/views/test/index"),
-    	meta: {}
+    	meta: {
+            showPageTitle: true
+        }
     },
     {
     	path: "/testmapdev",
     	name: "测试地图开发专用",
     	component: () => import("@/views/test/mapDev"),
-    	meta: {}
+    	meta: {
+            showPageTitle: true
+        }
     },
 	{
 		path: "/index",

@@ -6,6 +6,9 @@
         <div @click="onGotoAboutCanal" class="mcv-action-box" title="关于平陆运河">
             <img class="dp-bk wh-f" :src="publicAssets.iconHelpAboutCanal" />
         </div>
+        <div @click="onToggleFullScreen" class="mcv-action-box" title="全屏显示">
+            <img class="dp-bk wh-f" :src="publicAssets.iconFullScreen" />
+        </div>
         <div @click="onPositionMyLocation" class="mcv-action-box" :class="{'mcv-positionning-ani': isPositionning}" title="定位到我的位置">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapLocationPosition" />
         </div>
@@ -67,6 +70,15 @@
     
     function onGotoAboutCanal(){
         emits("onaboutcanal", true);
+    }
+    
+    function onToggleFullScreen(){
+        const isFS = document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen;
+        if(!isFS){
+            document.documentElement.requestFullscreen();
+        } else{
+            document.exitFullscreen();
+        }
     }
     
     function onPositionMyLocation() {
