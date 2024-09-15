@@ -6,14 +6,14 @@
         <div @click="onGotoAboutCanal" class="mcv-action-box" title="关于平陆运河">
             <img class="dp-bk wh-f" :src="publicAssets.iconHelpAboutCanal" />
         </div>
-        <div @click="onToggleFullScreen" class="mcv-action-box" title="全屏显示">
-            <img class="dp-bk wh-f" :src="publicAssets.iconFullScreen" />
+        <div @click="onToggleFullScreen" class="mcv-action-box" title="切换或取消全屏显示">
+            <img class="dp-bk wh-f" :src="!isFS ? publicAssets.iconFullScreen : publicAssets.iconFullScreenExit" />
         </div>
         <div @click="onClickShare" class="mcv-action-box" title="分享此页面">
-            <img class="dp-bk wh-f" :src="publicAssets.iconShareGreen" />
+            <img class="dp-bk wh-f" :class="{'mcv-sharing-ani': isSharing}" :src="publicAssets.iconShareGreen" />
         </div>
-        <div @click="onPositionMyLocation" class="mcv-action-box" :class="{'mcv-positionning-ani': isPositionning}" title="定位到我的位置">
-            <img class="dp-bk wh-f" :src="publicAssets.iconMapLocationPosition" />
+        <div @click="onPositionMyLocation" class="mcv-action-box" title="定位到我的位置">
+            <img class="dp-bk wh-f" :class="{'mcv-positionning-ani': isPositionning}" :src="publicAssets.iconMapLocationPosition" />
         </div>
         <div @click="onRestorePerspective" class="mcv-action-box" title="还原成默认视图">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapRestorePerspective" />
@@ -22,12 +22,10 @@
             <img class="dp-bk wh-f" :src="publicAssets.iconMapAdministrativeRegion" />
         </div>
         <div @click="onShowOrHideCallout" class="mcv-action-box" title="显示或隐藏图集">
-            <img v-if="isCalloutShowing" class="dp-bk wh-f" :src="publicAssets.iconMapCalloutShowing" />
-            <img v-else class="dp-bk wh-f" :src="publicAssets.iconMapCalloutHiding" />
+            <img class="dp-bk wh-f" :src="isCalloutShowing ? publicAssets.iconMapCalloutShowing : publicAssets.iconMapCalloutHiding" />
         </div>
         <div @click="onToggleMapType" class="mcv-action-box" title="切换成卫星或普通地图">
-            <img v-if="isSatelliteMap" class="dp-bk wh-f" :src="publicAssets.iconMapToggleLayers" />
-            <img v-else class="dp-bk wh-f" :src="publicAssets.iconMapSatelliteFill" />
+            <img class="dp-bk wh-f" :src="isSatelliteMap ? publicAssets.iconMapToggleLayers : publicAssets.iconMapSatelliteFill" />
         </div>
         <div @click="onPanoramicView" class="mcv-action-box" title="全景视图">
             <img class="dp-bk wh-f" :src="publicAssets.iconPanoramicView" />
@@ -54,6 +52,8 @@
     const isShowHelps = ref(false); //是否显示帮助框
     const isSlideOut = ref(false); //提示小组件是否滑出
     const helpDescTitles = reactive([]); //图标的功能描述
+    const isFS = ref(document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen || false); //是否正在全屏显示
+    const isSharing = ref(false);
     
     const emits = defineEmits([
         "onshare",
@@ -69,7 +69,32 @@
     const $instance = getCurrentInstance();
     
     function onClickShare(){
-        emits("onshare", true);
+        if(navigator.share && window.fetch){
+            isSharing.value = true;
+            window.fetch(publicAssets.imagePictureForShare).then(res => {
+                if(res.ok){
+                    res.blob().then(theBlob => {
+                        const idx = res.url.lastIndexOf("/") + 1;
+                        const fileName = res.url.substr(idx);
+                        navigator.share({
+                            url: location.href,
+                            text: "刚刚有人分享了平陆运河的游览照片，快点去看看吧",
+                            title: "平陆运河最新图集",
+                            files: [new File([theBlob], fileName, { type: theBlob.type })]
+                        });
+                        isSharing.value = false;
+                    });
+                } else {
+                    appToast("分享失败：" + res.statusText);
+                    isSharing.value = false;
+                }
+            }).catch(err => {
+                appToast("分享出错：" + err.message);
+                isSharing.value = false;
+            });
+        } else {
+            emits("onshare", true);
+        }
     }
     
     function onGotoAboutCanal(){
@@ -77,11 +102,12 @@
     }
     
     function onToggleFullScreen(){
-        const isFS = document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen;
-        if(!isFS){
+        if(!(document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen)){
             document.documentElement.requestFullscreen();
+            isFS.value = true;
         } else{
             document.exitFullscreen();
+            isFS.value = false;
         }
     }
     
@@ -193,9 +219,13 @@
 </script>
 
 <style>
-    @keyframes mcv-location-positionning-kf {/* 正在定位动画 */
+    @keyframes mcv-location-positionning-kf {/* 正在定位动画帧 */
         from { transform: rotate(0deg) }
         to { transform: rotate(360deg) }
+    }
+    @keyframes mcv-share-fetching-kf {/* 正在获取分享图片动画帧 */
+        from { transform: scale(1) rotateZ(0deg) }
+        to { transform: scale(0.75) rotateZ(10deg) }
     }
 
     .mcv-box-container {
@@ -229,6 +259,10 @@
 
     .mcv-positionning-ani {
         animation: mcv-location-positionning-kf 1s ease infinite;
+    }
+    
+    .mcv-sharing-ani {
+        animation: mcv-share-fetching-kf 1s ease infinite alternate;
     }
     
     .mcv-help-box{

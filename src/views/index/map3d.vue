@@ -68,29 +68,7 @@
     
     //点击了分享
     function onClickShare(){
-        if(navigator.share && window.fetch){
-            window.fetch(publicAssets.imagePictureForShare).then(res => {
-                if(!res.ok){
-                    return !appToast("分享失败：" + res.statusText);
-                }
-                
-                res.blob().then(theBlob => {
-                    const idx = res.url.lastIndexOf("/") + 1;
-                    const fileName = res.url.substr(idx);
-                    
-                    navigator.share({
-                        url: location.href,
-                        text: "刚刚有人分享了平陆运河的游览照片，快点去看看吧",
-                        title: "平陆运河最新图集",
-                        files: [new File([theBlob], fileName, { type: theBlob.type })]
-                    });
-                });
-            }).catch(err => {
-                appToast("分享出错：" + err.message);
-            });
-        } else {
-            isShowSharePanel.value = true;
-        }
+        isShowSharePanel.value = true;
     }
     
     //转到运河简介
