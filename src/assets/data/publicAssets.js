@@ -69,6 +69,7 @@ const AssetsPathMap = {
     iconShareGreen: "icons/share_green.png",
     iconHelpQuestion: "icons/help_question.png",
     iconFullScreen: "icons/full_screen.png",
+    iconPanoramicView: "icons/panoramic_view.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

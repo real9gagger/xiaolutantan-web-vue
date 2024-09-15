@@ -1,7 +1,7 @@
 <template>
     <div class="mcv-box-container">
-        <div @click="onClickShare" class="mcv-action-box" title="分享此页面">
-            <img class="dp-bk wh-f" :src="publicAssets.iconShareGreen" />
+        <div @click="onShowHelps" class="mcv-action-box" title="显示图标功能描述">
+            <img class="dp-bk wh-f" :src="publicAssets.iconHelpQuestion" />
         </div>
         <div @click="onGotoAboutCanal" class="mcv-action-box" title="关于平陆运河">
             <img class="dp-bk wh-f" :src="publicAssets.iconHelpAboutCanal" />
@@ -9,11 +9,17 @@
         <div @click="onToggleFullScreen" class="mcv-action-box" title="全屏显示">
             <img class="dp-bk wh-f" :src="publicAssets.iconFullScreen" />
         </div>
+        <div @click="onClickShare" class="mcv-action-box" title="分享此页面">
+            <img class="dp-bk wh-f" :src="publicAssets.iconShareGreen" />
+        </div>
         <div @click="onPositionMyLocation" class="mcv-action-box" :class="{'mcv-positionning-ani': isPositionning}" title="定位到我的位置">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapLocationPosition" />
         </div>
         <div @click="onRestorePerspective" class="mcv-action-box" title="还原成默认视图">
             <img class="dp-bk wh-f" :src="publicAssets.iconMapRestorePerspective" />
+        </div>
+        <div @click="onShowOrHideRegion" class="mcv-action-box" title="地图展示设置">
+            <img class="dp-bk wh-f" :src="publicAssets.iconMapAdministrativeRegion" />
         </div>
         <div @click="onShowOrHideCallout" class="mcv-action-box" title="显示或隐藏图集">
             <img v-if="isCalloutShowing" class="dp-bk wh-f" :src="publicAssets.iconMapCalloutShowing" />
@@ -23,14 +29,11 @@
             <img v-if="isSatelliteMap" class="dp-bk wh-f" :src="publicAssets.iconMapToggleLayers" />
             <img v-else class="dp-bk wh-f" :src="publicAssets.iconMapSatelliteFill" />
         </div>
-        <div @click="onShowOrHideRegion" class="mcv-action-box" title="地图展示设置">
-            <img class="dp-bk wh-f" :src="publicAssets.iconMapAdministrativeRegion" />
+        <div @click="onPanoramicView" class="mcv-action-box" title="全景视图">
+            <img class="dp-bk wh-f" :src="publicAssets.iconPanoramicView" />
         </div>
         <div @click="onGotoMyAccount" class="mcv-action-box user-avatar" title="转到个人中心">
             <img class="dp-bk wh-f" :src="publicAssets.iconDefaultUserAvatar" />
-        </div>
-        <div @click="onShowHelps" class="mcv-action-box" title="显示图标描述信息">
-            <img class="dp-bk wh-f" :src="publicAssets.iconHelpQuestion" />
         </div>
         <ul v-show="isShowHelps" class="mcv-help-box" ref="mcvHelpBox">
             <li v-for="txt, idx in helpDescTitles" class="mcv-help-item"
@@ -60,6 +63,7 @@
         "togglecallout",
         "togglemaptype",
         "toggleregion",
+        "panoramicview",
         "gotoaccount",
     ]);
     const $instance = getCurrentInstance();
@@ -128,6 +132,10 @@
 
     function onShowOrHideRegion() {
         emits("toggleregion", null);
+    }
+
+    function onPanoramicView(){
+        emits("panoramicview", true);
     }
 
     function onGotoMyAccount() {

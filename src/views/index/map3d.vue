@@ -9,6 +9,7 @@
             @restoreperspective="onRestorePerspective"
             @togglemaptype="onToggleMapType"
             @toggleregion="onShowOrHideRegion"
+            @panoramicview="onPanoramicView"
             @gotoaccount="onGotoMyAccount"
             @togglecallout="buildSharePicture"
         />
@@ -155,6 +156,11 @@
     //地图展示设置
     function onShowOrHideRegion() {
         $router.push("/map3dsettings");
+    }
+    
+    //转到全景景点
+    function onPanoramicView(){
+        $router.push("/panoramiclist");
     }
     
     //转到我的账户

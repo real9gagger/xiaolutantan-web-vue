@@ -160,5 +160,21 @@ export default [
     	meta: {
             showPageTitle: true
         }
-    }
+    },
+    {
+    	path: "/panoramiclist",
+    	name: "全景景点",
+    	component: () => import("@/views/canal/panoramicList"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
+    	path: "/panoramicview",
+    	name: "全景欣赏",
+    	component: () => import("@/views/canal/panoramicView"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
 ];
