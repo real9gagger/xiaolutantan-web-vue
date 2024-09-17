@@ -6,6 +6,9 @@
                 <button type="button" class="btn-box wi-f" @click="gotoMapDev">地图开发测试</button>
             </div>
             <div class="mg-t-1rem ta-c">
+                <button type="button" class="btn-box wi-f" @click="gotoTestInhale">测试吸入动画</button>
+            </div>
+            <div class="mg-t-1rem ta-c">
                 <button type="button" class="btn-box wi-f" @click="checkPageName">检查页面是否都有 “name” 属性</button>
             </div>
         </div>
@@ -21,6 +24,10 @@
     
     function gotoMapDev() {
         $router.push("/testmapdev");
+    }
+    
+    function gotoTestInhale(){
+        $router.push("/testinhale");
     }
 
     function checkPageName() {

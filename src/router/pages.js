@@ -39,6 +39,14 @@ export default [
             showPageTitle: true
         }
     },
+    {
+    	path: "/testinhale",
+    	name: "测试吸入动画",
+    	component: () => import("@/views/test/inhalationEffect"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
 	{
 		path: "/index",
 		name: "主页",
