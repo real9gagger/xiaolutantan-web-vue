@@ -17,7 +17,9 @@ export default {
         UPDATE_KEEP_ALIVE_INCLUDES(state, payload){//更新包含项
             //console.log(payload);
             if(payload?.toName){
-                const idxF = state.historyRouteList.findIndex(vx => vx[1] === payload.fromPath);
+                //如果 payload.fromName 为 null，可能是刷新或首次进来，因此尝试取最后的项的索引
+                //如果是刷新：state.historyRouteList.length 大于 0，否则是首次进来！！！
+                const idxF = (payload.fromName ? state.historyRouteList.findIndex(vx => vx[1] === payload.fromPath) : state.historyRouteList.length - 1);
                 const idxT = state.historyRouteList.findIndex(vx => vx[1] === payload.toPath);
                 
                 if(idxF >= 0){

@@ -179,7 +179,7 @@ export default [
     },
     {
     	path: "/panoramicview",
-    	name: "全景欣赏",
+    	name: "全景游览",
     	component: () => import("@/views/canal/panoramicView"),
     	meta: {
             showPageTitle: true
