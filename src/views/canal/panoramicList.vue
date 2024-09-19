@@ -20,11 +20,6 @@
     function gotoPanoramicView(idx){
         $router.push("/panoramicview?id=" + panoList[idx].id);
     }
-    function getItemStyle(){
-        return {
-            flexBasis: 1
-        }
-    }
 </script>
 
 <style scoped="scoped">

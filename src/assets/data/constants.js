@@ -70,8 +70,8 @@ export const panoList = [
     },
     {
         id: 0x55,
-        thumbPath: "panoramic/panos/shajing_estuary_180_tiles/thumb.jpg",
-        scenesXml: "panoramic/scenes/shajing_estuary_180.xml",
+        thumbPath: "panoramic/panos/shajing_estuary_720_tiles/thumb.jpg",
+        scenesXml: "panoramic/scenes/shajing_estuary_720.xml",
         title: "沙井入海口",
         captureTime: "2022年9月27日",
         lnglat: [108.609076, 21.854558]

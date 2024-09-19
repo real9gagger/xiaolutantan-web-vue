@@ -1,0 +1,19 @@
+﻿<krpano version="1.21" title="全景游览">
+
+	<include url="../skin/vtourskin.xml" />
+	
+	<scene name="scene_qishi_hinge_720" title="企石枢纽" thumburl="../panos/qishi_hinge_720_tiles/thumb.jpg" lat="22.322861" lng="108.942663" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/qishi_hinge_720_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/qishi_hinge_720_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,2048x1026,4096x2050,8192x4096" />
+		</image>
+
+	</scene>
+
+</krpano>
