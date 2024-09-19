@@ -27,7 +27,7 @@
         <div @click="onToggleMapType" class="mcv-action-box" title="切换成卫星或普通地图">
             <img class="dp-bk wh-f" :src="isSatelliteMap ? publicAssets.iconMapToggleLayers : publicAssets.iconMapSatelliteFill" />
         </div>
-        <div @click="onPanoramicView" class="mcv-action-box" title="全景视图">
+        <div @click="onPanoramicView" class="mcv-action-box pano-view" title="全景视图">
             <img class="dp-bk wh-f" :src="publicAssets.iconPanoramicView" />
         </div>
         <div @click="onGotoMyAccount" class="mcv-action-box user-avatar" title="转到个人中心">
@@ -252,6 +252,11 @@
         background-color: #d9f1df;
     }
 
+    .mcv-action-box.pano-view {
+        box-shadow: 0 0 0.5rem 0 #ff660099;
+        border: 0.05rem solid #ff6600;
+    }
+    
     .mcv-action-box.user-avatar {
         padding: 0;
         background-color: var(--main-color);

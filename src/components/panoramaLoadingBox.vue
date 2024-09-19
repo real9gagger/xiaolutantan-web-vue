@@ -1,7 +1,7 @@
 <template>
     <div class="plb-loading-container fx-vm" :class="{'fadeout': props.isFadeOut}" @transitionend="onBoxTransitionEnd">
         <div class="dp-bk ps-a po-mc tc-mc ta-c lh-1x">
-            <h4 class="fs-1rem5">720</h4>
+            <h4 class="fs-1rem5">360</h4>
             <p class="fs-rem6">全景游览</p>
         </div>
         <div class="plb-loading-circle"></div>
