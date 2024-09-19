@@ -1,10 +1,10 @@
 <template>
     <div class="page-limit-width">
-        <div class="content-cage" style="padding:0" @click="gotoPanoramicView">
-            <ul>
-                <li v-for="item in panoList" :key="item.title" class="pnl-li-item">
-                    <img :src="item.thumbPath" :title="item.title" class="wi-f" />
-                    <span class="pnl-li-title">{{item.title}}</span>
+        <div class="content-cage" style="padding:0.1rem 0 0 0.1rem">
+            <ul class="fx-r fx-wp">
+                <li v-for="item,index in panoList" :key="item.id" class="pnl-li-item" @click="gotoPanoramicView(index)">
+                    <img :src="item.thumbPath" :alt="item.title" class="wi-f" />
+                    <span class="pnl-li-title">{{item.title}} • {{item.captureTime}}</span>
                 </li>
             </ul>
         </div>
@@ -13,34 +13,17 @@
 
 <script setup name="CanalPanoramicList">
     import { useRouter } from "vue-router";
-    import publicAssets from "@/assets/data/publicAssets.js";
+    import { panoList } from "@/assets/data/constants.js";
     
     const $router = useRouter();
-    const panoList = [ //全景图片列表
-        {
-            thumbPath: "sharepics/qingnian_hinge_1.jpg",
-            title: "青年枢纽"
-        },
-        {
-            thumbPath: "sharepics/qingnian_hinge_1.jpg",
-            title: "青年枢纽"
-        },
-        {
-            thumbPath: "sharepics/qingnian_hinge_1.jpg",
-            title: "青年枢纽"
-        },
-        {
-            thumbPath: "sharepics/qingnian_hinge_1.jpg",
-            title: "青年枢纽"
-        },
-        {
-            thumbPath: "sharepics/qingnian_hinge_1.jpg",
-            title: "青年枢纽"
-        }
-    ];
     
-    function gotoPanoramicView(){
-        $router.push("/panoramicview");
+    function gotoPanoramicView(idx){
+        $router.push("/panoramicview?id=" + panoList[idx].id);
+    }
+    function getItemStyle(){
+        return {
+            flexBasis: 1
+        }
     }
 </script>
 
@@ -49,16 +32,23 @@
         position: relative;
         max-height: 10rem;
         overflow: hidden;
+        cursor: pointer;
+        padding-right: 0.1rem;
+        margin-bottom: 0.1rem;
+        flex-basis: 50%;
+    }
+    .pnl-li-item:active{
+        opacity: 0.6;
     }
     .pnl-li-title{
         display: block;
         position: absolute;
-        left: 0;
-        top: 0;
+        right: 0;
+        bottom: 0;
         z-index: 1;
-        padding: 0.3rem 0.6rem;
-        font-size: 0.6rem;
-        color: #fff;
+        padding: 0.2rem 0.4rem;
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.8);
     }
     .pnl-pic-mask1{
         -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);

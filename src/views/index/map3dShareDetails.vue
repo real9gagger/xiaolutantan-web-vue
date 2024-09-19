@@ -40,11 +40,7 @@
             </div>
         </template>
         <template v-else >
-            <div class="content-cage" style="padding-top:15vh">
-                <h4 class="fs-1rem tc-33 ta-c">照片已失效</h4>
-                <img :src="publicAssets.imageImgLost" style="display:block;margin:2rem auto;width:10rem;height:auto;" />
-                <a class="dp-bk tc-b0 ta-c fw-b" @click="goBackToHomePage">返回主页</a>
-            </div>
+            <data-lost-box class="content-cage" title="照片已失效" />
         </template>
     </div>
 </template>
@@ -58,6 +54,7 @@
     import publicAssets from "@/assets/data/publicAssets.js";
     import gestureImage from "@/components/gestureImage.vue";
     import map3dCanalThumbnail from "@/components/map3dCanalThumbnail.vue";
+    import dataLostBox from "@/components/dataLostBox.vue";
     import ajaxRequest from "@/request/index.js";
     
     //swiper开发文档：https://www.swiper.com.cn/api/index.html
@@ -94,9 +91,6 @@
                 nonRVs.hasDblClicked = false;
             }, 300);
         }
-    }
-    function goBackToHomePage(){
-        $router.replace("/");
     }
     function gotoUserPage(){
         //if original page is from user center
