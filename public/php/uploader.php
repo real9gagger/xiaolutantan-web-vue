@@ -61,20 +61,20 @@ function image_rotation($file_path){
 
 //获取数据集
 function get_data_set(){
-    $path_dataset = $_SERVER['DOCUMENT_ROOT'] . '/sharepics/dataset.json';
+    $path_dataset = dirname(__DIR__) . '/sharepics/dataset.json';
     return json_decode(file_get_contents($path_dataset), true);
 }
 
 //保存数据集
 function save_data_set($new_data){
-    $path_dataset = $_SERVER['DOCUMENT_ROOT'] . '/sharepics/dataset.json';
+    $path_dataset = dirname(__DIR__) . '/sharepics/dataset.json';
     file_put_contents($path_dataset, json_encode($new_data, JSON_UNESCAPED_UNICODE));
 }
 
 //2024年9月11日：暂时使用文件来缓存数据
 function get_cache($key){
     $md5key = md5($key);
-    $path_cache = $_SERVER['DOCUMENT_ROOT'] . "/sharepics/{$md5key}.cache";
+    $path_cache = dirname(__DIR__) . "/sharepics/{$md5key}.cache";
     $dat_cache = json_decode(file_get_contents($path_cache), true);
     return $dat_cache;
 }
@@ -82,7 +82,7 @@ function get_cache($key){
 //2024年9月11日：暂时使用文件来缓存数据
 function set_cache($key, $dat){
     $md5key = md5($key);
-    $path_cache = $_SERVER['DOCUMENT_ROOT'] . "/sharepics/{$md5key}.cache";
+    $path_cache = dirname(__DIR__) . "/sharepics/{$md5key}.cache";
     
     if(!$dat){
         unlink($path_cache);
@@ -179,7 +179,7 @@ function upload_picture(){
         $new_name = ('test_pic_'.$new_name);
     }
     
-    $root_dir = $_SERVER['DOCUMENT_ROOT'];
+    $root_dir = dirname(__DIR__);
     $path_original = '/sharepics/original/'; //原始图片所在的目录
     $path_thumbnail = '/sharepics/thumbnail/'; //原始图片的缩略图所在的目录
     
@@ -247,8 +247,8 @@ function upload_picture(){
         'id'            => intval($_GET['file_nth']),
         'description'   => $my_file['name'],
         'size'          => $my_file['size'],
-        'picPath'       => $path_original.$new_name,
-        'thumbnailPath' => $path_thumbnail.$new_name,
+        'picPath'       => substr($path_original, 1).$new_name, //不要开头的斜杠
+        'thumbnailPath' => substr($path_thumbnail, 1).$new_name, //不要开头的斜杠
         'width'         => $image_info[0],
         'height'        => $image_info[1],
         'sort'          => 0,
@@ -336,7 +336,7 @@ function delete_my_post(){
     if($post_id){
         $post_index = -1;
         $dat_list = get_data_set();
-        $root_dir = $_SERVER['DOCUMENT_ROOT'];
+        $root_dir = dirname(__DIR__) . '/';
         
         foreach($dat_list as $ix => $vx){
             if($vx['id'] === $post_id){

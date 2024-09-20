@@ -1,8 +1,11 @@
 <template>
-    <div class="page-limit-width">
+    <div class="page-limit-width" @click="clearCurrentIndex">
         <div class="content-cage" style="padding:0.15rem 0 0 0.15rem">
             <ul class="fx-r fx-wp">
-                <li v-for="item,index in panoList" :key="item.id" class="pnl-li-item" @click="gotoPanoramicView(index)">
+                <li v-for="item,index in panoList" class="pnl-li-item" 
+                :key="item.id" 
+                :class="{'actived': currentIndex===index}" 
+                @click.stop="gotoPanoramicView(index)">
                     <img :src="item.thumbPath" :alt="item.title" class="wi-f" />
                     <span class="pnl-li-title">{{item.title}} • {{item.captureTime}}</span>
                 </li>
@@ -12,13 +15,20 @@
 </template>
 
 <script setup name="CanalPanoramicList">
+    import { ref } from "vue";
     import { useRouter } from "vue-router";
     import { panoList } from "@/assets/data/constants.js";
     
     const $router = useRouter();
+    const currentIndex = ref(-1);
     
     function gotoPanoramicView(idx){
+        currentIndex.value = idx;
         $router.push("/panoramicview?id=" + panoList[idx].id);
+    }
+    
+    function clearCurrentIndex(){
+        currentIndex.value = -1;
     }
 </script>
 
@@ -34,6 +44,14 @@
     }
     .pnl-li-item:active{
         opacity: 0.75;
+    }
+    .pnl-li-item.actived::after{
+        content: "";
+        display: block;
+        position: absolute;
+        inset: 0 0.15rem 0 0;
+        z-index: 1;
+        border: 0.1rem solid #a7d129;
     }
     .pnl-li-title{
         display: block;

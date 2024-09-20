@@ -3,8 +3,9 @@
  * https://cli.vuejs.org/zh/config/#%E7%9B%AE%E6%A0%87%E6%B5%8F%E8%A7%88%E5%99%A8
  */
 // 基础路径，发布前修改这里,当前配置打包出来的资源都是相对路径
+const BASE_PATH = './';
 module.exports = {
-  publicPath: './', //Vue CLI 3.3 之前的版本，<%= BASE_URL %> 对应的是 vue.config.js中的 publicPath，vue CLI 3.3 之后（包括3.3）的版本，对应的是 baseURl
+  publicPath: BASE_PATH, //Vue CLI 3.3 之前的版本，<%= BASE_URL %> 对应的是 vue.config.js中的 publicPath，vue CLI 3.3 之后（包括3.3）的版本，对应的是 baseURl
   lintOnSave: true,
   productionSourceMap: false,
   css: {
@@ -46,7 +47,7 @@ module.exports = {
       require('unplugin-vue-setup-extend-plus/webpack').default({
         enableAutoExpose: true
       })
-    ],
+    ]
   },
   // 配置转发代理
   devServer: {
@@ -56,7 +57,7 @@ module.exports = {
         target: 'http://localhost:80',
         ws: true,
         pathRewrite: {
-          '^/xlttapi': '/php/uploader.php'
+          '^/xlttapi': BASE_PATH + 'php/uploader.php'
         },
 		changeOrigin: true
       }

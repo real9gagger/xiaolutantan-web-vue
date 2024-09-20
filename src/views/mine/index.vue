@@ -146,7 +146,7 @@
             popupVisible.value = true;
             
             nonRVs.selectItemID = item.id;
-        }, 600);
+        }, 500);
     }
     function onItemPointerUp(idx){
         const delta = (Date.now() - nonRVs.pointerDownTS);
@@ -163,7 +163,7 @@
         activeIndex.value = -1;
     }
     function preventContextMenu(evt){
-        evt.preventDefault(); //阻止浏览器弹出 “翻译、全选、复制、搜索...” 菜单
+        //evt.preventDefault(); //阻止浏览器弹出 “翻译、全选、复制、搜索...” 菜单
     }
     function onLogout(){
         alertConfirm("退出登录", "确定").then(() => {
