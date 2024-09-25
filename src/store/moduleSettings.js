@@ -3,6 +3,7 @@ export default {
     	return {
     		mapAdministrativeType: 0, //显示的地图行政区域类型：市、县、镇
             canalDisplayType: 0, //显示的运河方式：单段显示、分段显示
+            mapLayerType: 0, //地图图层显示类型
             
             pickPlaceAddress: "", //选取的地点的地址
             pickPlaceTitle: "", //选取的地点的名称
@@ -20,6 +21,9 @@ export default {
         },
         TOGGLE_CANAL_DISPLAY_TYPE(state, payload){
             state.canalDisplayType = (+payload || 0);
+        },
+        TOGGLE_MAP_LAYER_TYPE(state, payload){
+            state.mapLayerType = (+payload || 0);
         },
         SET_PICK_PLACE_INFO(state, payload){
             if(payload && payload.address && payload.title && payload.point){
@@ -54,6 +58,9 @@ export default {
         },
         toggleCanalDisplayType({ commit }, payload){
             commit("TOGGLE_CANAL_DISPLAY_TYPE", payload);
+        },
+        toggleMapLayerType({ commit }, payload){
+            commit("TOGGLE_MAP_LAYER_TYPE", payload);
         },
         setPickPlaceInfo({ commit }, payload){
             commit("SET_PICK_PLACE_INFO", payload);

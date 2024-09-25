@@ -21,6 +21,7 @@ const myGetters = {
     
     mapAdministrativeType: (state) => state.moduleSettings.mapAdministrativeType,
     canalDisplayType: (state) => state.moduleSettings.canalDisplayType,
+    mapLayerType: (state) => state.moduleSettings.mapLayerType,
     
     pickPlaceAddress: (state) => state.moduleSettings.pickPlaceAddress,
     pickPlaceTitle: (state) => state.moduleSettings.pickPlaceTitle,

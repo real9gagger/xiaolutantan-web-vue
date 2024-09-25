@@ -43,17 +43,19 @@
 </template>
 
 <script setup name="Map3DControlVertical">
-    import { ref, defineEmits, getCurrentInstance, reactive } from "vue";
+    import { ref, defineEmits, getCurrentInstance, reactive, computed } from "vue";
+    import { useStore } from "vuex";
+    import { mapLayerType } from "@/assets/data/constants.js";
     import publicAssets from "@/assets/data/publicAssets.js";
 
     const isCalloutShowing = ref(true); //是否显示图集气泡
-    const isSatelliteMap = ref(false); //是否显示卫星地图
     const isPositionning = ref(false); //是否正在定位
     const isShowHelps = ref(false); //是否显示帮助框
     const isSlideOut = ref(false); //提示小组件是否滑出
     const helpDescTitles = reactive([]); //图标的功能描述
     const isFS = ref(document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen || false); //是否正在全屏显示
     const isSharing = ref(false);
+    const isSatelliteMap = computed(() => ($store.getters.mapLayerType===mapLayerType.SATELLITE)); //是否显示卫星地图
     
     const emits = defineEmits([
         "onshare",
@@ -61,12 +63,12 @@
         "positionlocation",
         "restoreperspective",
         "togglecallout",
-        "togglemaptype",
         "toggleregion",
         "panoramicview",
         "gotoaccount",
     ]);
     const $instance = getCurrentInstance();
+    const $store = useStore();
     
     function onClickShare(){
         if(navigator.share && window.fetch){
@@ -152,8 +154,7 @@
     }
 
     function onToggleMapType() {
-        isSatelliteMap.value = !isSatelliteMap.value;
-        emits("togglemaptype", isSatelliteMap.value);
+        $store.dispatch("toggleMapLayerType", !isSatelliteMap.value ? mapLayerType.SATELLITE : mapLayerType.NORMAL);
     }
 
     function onShowOrHideRegion() {

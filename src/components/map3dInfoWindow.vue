@@ -1,8 +1,10 @@
 <template>
     <div v-if="isShowing" class="miw-box-container" :class="{'showup': isAnimating}">
-        <img class="miw-icon-box" :src="publicAssets.iconCurrentPositionCity" />
-        <span class="miw-text-box">{{title}}</span>
-        <img class="miw-icon-box" @click="onPinBtnTap" :src="publicAssets.iconMapPinFill" />
+        <div class="miw-box-content">
+            <img class="miw-icon-box" :src="publicAssets.iconCurrentPositionCity" />
+            <span class="miw-text-box">{{title}}</span>
+            <img class="miw-icon-box" @click="onPinBtnTap" :src="publicAssets.iconMapPinFill" />
+        </div>
     </div>
 </template>
 
@@ -61,27 +63,32 @@
 
 <style>
     .miw-box-container{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
         position: fixed;
         bottom: 0.5rem;
         right: 0.5rem;
         left: 0.5rem;
         z-index: 8899;
-        background-color: #fff;
-        box-shadow: 0 0 0.5rem 0 #0099ff44;
-        border-radius: 0.5rem;
-        padding: 0.5rem;
         transform: translateY(120%);
         transform-origin: 50% 100% 0;
         opacity: 0;
         transition: transform 300ms, opacity 300ms;
-        background-image: linear-gradient(60deg, #0099ff22 0%, #0099ff11 70%, #0099ff22 100%);
     }
     .miw-box-container.showup {
         transform: translateY(0%);
         opacity: 1;
+    }
+    .miw-box-content{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background-color: #fff;
+        background-image: linear-gradient(60deg, #0099ff22 0%, #0099ff11 70%, #0099ff22 100%);
+        box-shadow: 0 0 0.5rem 0 #0099ff55;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
     }
     .miw-icon-box {
         width: 1rem;

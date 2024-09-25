@@ -22,6 +22,16 @@
                     <span class="mds-row-desc">{{item.title}}</span>
                 </div>
             </div>
+            <h4 class="mds-row-title mg-t-1rem">地图类型</h4>
+            <div class="fx-r fx-wp">
+                <div v-for="item in mapTypes" class="mds-row-item"
+                    :key="item.typeCode"
+                    :class="{'selected': lyType===item.typeCode, 'lastone': item.isLastOne}" 
+                    @click="toggleMapType(item.typeCode)">
+                    <img class="mds-row-pic" :src="item.iconPath" />
+                    <span class="mds-row-desc">{{item.title}}</span>
+                </div>
+            </div>
         </div>
         <div class="fixed-limit-width po-br-0 pd-1rem">
             <button type="button" class="btn-box" @click="onConfirm">完 成</button>
@@ -33,13 +43,14 @@
     import { ref } from "vue";
     import { useStore } from "vuex";
     import { useRouter } from "vue-router";
-    import { administrativeRegion, canalDisplayMode } from "@/assets/data/constants.js";
+    import { administrativeRegion, canalDisplayMode, mapLayerType } from "@/assets/data/constants.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const $store = useStore();
     const $router = useRouter();
     const maType = ref($store.getters.mapAdministrativeType);
     const cdType = ref($store.getters.canalDisplayType);
+    const lyType = ref($store.getters.mapLayerType); //layer Type 图层类型
     const arList = [
         {
             title: "不显示",
@@ -81,6 +92,29 @@
             isLastOne: true
         }
     ];
+    const mapTypes = [
+        {
+            title: "极简",
+            iconPath: publicAssets.imageRegionNone,
+            typeCode: mapLayerType.MINIMALISM
+        },
+        {
+            title: "普通",
+            iconPath: publicAssets.imageMapTypeNormal,
+            typeCode: mapLayerType.NORMAL
+        },
+        {
+            title: "地形图",
+            iconPath: publicAssets.imageMapTypeTopographic,
+            typeCode: mapLayerType.TOPOGRAPHIC
+        },
+        {
+            title: "卫星地图",
+            iconPath: publicAssets.imageMapTypeSatellite,
+            typeCode: mapLayerType.SATELLITE,
+            isLastOne: true
+        }
+    ];
     
     function toggleRegion(code){
         maType.value = code;
@@ -88,12 +122,18 @@
     function toggleDisplayMode(code){
         cdType.value = code;
     }
+    function toggleMapType(code){
+        lyType.value = code;
+    }
     function onConfirm(){
         if($store.getters.mapAdministrativeType !== maType.value){
             $store.dispatch("toggleMapAdministrativeType", maType.value);
         }
         if($store.getters.canalDisplayType !== cdType.value){
             $store.dispatch("toggleCanalDisplayType", cdType.value);
+        }
+        if($store.getters.mapLayerType !== lyType.value){
+            $store.dispatch("toggleMapLayerType", lyType.value);
         }
         $router.back();
     }

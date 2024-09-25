@@ -93,6 +93,9 @@ const AssetsPathMap = {
     imageDonateByWechatpay: "images/donate_by_wechatpay.jpg",
     imageDonateByAlipay: "images/donate_by_alipay.jpg",
     imagePictureForShare: "images/picture_for_share.png",
+    imageMapTypeNormal: "images/map_type_normal.png",
+    imageMapTypeSatellite: "images/map_type_satellite.png",
+    imageMapTypeTopographic: "images/map_type_topographic.png",
     
     //SVG图片
     svgLoadingGif: "svgs/loading_gif.svg",

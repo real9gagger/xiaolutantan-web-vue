@@ -51,13 +51,13 @@
         position: absolute;
         inset: 0 0.15rem 0 0;
         z-index: 1;
-        border: 0.1rem solid #a7d129;
+        border: 0.1rem solid #f56c6c;
     }
     .pnl-li-title{
         display: block;
         position: absolute;
         right: 0;
-        top: 0;
+        bottom: 0;
         z-index: 1;
         padding: 0.2rem 0.4rem;
         font-size: 0.6rem;

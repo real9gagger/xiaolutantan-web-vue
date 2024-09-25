@@ -13,6 +13,14 @@ export const canalDisplayMode = {
     SEGMENTED_DISPLAY: 0xFF00,
 };
 
+//地图图层类型
+export const mapLayerType = {
+    NORMAL: 0x0000,
+    MINIMALISM: 0x1111,
+    TOPOGRAPHIC: 0x2222,
+    SATELLITE: 0x3333
+};
+
 //小程序主色
 export const appMainColor = "#43BA62";
 

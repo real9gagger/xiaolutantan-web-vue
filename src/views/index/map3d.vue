@@ -7,7 +7,6 @@
             @onaboutcanal="onGotoAboutCanal"
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
-            @togglemaptype="onToggleMapType"
             @toggleregion="onShowOrHideRegion"
             @panoramicview="onPanoramicView"
             @gotoaccount="onGotoMyAccount"
@@ -25,7 +24,7 @@
     import { useRouter } from "vue-router";
     import { getUpperSectionLength, combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort } from "@/utils/maphelper.js";
-    import { administrativeRegion, canalDisplayMode, appMainColor } from "@/assets/data/constants.js";
+    import { administrativeRegion, canalDisplayMode, mapLayerType, appMainColor } from "@/assets/data/constants.js";
     import { needDebounce } from "@/utils/cocohelper.js";
     
     import axios from "axios";
@@ -35,6 +34,7 @@
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
     import map3dSharePictureCallout from "@/components/map3dSharePictureCallout.vue";
     import pageSharePanel from "@/components/pageSharePanel.vue";
+    import bdMapStyle from "@/assets/json/bdMapStyle.json";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
     import bdMapStyleForSatellite from "@/assets/json/bdMapStyleForSatellite.json";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -46,10 +46,11 @@
     let mapAreaLayer = null; //地图周边城市图层
     let mapActivitingCallout = null; //当前被点击的气泡
     let mapIgnoreClicked = false; //是否忽略地图点击
-    let isSatelliteMapType = false; //是否是卫星地图
     
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
+    //天地图，地形图瓦片图层URL
+    const TIAN_DITU_TILE_TOPO = "https://t1.tianditu.gov.cn/ter_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
     //默认视图
     const DEFAULT_VIEW_POINTS = [
         new BMapGL.Point(108.415365, 22.817497),
@@ -105,8 +106,13 @@
         iwLnglats.value = [res.locationPoint];
     }
     
-    //接换成卫星地图或普通地图
+    //切换成卫星地图或普通地图
     function onToggleMapType(arg0){
+        if(mapWmtsLayer){
+            mapInstance.removeTileLayer(mapWmtsLayer);
+            mapWmtsLayer = null;
+        }
+        
         if(arg0){
             mapWmtsLayer = new BMapGL.XYZLayer({
                 useThumbData: true,
@@ -119,14 +125,35 @@
             mapInstance.setMaxZoom(18);
             mapInstance.setMapStyleV2(bdMapStyleForSatellite);
         } else {
-            if(mapWmtsLayer){
-                mapInstance.removeTileLayer(mapWmtsLayer);
-                mapInstance.setMaxZoom(23);
-                mapInstance.setMapStyleV2(bdMapStyleFor3D);
-                mapWmtsLayer = null;
-            }
+            mapInstance.setMaxZoom(23);
+            mapInstance.setMapStyleV2(bdMapStyleFor3D);
         }
-        isSatelliteMapType = !!arg0;
+        
+        buildCanalPOI();
+    }
+    
+    //切换成地形图或者极简地图
+    function onToggleMapTopo(arg0){
+        if(mapWmtsLayer){
+            mapInstance.removeTileLayer(mapWmtsLayer);
+            mapWmtsLayer = null;
+        }
+        
+        if(arg0){
+            mapWmtsLayer = new BMapGL.XYZLayer({
+                useThumbData: true,
+                tileUrlTemplate: TIAN_DITU_TILE_TOPO,
+                zIndex: 0,
+                maxZoom: 23,
+                minZoom: 3
+            });
+            mapInstance.addTileLayer(mapWmtsLayer);
+            mapInstance.setMaxZoom(15);
+            mapInstance.setMapStyleV2(bdMapStyleForSatellite);
+        } else {
+            mapInstance.setMaxZoom(23);
+            mapInstance.setMapStyleV2(bdMapStyle);
+        }
         
         buildCanalPOI();
     }
@@ -364,13 +391,14 @@
         
         const poiList = getCanalPOIList();
         const iconSize = new BMapGL.Size(90, 30);
-
+        const isSatelliteMap = ($store.getters.mapLayerType === mapLayerType.SATELLITE);
+        
         //再添加
         for(const vx of poiList){
             mapInstance.addOverlay(new BMapGL.Marker(gcj02ToMapPoint(vx.lngLat), {
                 enableClicking: false,
                 title: vx.title,
-                icon: new BMapGL.Icon(publicAssets[!isSatelliteMapType ? vx.iconName1 : vx.iconName2], iconSize, {
+                icon: new BMapGL.Icon(publicAssets[!isSatelliteMap ? vx.iconName1 : vx.iconName2], iconSize, {
                     anchor: new BMapGL.Size(iconSize.width * vx.iconAnchor.x, iconSize.height * vx.iconAnchor.y)
                 }),
                 isPlyhPOI: true
@@ -489,6 +517,15 @@
         buildCanalPOI();
         iwTitle.value = null;
         iwLnglats.value = null;
+    });
+    //更新地图类型，重绘地图
+    watch(() => $store.getters.mapLayerType, function(newVal){
+        switch(newVal){
+            case mapLayerType.MINIMALISM: onToggleMapTopo(false); break;
+            case mapLayerType.TOPOGRAPHIC: onToggleMapTopo(true); break;
+            case mapLayerType.SATELLITE: onToggleMapType(true); break;
+            default: onToggleMapType(false); break;
+        }
     });
     
     //用户发布啦新帖子！重新加载数据并更新视图！

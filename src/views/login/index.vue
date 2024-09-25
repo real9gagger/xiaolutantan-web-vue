@@ -95,7 +95,7 @@
         if(phoneNumber.value.length !== pnMaxLength){
             return !appToast("请填写手机号码");
         } else {
-            return !appToast("功能未开放，暂不可用");
+            return !appToast("服务器错误"); //2024年9月25日 功能未开放，暂不可用
         }
         
         if(waitSeconds.value > 0){
