@@ -471,19 +471,25 @@
             }
             
             let isSetZ = false;
+            let nth = 1;
+            
+            //经纬度越高（越往北），层级越小
+            res1.sort(function(v1, v2){
+                return (v1.latitude > v2.latitude ? -1 : 1);
+            });
             
             for(const item of res1){
                 if(item.status === 1 && item.pictureList?.length){//有效和有图片的才显示
                     const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
                         point: gcj02ToMapPoint([item.longitude, item.latitude]),
                         properties: item,
-                        zIndex: 99,
+                        zIndex: nth++,
                     });
                     mapInstance.addOverlay(customOverlay);
                     customOverlay._config = { isSharePicture: true };
                     customOverlay.addEventListener("click", onSharePictureClicked);
                     
-                    //2024年9月5日 处理由于Z层级太低，导致偶尔无法点击照片气泡的问题
+                    //2024年9月5日 处理由于父元素Z层级太低，导致偶尔无法点击照片气泡的问题
                     if(!isSetZ){
                         isSetZ = true;
                         $(customOverlay.domElement).parent().css("z-index", 8888);
