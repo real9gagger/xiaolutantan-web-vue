@@ -497,8 +497,8 @@ if(function_exists('getallheaders')){
         ajax_error('登录已超时');
     }
 } else {
-    $origin = $_SERVER['HTTP_ORIGIN'];
-    if($origin !== 'https://www.iouiou.com'){
+    $origin = $_SERVER['HTTP_HOST'];
+    if($origin !== 'www.iouiou.com'){
         ajax_error('您无权访问');
     }
 }
