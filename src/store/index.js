@@ -31,6 +31,8 @@ const myGetters = {
     pickUserNickName: (state) => state.moduleSettings.pickUserNickName,
     pickUserAvatarUrl: (state) => state.moduleSettings.pickUserAvatarUrl,
     
+    pickPictureSourceUrl: (state) => state.moduleSettings.pickPictureSourceUrl,
+    
     thereAreNewPostsTs:  (state) => state.moduleSettings.thereAreNewPostsTs,
     
     isUserLogined: (state) => !!state.userInfo.authToken,

@@ -72,6 +72,11 @@
     const popupTitle = ref("");
     const popupButtons = reactive([
         {
+            name: "转到照片来源",
+            key: 0x100,
+            hidden: false
+        },
+        {
             name: "仅自己可见",
             key: 0x007,
             hidden: false
@@ -193,7 +198,7 @@
                 break;
             case 0x009: 
                 alertConfirm("删除帖子", "删除", true).then(() => {
-                    ajaxRequest("deleteMyPost", { 
+                    ajaxRequest("deleteMyPost", {
                         postId: nonRVs.selectItemID,
                         deleteTs: Date.now()
                     }).then(() => {
@@ -201,6 +206,9 @@
                         appToast("已删除");
                     });
                 });
+                break;
+            case 0x100:
+                window.open(postList[activeIndex.value].pictureSourceUrl, "_blank");
                 break;
         }
     }

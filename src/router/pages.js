@@ -146,6 +146,15 @@ export default [
         }
     },
     {
+    	path: "/picturesourceurl",
+    	name: "照片源网址",
+    	component: () => import("@/views/mine/sourceUrlInputer"),
+    	meta: {
+            showPageTitle: true,
+            loginRequired: true
+        }
+    },
+    {
     	path: "/aboutcanal",
     	name: "关于平陆运河",
     	component: () => import("@/views/help/aboutCanal"),

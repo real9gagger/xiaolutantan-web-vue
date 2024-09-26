@@ -71,6 +71,7 @@ const AssetsPathMap = {
     iconFullScreen: "icons/full_screen.png",
     iconFullScreenExit: "icons/full_screen_exit.png",
     iconPanoramicView: "icons/panoramic_view.png",
+    iconPictureSourceUrl: "icons/picture_source_url.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

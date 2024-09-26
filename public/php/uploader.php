@@ -271,7 +271,8 @@ function save_share_pics(){
         !$posts['longitude'] ||
         !$posts['latitude'] || 
         !$posts['locationAddress'] ||
-        !$posts['pictureList']){
+        !$posts['pictureList'] ||
+        !$posts['pictureSourceUrl']){
         ajax_error('保存失败，数据不全');
     }
     
@@ -289,6 +290,7 @@ function save_share_pics(){
         'coordinateSystem'  => 'BD09', //经纬度坐标系系统类型：BD09、GCJ02、WGS84
         'locationAddress'   => $posts['locationAddress'],
         'pictureList'       => $posts['pictureList'],
+        'pictureSourceUrl'  => $posts['pictureSourceUrl'],
         'status'            => 1, //1-有效，0-失效
         'likesCount'        => 0, //点赞数量
         'commentCount'      => 0, //评论数量
@@ -489,13 +491,19 @@ function get_post_by_id(){
     }
 }
 
-//调用函数
-$headers = getallheaders();
-
-if($headers['Authorization'] !== 'Bearer Xltt-Token'){
-    ajax_error('登录已超时');
+if(function_exists('getallheaders')){
+    $headers = getallheaders();
+    if($headers['Authorization'] !== 'Bearer Xltt-Token'){
+        ajax_error('登录已超时');
+    }
+} else {
+    $origin = $_SERVER['HTTP_ORIGIN'];
+    if($origin !== 'https://www.iouiou.com'){
+        ajax_error('您无权访问');
+    }
 }
 
+//可调用的函数
 $api_actions = [
     'upload_picture',
     'save_share_pics',

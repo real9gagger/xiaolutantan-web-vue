@@ -11,6 +11,7 @@ export default {
             pickPlaceLatitude: 0, //选取的地点的纬度
             pickUserNickName: "", //选取的发布用户昵称
             pickUserAvatarUrl: "", //选取的发布用户头像链接
+            pickPictureSourceUrl: "", //输入的图片来源网址
             
             thereAreNewPostsTs: 0, //有新帖子发布的时间戳（time stamp）！
     	}
@@ -47,6 +48,13 @@ export default {
                 state.pickUserAvatarUrl = "";
             }
         },
+        SET_PICK_PICTURE_SOURCE(state, payload){
+            if(payload && payload.pictureSourceUrl){
+                state.pickPictureSourceUrl = payload.pictureSourceUrl;
+            } else {
+                state.pickPictureSourceUrl = "";
+            }
+        },
         SET_THERE_ARE_NEW_POSTS(state, payload){
             //有新帖子发布啦，则更新一个时间戳，用于刷新界面！
             state.thereAreNewPostsTs = (payload ? Date.now() : 0);
@@ -67,6 +75,9 @@ export default {
         },
         setPickUserInfo({ commit }, payload){
             commit("SET_PICK_USER_INFO", payload);
+        },
+        setPickPictureSource({ commit }, payload){
+            commit("SET_PICK_PICTURE_SOURCE", payload);
         },
         setThereAreNewPosts({ commit }, payload){
             commit("SET_THERE_ARE_NEW_POSTS", payload);

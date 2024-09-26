@@ -43,13 +43,15 @@ export const donateWords = "您的捐款将帮助我们持续改善和发展";
 export const contactEmail = "3259833818@qq.com";
 
 //全景图片列表（2024年9月19日：目前无数据库，暂时写死，后面如果有新的全景图，需要手工添加）
+//可去 https://www.720yun.com 搜索关于 “平陆运河” 的全景图
 export const panoList = [
     {
         id: 0x11,
         thumbPath: "panoramic/panos/pingtang_estuary_720_tiles/thumb.jpg",
         scenesXml: "panoramic/scenes/pingtang_estuary_720.xml",
         title: "平塘江口",
-        captureTime: "2022年9月9日",
+        captureTime: "2022/9/9",
+        sourceUrl: "https://www.720yun.com/t/f2vk6edy5rm?scene_id=99822377",
         lnglat: [109.073873, 22.642090]
     },
     {
@@ -57,7 +59,8 @@ export const panoList = [
         thumbPath: "panoramic/panos/madao_hinge_720_tiles/thumb.jpg",
         scenesXml: "panoramic/scenes/madao_hinge_720.xml",
         title: "马道枢纽",
-        captureTime: "2022年9月18日",
+        captureTime: "2022/9/18",
+        sourceUrl: "https://www.720yun.com/t/e6vk6edyp8q?scene_id=99822487",
         lnglat: [108.944385, 22.378856]
     },
     {
@@ -65,7 +68,8 @@ export const panoList = [
         thumbPath: "panoramic/panos/qishi_hinge_720_tiles/thumb.jpg",
         scenesXml: "panoramic/scenes/qishi_hinge_720.xml",
         title: "企石枢纽",
-        captureTime: "2022年9月19日",
+        captureTime: "2022/9/19",
+        sourceUrl: "https://www.720yun.com/t/34vk6edyp7y?scene_id=99822525",
         lnglat: [108.942663, 22.322861]
     },
     {
@@ -73,7 +77,8 @@ export const panoList = [
         thumbPath: "panoramic/panos/qingnian_hinge_720_tiles/thumb.jpg",
         scenesXml: "panoramic/scenes/qingnian_hinge_720.xml",
         title: "青年枢纽",
-        captureTime: "2022年9月20日",
+        captureTime: "2022/9/20",
+        sourceUrl: "https://www.720yun.com/t/03vk6edyp77?scene_id=99822534",
         lnglat: [108.654629, 22.005420]
     },
     {
@@ -81,7 +86,17 @@ export const panoList = [
         thumbPath: "panoramic/panos/shajing_estuary_720_tiles/thumb.jpg",
         scenesXml: "panoramic/scenes/shajing_estuary_720.xml",
         title: "沙井入海口",
-        captureTime: "2022年9月27日",
+        captureTime: "2022/9/27",
+        sourceUrl: "https://www.720yun.com/t/81vk6edypp9?scene_id=99822570",
         lnglat: [108.609076, 21.854558]
+    },
+    {
+        id: 0x66,
+        thumbPath: "panoramic/panos/qinzhou_port_360_tiles/thumb.jpg",
+        scenesXml: "panoramic/scenes/qinzhou_port_360.xml",
+        title: "钦州港",
+        captureTime: "2022/9/28",
+        sourceUrl: "https://www.720yun.com/t/1bvk67d7pqq?scene_id=104973495",
+        lnglat: [108.591074, 21.739349]
     }
 ];

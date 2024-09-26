@@ -29,6 +29,14 @@
                 </template>
                 <img :src="publicAssets.iconArrowRight" class="wh-1em op-6" />
             </div>
+            <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>
+            <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoSourceUrlInputer">
+                <img :src="publicAssets.iconPictureSourceUrl" class="wh-1em" />
+                <span class="mg-lr-rem25 tc-66 fx-g1">照片来源</span>
+                <span v-if="shortSourceUrl" class="ta-r" target="_blank">{{shortSourceUrl}}…</span>
+                <img :src="publicAssets.iconArrowRight" class="wh-1em op-6" />
+            </div>
+            <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>
         </div>
         <div class="fixed-limit-width po-br-0 pd-1rem">
             <button v-if="!isPublishing" type="button" class="btn-box" @click="onPublishes">发 布</button>
@@ -47,7 +55,7 @@
     import pictureUploader from "@/components/pictureUploader.vue";
     import ajaxRequest from "@/request/index.js";
     
-    const MAX_TEXT_LENGTH = 800;
+    const MAX_TEXT_LENGTH = 500;
     
     const $instance = getCurrentInstance();
     const $router = useRouter();
@@ -57,12 +65,23 @@
     const isPublishing = ref(false); //是否正在发布
     const captureAddress = computed(() => $store.getters.pickPlaceAddress);
     const authorName = computed(() => $store.getters.pickUserNickName);
+    const shortSourceUrl = computed(() => {
+        if(!$store.getters.pickPictureSourceUrl){
+            return "";
+        }
+        
+        const idx = $store.getters.pickPictureSourceUrl.indexOf("/", 8);
+        return (idx >= 0 ? $store.getters.pickPictureSourceUrl.substr(0, idx) : $store.getters.pickPictureSourceUrl);
+    });
     
     function gotoAddressPicker(){
         $router.push("/map3dpicker");
     }
     function gotoUserPicker(){
         $router.push("/userpicker");
+    }
+    function gotoSourceUrlInputer(){
+        $router.push("/picturesourceurl");
     }
     function gotoImagePreview(arg0){
         setPageTempData(arg0);
@@ -90,6 +109,9 @@
         if(!authorName.value){
             return !appToast("请选择内容创作者");
         }
+        if(!shortSourceUrl.value){
+            return !appToast("请补充照片来源网址");
+        }
         
         isPublishing.value = true;
         $instance.refs.puBox.startUpload().then(pics => {
@@ -100,6 +122,7 @@
                 "longitude": $store.getters.pickPlaceLongitude,
                 "latitude": $store.getters.pickPlaceLatitude,
                 "locationAddress": captureAddress.value,
+                "pictureSourceUrl": $store.getters.pickPictureSourceUrl,
                 "pictureList": pics
             }).then(res => { 
                 //！！！如果保存成功后页面会自动刷新，那是因为 vue-cli 监听到项目文件有变更，因此刷新页面，正式环境不会有此问题
