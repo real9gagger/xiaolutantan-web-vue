@@ -1,0 +1,19 @@
+﻿<krpano version="1.21" title="全景游览">
+
+	<include url="../skin/vtourskin.xml" />
+
+	<scene name="scene_qingnian_hinge_01" title="夕阳下的青年枢纽" thumburl="../panos/qingnian_hinge_01_tiles/thumb.jpg" lat="22.005420" lng="108.654629" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/qingnian_hinge_01_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/qingnian_hinge_01_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,1664x832,3328x1664,6912x3456,13824x6912,27392x13696" />
+		</image>
+
+	</scene>
+
+</krpano>

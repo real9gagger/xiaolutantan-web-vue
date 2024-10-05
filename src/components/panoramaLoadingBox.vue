@@ -51,7 +51,7 @@
         position: relative;
         width: 5rem;
         height: 5rem;
-        border: 0.2rem solid var(--main-color);
+        border: 0.15rem solid var(--main-color);
         border-radius: 50%;
         animation: plb-panorama-loading-kf 2s linear infinite;
     }
@@ -59,13 +59,13 @@
         content: "";
         display: block;
         position: absolute;
-        left: calc(50% - 0.5rem);
-        top: -0.6rem;
+        left: calc(50% - 0.4rem);
+        top: -0.5rem;
         z-index: 1;
-        width: 1rem;
-        height: 1rem;
+        width: 0.8rem;
+        height: 0.8rem;
         background-color: var(--main-color);
-        border: 0.25rem solid #fff;
+        border: 0.2rem solid #fff;
         border-radius: 50%;
         box-sizing: border-box;
     }

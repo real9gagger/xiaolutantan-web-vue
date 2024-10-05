@@ -46,57 +46,74 @@ export const contactEmail = "3259833818@qq.com";
 //可去 https://www.720yun.com 搜索关于 “平陆运河” 的全景图
 export const panoList = [
     {
-        id: 0x11,
-        thumbPath: "panoramic/panos/pingtang_estuary_720_tiles/thumb.jpg",
-        scenesXml: "panoramic/scenes/pingtang_estuary_720.xml",
-        title: "平塘江口",
-        captureTime: "2022/9/9",
-        sourceUrl: "https://www.720yun.com/t/f2vk6edy5rm?scene_id=99822377",
-        lnglat: [109.073873, 22.642090]
-    },
+        id: 0x80,
+        thumbPaths: ["panoramic/panos/qingnian_hinge_01_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/qingnian_hinge_540.xml",
+        title: "夕阳下的青年枢纽",
+        captureTime: "2023/06/01",
+        sourceUrls: ["https://www.720yun.com/t/5dvk67dwgfm?scene_id=110927179"],
+        lnglat: [108.654629, 22.00542]
+    }, 
     {
-        id: 0x22,
-        thumbPath: "panoramic/panos/madao_hinge_720_tiles/thumb.jpg",
-        scenesXml: "panoramic/scenes/madao_hinge_720.xml",
-        title: "马道枢纽",
-        captureTime: "2022/9/18",
-        sourceUrl: "https://www.720yun.com/t/e6vk6edyp8q?scene_id=99822487",
-        lnglat: [108.944385, 22.378856]
-    },
+        id: 0x70,
+        thumbPaths: ["panoramic/panos/jiuzhou_bridge_01_tiles/thumb.jpg", "panoramic/panos/jiuzhou_bridge_02_tiles/thumb.jpg", "panoramic/panos/jiuzhou_bridge_03_tiles/thumb.jpg", "panoramic/panos/jiuzhou_bridge_04_tiles/thumb.jpg", "panoramic/panos/jiuzhou_bridge_05_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/jiuzhou_bridge_540.xml",
+        title: "旧州特大桥效果图",
+        captureTime: "2022/10/13",
+        sourceUrls: ["https://www.720yun.com/t/a1vkb78wz2m?scene_id=100383660", "https://www.720yun.com/t/44vkbe2qg2b?scene_id=88166436"],
+        lnglat: [108.938894, 22.435287]
+    }, 
     {
-        id: 0x33,
-        thumbPath: "panoramic/panos/qishi_hinge_720_tiles/thumb.jpg",
-        scenesXml: "panoramic/scenes/qishi_hinge_720.xml",
-        title: "企石枢纽",
-        captureTime: "2022/9/19",
-        sourceUrl: "https://www.720yun.com/t/34vk6edyp7y?scene_id=99822525",
-        lnglat: [108.942663, 22.322861]
-    },
-    {
-        id: 0x44,
-        thumbPath: "panoramic/panos/qingnian_hinge_720_tiles/thumb.jpg",
-        scenesXml: "panoramic/scenes/qingnian_hinge_720.xml",
-        title: "青年枢纽",
-        captureTime: "2022/9/20",
-        sourceUrl: "https://www.720yun.com/t/03vk6edyp77?scene_id=99822534",
-        lnglat: [108.654629, 22.005420]
-    },
-    {
-        id: 0x55,
-        thumbPath: "panoramic/panos/shajing_estuary_720_tiles/thumb.jpg",
-        scenesXml: "panoramic/scenes/shajing_estuary_720.xml",
-        title: "沙井入海口",
-        captureTime: "2022/9/27",
-        sourceUrl: "https://www.720yun.com/t/81vk6edypp9?scene_id=99822570",
-        lnglat: [108.609076, 21.854558]
-    },
-    {
-        id: 0x66,
-        thumbPath: "panoramic/panos/qinzhou_port_360_tiles/thumb.jpg",
+        id: 0x60,
+        thumbPaths: ["panoramic/panos/qinzhou_port_360_tiles/thumb.jpg"],
         scenesXml: "panoramic/scenes/qinzhou_port_360.xml",
         title: "钦州港",
         captureTime: "2022/9/28",
-        sourceUrl: "https://www.720yun.com/t/1bvk67d7pqq?scene_id=104973495",
+        sourceUrls: ["https://www.720yun.com/t/1bvk67d7pqq?scene_id=104973495"],
         lnglat: [108.591074, 21.739349]
+    }, 
+    {
+        id: 0x50,
+        thumbPaths: ["panoramic/panos/shajing_estuary_720_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/shajing_estuary_720.xml",
+        title: "沙井入海口",
+        captureTime: "2022/9/27",
+        sourceUrls: ["https://www.720yun.com/t/81vk6edypp9?scene_id=99822570"],
+        lnglat: [108.609076, 21.854558]
+    }, 
+    {
+        id: 0x40,
+        thumbPaths: ["panoramic/panos/qingnian_hinge_720_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/qingnian_hinge_720.xml",
+        title: "开挖前的青年枢纽",
+        captureTime: "2022/9/20",
+        sourceUrls: ["https://www.720yun.com/t/03vk6edyp77?scene_id=99822534"],
+        lnglat: [108.654629, 22.00542]
+    }, {
+        id: 0x30,
+        thumbPaths: ["panoramic/panos/qishi_hinge_720_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/qishi_hinge_720.xml",
+        title: "开挖前的企石枢纽",
+        captureTime: "2022/9/19",
+        sourceUrls: ["https://www.720yun.com/t/34vk6edyp7y?scene_id=99822525"],
+        lnglat: [108.942663, 22.322861]
+    }, 
+    {
+        id: 0x20,
+        thumbPaths: ["panoramic/panos/madao_hinge_720_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/madao_hinge_720.xml",
+        title: "开挖前的马道枢纽",
+        captureTime: "2022/9/18",
+        sourceUrls: ["https://www.720yun.com/t/e6vk6edyp8q?scene_id=99822487"],
+        lnglat: [108.944385, 22.378856]
+    }, 
+    {
+        id: 0x10,
+        thumbPaths: ["panoramic/panos/pingtang_estuary_720_tiles/thumb.jpg"],
+        scenesXml: "panoramic/scenes/pingtang_estuary_720.xml",
+        title: "平塘江口",
+        captureTime: "2022/9/9",
+        sourceUrls: ["https://www.720yun.com/t/f2vk6edy5rm?scene_id=99822377"],
+        lnglat: [109.073873, 22.64209]
     }
 ];

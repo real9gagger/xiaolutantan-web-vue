@@ -6,7 +6,8 @@
                 :key="item.id" 
                 :class="{'actived': currentIndex===index}" 
                 @click.stop="gotoPanoramicView(index)">
-                    <img :src="item.thumbPath" :alt="item.title" class="wi-f" />
+                    <img v-for="pic,nth in item.thumbPaths" :key="nth" :src="pic" :alt="item.title" :class="{'pnl-li-thumbs': nth > 0}" :style="getThumbStyle(nth)" />
+                    <span v-if="item.thumbPaths.length > 1" class="pnl-pic-count" :style="getThumbStyle(item.thumbPaths.length)">+{{item.thumbPaths.length - 1}}</span>
                     <span class="pnl-li-title">{{item.title}} • {{item.captureTime}}</span>
                 </li>
             </ul>
@@ -29,6 +30,16 @@
     
     function clearCurrentIndex(){
         currentIndex.value = -1;
+    }
+    
+    function getThumbStyle(nth){
+        if(!nth){
+            return "width:100%";
+        }
+        
+        const offset = nth * 0.1;
+        
+        return `transform:translate(-${offset}rem,${offset}rem)`;
     }
 </script>
 
@@ -63,10 +74,26 @@
         font-size: 0.6rem;
         color: #fff;
     }
-    /* .pnl-pic-mask1{
-        -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
+    .pnl-li-thumbs{
+        display:block;
+        position:absolute;
+        top:0.25rem;
+        right:0.4rem;
+        z-index:8;
+        width:1.5rem;
+        height:1.5rem;
+        border:0.05rem solid #fff;
     }
-    .pnl-pic-mask2{
-        -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 0) 100%);
-    } */
+    .pnl-pic-count{
+        display:block;
+        position:absolute;
+        top:1.7rem;
+        right:0.3rem;
+        min-width:1.5rem;
+        color:#fff;
+        font-size:0.6rem;
+        text-align:center;
+        z-index:8;
+        opacity:0.6;
+    }
 </style>

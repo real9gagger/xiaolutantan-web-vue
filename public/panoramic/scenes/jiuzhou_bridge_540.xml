@@ -1,0 +1,74 @@
+﻿<krpano version="1.21" title="全景游览">
+	<include url="../skin/vtourskin.xml" />
+	
+	<scene name="scene_jiuzhou_bridge_01" title="旧州特大桥厂房效果图" thumburl="../panos/jiuzhou_bridge_01_tiles/thumb.jpg" lat="22.435287" lng="108.938894" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/jiuzhou_bridge_01_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/jiuzhou_bridge_01_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,2048x1024,3840x1920,7808x3904" />
+		</image>
+
+	</scene>
+
+	<scene name="scene_jiuzhou_bridge_02" title="旧州特大桥地面效果图" thumburl="../panos/jiuzhou_bridge_02_tiles/thumb.jpg" lat="22.435287" lng="108.938894" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/jiuzhou_bridge_02_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/jiuzhou_bridge_02_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,2048x1024,3840x1920,7808x3904" />
+		</image>
+
+	</scene>
+
+	<scene name="scene_jiuzhou_bridge_03" title="旧州特大桥俯视效果图" thumburl="../panos/jiuzhou_bridge_03_tiles/thumb.jpg" lat="22.435287" lng="108.938894" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/jiuzhou_bridge_03_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/jiuzhou_bridge_03_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,2048x1024,3840x1920,7808x3904" />
+		</image>
+
+	</scene>
+
+	<scene name="scene_jiuzhou_bridge_04" title="旧州特大桥桥面效果图" thumburl="../panos/jiuzhou_bridge_04_tiles/thumb.jpg" lat="22.435287" lng="108.938894" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/jiuzhou_bridge_04_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/jiuzhou_bridge_04_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,2048x1024,3840x1920,7808x3904" />
+		</image>
+
+	</scene>
+
+	<scene name="scene_jiuzhou_bridge_05" title="旧州特大桥新匠坊效果图" thumburl="../panos/jiuzhou_bridge_05_tiles/thumb.jpg" lat="22.435287" lng="108.938894" onstart="" alt="" heading="">
+		
+		<control bouncinglimits="calc:image.cube ? true : false" />
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="../panos/jiuzhou_bridge_05_tiles/preview.jpg" />
+
+		<image>
+			<sphere url="../panos/jiuzhou_bridge_05_tiles/l%l/%0v/l%l_%0v_%0h.jpg" multires="512,2048x1024,3840x1920,7808x3904" />
+		</image>
+
+	</scene>
+
+</krpano>
