@@ -27,7 +27,7 @@ function get_new_name($old_name){
     }
     
     $file_ext = strtolower(substr($old_name, $dot_pos));
-    if(!preg_match("/^\.(jpg|jpeg|png|bmp|gif)$/", $file_ext)){
+    if(!preg_match("/^\.(jpg|jpeg|png|bmp|gif|webp)$/", $file_ext)){
         return null;
     }
     
@@ -233,6 +233,13 @@ function upload_picture(){
             $src_pic = imagecreatefrombmp($root_dir.$path_original.$new_name);
             $img_resized = imagescale($src_pic, $thumbnail_width, $thumbnail_height);
             imagebmp($img_resized, $root_dir.$path_thumbnail.$new_name);
+            break;
+        case IMAGETYPE_WEBP:
+            $src_pic = imagecreatefromwebp($root_dir.$path_original.$new_name);
+            $img_resized = imagescale($src_pic, $thumbnail_width, $thumbnail_height);
+            //$img_resized = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
+            //imagecopyresampled($img_resized, $src_pic, 0, 0, 0, 0, $thumbnail_width, $thumbnail_height, $image_info[0], $image_info[1]);
+            imagewebp($img_resized, $root_dir.$path_thumbnail.$new_name);
             break;
     }
     

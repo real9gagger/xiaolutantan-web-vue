@@ -41,7 +41,7 @@
     import publicAssets from "@/assets/data/publicAssets.js";
     import progressCircle from "./progressCircle.vue";
     
-    const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF"; //可接受的图片类型
+    const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF,.WEBP"; //可接受的图片类型
     const VIDEO_ACCEPT_TYPE = ".MP4"; //可接受的视频类型
     const PIC_WIDTH_AND_MARGIN = (5.25 * window.pxOf1rem); /* （宽度加上外边距）乘以（1rem有多少像素） */
     
@@ -49,7 +49,7 @@
     const emits = defineEmits(["pictap"]);
     const uploadFileList = reactive([]); //待上传的图片信息
     const dragTransXY = reactive([0, 0]);//第〇、一索引用来保存当前位置
-    const chooseType = ref(0x9); //0x9 - 图片，0x1 - 视频。（值表示最多可以上传的文件数量！）
+    const chooseType = ref(0xF); //0xF - 图片，0x1 - 视频。（值表示最多可以上传的文件数量！）
     const dragIndex = ref(-1); //当前拖动的图像的索引
     const insertIndex = ref(-1); //图像插入的位置对应的索引
     const isReleaseHand = ref(false); //是否是松开手
@@ -216,7 +216,7 @@
     }
     
     function onChoosePictures(){
-        chooseType.value = 0x9;
+        chooseType.value = 0xF;
         $instance.refs.inputFileBox.click();
     }
     function onChooseChange(evt){
@@ -226,8 +226,8 @@
         const maxIndex = chooseType.value - 1; //允许的最大索引
         for(const file of evt.target.files){
             if(uploadFileList.length > maxIndex){
-                //appToast("最多 9 张图片");
-                break; //最多 9 张图片
+                //appToast(`最多上传数量：${maxIndex}`);
+                break;
             }
             if(file.size > maxFileSize){
                 appToast("部分文件大小超过16M，已忽略");
