@@ -13,8 +13,10 @@
             @gotoaccount="onGotoMyAccount"
             @togglecallout="buildSharePicture"
         />
-        <map3d-tools-popup v-model="isShowMapTools" />
-        <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="OnMapPlacePins" />
+        <map3d-tools-popup 
+            v-model="isShowMapTools"
+            @measuredistance="onMeasureDistance" />
+        <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="onMapPlacePins" />
         <map3d-share-picture-callout ref="mspcBox" />
         <page-share-panel v-model="isShowSharePanel" />
     </div>
@@ -217,7 +219,7 @@
             iwTitle.value = theItem.properties.name;
             iwLnglats.value = getLnglatViewPort(theItem.geometry.coordinates[0]);
             mapIgnoreClicked = true;
-            needDebounce(resetSomeData, 100);
+            needDebounce(onResetSomeData, 100);
         }
     }
     
@@ -226,7 +228,7 @@
         const dat = evt.target.properties;
         
         mapIgnoreClicked = true;
-        needDebounce(resetSomeData, 100);
+        needDebounce(onResetSomeData, 100);
         
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos_" + dat.id, dat);
@@ -237,17 +239,26 @@
     }
     
     //重置一些数据
-    function resetSomeData(){
+    function onResetSomeData(){
         mapIgnoreClicked = false;
+        isShowMapTools.value = false;
     }
     
     //定位到某个地点获取某个地区
-    function OnMapPlacePins(arg){
+    function onMapPlacePins(arg){
         if(arg.length === 1){
             mapInstance.flyTo(arg[0], 17);
         } else if(arg.length >= 2){//缩放视野到对应的周边区域
             mapInstance.setViewport(arg.map(gcj02ToMapPoint));
         }
+    }
+    
+    //开始测量距离
+    function onMeasureDistance(){
+        //参见：https://lbsyun.baidu.com/jsdemo.htm#gl_tool_1
+        //源码：http://mapopen.bj.bcebos.com/github/BMapGLLib/DistanceTool/src/DistanceTool.js
+        const myTool = new BMapGLLib.DistanceTool(mapInstance);
+        myTool.open();
     }
     
     //创建百度地图

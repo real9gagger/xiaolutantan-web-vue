@@ -1,19 +1,19 @@
 <template>
     <transition name="mtp-show-out">
         <ul v-if="isVisible" class="fx-r fx-wp mtp-box-container">
-            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onClose">
+            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onMeasureDistance">
                 <img :src="publicAssets.svgMapRuler" class="mtp-li-pic" />
                 <span class="fs-rem6 tc-66">测距</span>
             </li>
-            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onClose">
+            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onMeasureArea">
                 <img :src="publicAssets.svgMeasureArea" class="mtp-li-pic" />
                 <span class="fs-rem6 tc-66">测量面积</span>
             </li>
-            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onClose">
+            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onAddMarker">
                 <img :src="publicAssets.svgAddMarker" class="mtp-li-pic" />
                 <span class="fs-rem6 tc-66">标记</span>
             </li>
-            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onClose">
+            <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onClearAll">
                 <img :src="publicAssets.svgClearAll" class="mtp-li-pic" />
                 <span class="fs-rem6 tc-66">清空</span>
             </li>
@@ -23,16 +23,36 @@
 </template>
 
 <script setup name="Map3DToolsPopup">
-    import { defineProps, defineModel, ref, getCurrentInstance, nextTick } from "vue";
+    import { defineModel, defineEmits } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
+    
+    const emits = defineEmits([
+        "measuredistance", 
+        "measurearea", 
+        "addmarker", 
+        "clearall"
+    ]);
     
     const isVisible = defineModel({
         type: Boolean,
         default: false
     });
     
-    function onClose(){
+    function onMeasureDistance(){
         isVisible.value = false;
+        emits("measuredistance", true);
+    }
+    function onMeasureArea(){
+        isVisible.value = false;
+        emits("measurearea", true);
+    }
+    function onAddMarker(){
+        isVisible.value = false;
+        emits("addmarker", true);
+    }
+    function onClearAll(){
+        isVisible.value = false;
+        emits("clearall", true);
     }
 </script>
 
