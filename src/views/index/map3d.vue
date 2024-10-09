@@ -15,7 +15,11 @@
         />
         <map3d-tools-popup 
             v-model="isShowMapTools"
-            @measuredistance="onMeasureDistance" />
+            @measuredistance="onMeasureDistance"
+            @measurearea="onMeasureArea"
+            @addmarker="onAddMarker"
+            @clearall="onClearAllToolContent"
+        />
         <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="onMapPlacePins" />
         <map3d-share-picture-callout ref="mspcBox" />
         <page-share-panel v-model="isShowSharePanel" />
@@ -30,7 +34,8 @@
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort } from "@/utils/maphelper.js";
     import { administrativeRegion, canalDisplayMode, mapLayerType, appMainColor } from "@/assets/data/constants.js";
     import { needDebounce } from "@/utils/cocohelper.js";
-    
+    import { DrawScene, DistanceMeasure, AreaMeasure } from "bmap-draw";
+
     import axios from "axios";
     import ajaxRequest from "@/request/index.js";
     import myStorage from "@/utils/mystorage.js";
@@ -51,6 +56,9 @@
     let mapAreaLayer = null; //地图周边城市图层
     let mapActivitingCallout = null; //当前被点击的气泡
     let mapIgnoreClicked = false; //是否忽略地图点击
+    let mapDrawScene = null; //地图绘制场景
+    let mapDistanceTool = null; //地图测距工具
+    let mapAreaTool = null; //地图测量面积工具
     
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
@@ -196,7 +204,6 @@
     //监听地图点击
     function onMapClicked(evt){
         //如果仅仅只是点击我的位置标记，则不隐藏
-        //console.log(evt);
         if(!mapIgnoreClicked){
             if(!evt.overlay){
                 iwTitle.value = null;
@@ -257,8 +264,73 @@
     function onMeasureDistance(){
         //参见：https://lbsyun.baidu.com/jsdemo.htm#gl_tool_1
         //源码：http://mapopen.bj.bcebos.com/github/BMapGLLib/DistanceTool/src/DistanceTool.js
-        const myTool = new BMapGLLib.DistanceTool(mapInstance);
-        myTool.open();
+        /* 2024年10月9日，旧的测量方式，弃用。
+            const myTool = new BMapGLLib.DistanceTool(mapInstance);
+            myTool.open(); 
+        */
+        
+        //2024年10月9日，新测量方式。
+        //示例参见：https://lbsyun.baidu.com/bmap-draw/example/measure/measure-line
+        //开发文档：https://lbsyun.baidu.com/bmap-draw/guide
+        if(!mapDrawScene){
+            mapDrawScene = new DrawScene(mapInstance);
+        }
+        
+        if(!mapDistanceTool){
+            mapDistanceTool = new DistanceMeasure(mapDrawScene, {
+                isSeries: false // 不连续测量
+            });
+            
+            mapDistanceTool.addEventListener("measure-length-end", function(evt){
+                mapDistanceTool.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+            });
+        }
+        
+        mapDistanceTool.open();
+    }
+    
+    //测量面积
+    function onMeasureArea(){
+        //开发文档：https://lbsyun.baidu.com/bmap-draw/guide/measure/measure-area
+        if(!mapDrawScene){
+            mapDrawScene = new DrawScene(mapInstance);
+        }
+        
+        if(!mapAreaTool){
+            mapAreaTool = new AreaMeasure(mapDrawScene, {
+                isSeries: false,
+                baseOpts: {
+                    strokeColor: "#f00",
+                    strokeWeight: 2,
+                    fillColor: "#f00",
+                    fillOpacity: 0.1
+                }
+            });
+            
+            mapAreaTool.addEventListener("measure-area-end", function(evt){
+                mapAreaTool.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+            });
+        }
+        
+        mapAreaTool.open();
+    }
+    
+    //添加标记点
+    function onAddMarker(){
+        
+    }
+    
+    //清除地图工具绘制的所有内容
+    function onClearAllToolContent(){
+        const olList = mapInstance.getOverlays();
+        const clickEvt = new Event("onclick");
+        
+        //由于原插件不提供清除所绘制的内容的方式，因此使用黑客的妙招删除覆盖物。
+        for(let idx = olList.length - 1; idx >= 0; idx--){
+            if(olList[idx]._config?.isDrawToolOverlay){
+                olList[idx].fire(clickEvt); //触发删除按钮的点击事件
+            }
+        }
     }
     
     //创建百度地图
@@ -523,11 +595,11 @@
     //删除具有某个标识的一组覆盖物
     function clearMapOverlays(groupKey){
         const olList = mapInstance.getOverlays();
-        
+
         //倒序遍历
         for(let idx = olList.length - 1; idx >= 0; idx--){
-            if(olList[idx]._config[groupKey]){
-               mapInstance.removeOverlay(olList[idx]);
+            if(olList[idx]._config && olList[idx]._config[groupKey]){
+                mapInstance.removeOverlay(olList[idx]);
             }
         }
     }
@@ -554,7 +626,6 @@
             default: onToggleMapType(false); break;
         }
     });
-    
     //用户发布啦新帖子！重新加载数据并更新视图！
     watch(() => $store.getters.thereAreNewPostsTs, buildSharePicture);
     
@@ -583,6 +654,9 @@
         mapWmtsLayer = null;
         mapAreaLayer = null;
         mapActivitingCallout = null;
+        mapDrawScene = null;
+        mapDistanceTool = null;
+        mapAreaTool = null;
     });
 </script>
 
