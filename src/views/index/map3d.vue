@@ -5,6 +5,7 @@
         <map3d-control-vertical
             @onshare="onClickShare"
             @onaboutcanal="onGotoAboutCanal"
+            @showtools="onShowTools"
             @positionlocation="onPositionSuccess"
             @restoreperspective="onRestorePerspective"
             @toggleregion="onShowOrHideRegion"
@@ -12,6 +13,7 @@
             @gotoaccount="onGotoMyAccount"
             @togglecallout="buildSharePicture"
         />
+        <map3d-tools-popup v-model="isShowMapTools" />
         <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="OnMapPlacePins" />
         <map3d-share-picture-callout ref="mspcBox" />
         <page-share-panel v-model="isShowSharePanel" />
@@ -33,6 +35,7 @@
     import map3dControlVertical from "@/components/map3dControlVertical.vue";
     import map3dInfoWindow from "@/components/map3dInfoWindow.vue";
     import map3dSharePictureCallout from "@/components/map3dSharePictureCallout.vue";
+    import map3dToolsPopup from "@/components/map3dToolsPopup.vue";
     import pageSharePanel from "@/components/pageSharePanel.vue";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
@@ -66,6 +69,7 @@
     const iwTitle = ref("");
     const zlBoxWidth = ref(0);
     const isShowSharePanel = ref(false);
+    const isShowMapTools = ref(false);
     
     //点击了分享
     function onClickShare(){
@@ -75,6 +79,11 @@
     //转到运河简介
     function onGotoAboutCanal(){
         $router.push("/aboutcanal");
+    }
+    
+    //显示地图工具栏
+    function onShowTools(){
+        isShowMapTools.value = !isShowMapTools.value;
     }
     
     //还原默认视图
@@ -198,6 +207,7 @@
             //点击地图其他地方时重置！！！
             mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(mapActivitingCallout, false);
         }
+        isShowMapTools.value = false;
     }
     
     //点击运河周边区域时触发事件（该事件执行后会继续支持地图点击事件）

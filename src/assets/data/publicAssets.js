@@ -72,6 +72,7 @@ const AssetsPathMap = {
     iconFullScreenExit: "icons/full_screen_exit.png",
     iconPanoramicView: "icons/panoramic_view.png",
     iconPictureSourceUrl: "icons/picture_source_url.png",
+    iconMapTools: "icons/map_tools.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",
@@ -105,6 +106,10 @@ const AssetsPathMap = {
     svgWxCircle: "svgs/wx_circle.svg",
     svgWxFriend: "svgs/wx_friend.svg",
     svgScanQRcode: "svgs/scan_qrcode.svg",
+    svgMapRuler: "svgs/map_ruler.svg",
+    svgMeasureArea: "svgs/measure_area.svg",
+    svgAddMarker: "svgs/add_marker.svg",
+    svgClearAll: "svgs/clear_all.svg",
 };
 
 if(THE_BU){

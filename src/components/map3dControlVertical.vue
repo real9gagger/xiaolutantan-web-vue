@@ -9,6 +9,9 @@
         <div @click="onToggleFullScreen" class="mcv-action-box" title="切换或取消全屏显示">
             <img class="dp-bk wh-f" :src="!isFS ? publicAssets.iconFullScreen : publicAssets.iconFullScreenExit" />
         </div>
+        <div @click="onShowTools" class="mcv-action-box" title="地图工具箱">
+            <img class="dp-bk wh-f" :src="publicAssets.iconMapTools" />
+        </div>
         <div @click="onClickShare" class="mcv-action-box" title="分享此页面">
             <img class="dp-bk wh-f" :class="{'mcv-sharing-ani': isSharing}" :src="publicAssets.iconShareGreen" />
         </div>
@@ -60,6 +63,7 @@
     const emits = defineEmits([
         "onshare",
         "onaboutcanal",
+        "showtools",
         "positionlocation",
         "restoreperspective",
         "togglecallout",
@@ -101,6 +105,10 @@
     
     function onGotoAboutCanal(){
         emits("onaboutcanal", true);
+    }
+    
+    function onShowTools(){
+        emits("showtools", true);
     }
     
     function onToggleFullScreen(){
