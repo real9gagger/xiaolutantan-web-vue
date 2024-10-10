@@ -30,7 +30,8 @@
         "measuredistance", 
         "measurearea", 
         "addmarker", 
-        "clearall"
+        "clearall",
+        "beforechangetool"
     ]);
     
     const isVisible = defineModel({
@@ -40,18 +41,22 @@
     
     function onMeasureDistance(){
         isVisible.value = false;
+        emits("beforechangetool", 0x11);
         emits("measuredistance", true);
     }
     function onMeasureArea(){
         isVisible.value = false;
+        emits("beforechangetool", 0x22);
         emits("measurearea", true);
     }
     function onAddMarker(){
         isVisible.value = false;
+        emits("beforechangetool", 0x33);
         emits("addmarker", true);
     }
     function onClearAll(){
         isVisible.value = false;
+        emits("beforechangetool", 0x00);
         emits("clearall", true);
     }
 </script>

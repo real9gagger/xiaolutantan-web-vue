@@ -159,3 +159,154 @@ export function getFriendlyDistance(p1, p2){
         return ((dis / 1000).toFixed(0) + "km");//大于等于100公里，保留0位小数
     }
 }
+
+//添加地图自定义标记
+export function myMarkerFlag(bdmap){
+    if(!bdmap){
+        return;
+    }
+    
+    let isOpened = false;
+    let eventListeners = {};
+    let defCursor = null;
+    let followLabel = null;
+    let flagNth = 0;
+    let timerID = 0;
+    
+    const ADD_FLAG_EVENT_NAME = "add-marker-flag";
+    
+    const startDrawFlag = function(evt){
+        flagNth++;
+        
+        const lbl = new BMapGL.Label("标记" + flagNth, {
+            offset: new BMapGL.Size(-1, -26)
+        });
+        const mkr = new BMapGL.Marker(evt.latlng, {
+            enableDragging: true,
+            draggingCursor: "move",
+            title: "点击拖动标记"
+        });
+        
+        lbl.setStyle({
+           transform: "translate(-50%, -100%)",
+           padding: "1px 5px",
+           cursor: "text"
+        });
+        mkr.setLabel(lbl);
+        
+        bdmap.addOverlay(mkr);
+        
+        fireEvent(ADD_FLAG_EVENT_NAME, mkr);
+    };
+    
+    const onAdd = function(evt){
+        if(!isOpened || evt.target.id !== "mask"){//不是点击地图覆盖物才可以添加标记
+            return;
+        }
+        
+        clearTimeout(timerID);
+        timerID = setTimeout(startDrawFlag, 300, evt);
+    };
+    
+    const onMove = function(evt){
+        if(!isOpened){
+            return;
+        }
+        
+        if(!followLabel.isVisible()){
+            followLabel.show();
+        }
+        followLabel.setPosition(evt.latlng);
+    };
+    
+    const fireEvent = function(event, args){
+        if(eventListeners[event]?.length){
+            const eeee = {
+                currentTarget: null,
+                returnValue: true,
+                target: args,
+                type: event
+            };
+            for(const listener of eventListeners[event]){
+                listener(eeee);
+            }
+        }
+    };
+    
+    /* ================ 开放的函数 ================ */
+    
+    const onOpen = function(){
+        if(isOpened){
+            return;
+        }
+        
+        defCursor = bdmap.getDefaultCursor();
+        followLabel = new BMapGL.Label("单击添加标记，双击结束", { offset: new BMapGL.Size(5, 5) });
+        followLabel.hide();
+        followLabel.setStyle({
+            backgroundColor: "#fffbcc",
+            border: "1px solid #e1e1e1",
+            padding: "5px",
+            borderRadius: "2px",
+            color: "#703a04"
+        });
+        
+        bdmap.addEventListener("click", onAdd);
+        bdmap.addEventListener("dblclick", onClose);
+        bdmap.addEventListener("mousemove", onMove);
+        bdmap.setDefaultCursor("crosshair");
+        bdmap.disableDoubleClickZoom(); //关闭双击缩小
+        bdmap.addOverlay(followLabel);
+        
+        isOpened = true;
+    };
+    
+    const onClose = function(evt){
+        if(!isOpened){
+            return;
+        }
+        
+        clearTimeout(timerID);
+        
+        if(evt?.domEvent){
+            evt.domEvent.preventDefault();
+            evt.domEvent.stopPropagation();
+            evt.domEvent.stopImmediatePropagation();
+        }
+        
+        bdmap.removeEventListener("click", onAdd);
+        bdmap.removeEventListener("dblclick", onClose);
+        bdmap.removeEventListener("mousemove", onMove);
+        bdmap.setDefaultCursor(defCursor);
+        bdmap.enableDoubleClickZoom(); //开启双击缩小
+        bdmap.removeOverlay(followLabel);
+        
+        followLabel.destroy();
+        followLabel = null;
+        defCursor = null;
+        isOpened = false;
+    };
+    
+    const addEvent = function(event, listener) {
+        if((typeof event === "string") && (typeof listener === "function")){
+            eventListeners[event] = eventListeners[event] || [];
+            eventListeners[event].push(listener);
+        }
+    };
+    
+    const removeEvent = function(event, listener) {
+        if(eventListeners[event]?.length){
+            const idx = eventListeners[event].findIndex(vx => vx===listener);
+            if(idx >= 0){
+                eventListeners[event].splice(idx, 1);
+            }
+        }
+    };
+    
+    this.open = onOpen;
+    this.close = onClose;
+    this.addEventListener = addEvent;
+    this.removeEventListener = removeEvent;
+
+    return this;
+}

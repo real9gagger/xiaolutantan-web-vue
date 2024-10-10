@@ -19,6 +19,7 @@
             @measurearea="onMeasureArea"
             @addmarker="onAddMarker"
             @clearall="onClearAllToolContent"
+            @beforechangetool="onBeforeChangeTool"
         />
         <map3d-info-window :lnglats="iwLnglats" :title="iwTitle" @placepins="onMapPlacePins" />
         <map3d-share-picture-callout ref="mspcBox" />
@@ -31,10 +32,10 @@
     import { useStore } from "vuex";
     import { useRouter } from "vue-router";
     import { getUpperSectionLength, combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
-    import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort } from "@/utils/maphelper.js";
+    import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort, myMarkerFlag } from "@/utils/maphelper.js";
     import { administrativeRegion, canalDisplayMode, mapLayerType, appMainColor } from "@/assets/data/constants.js";
     import { needDebounce } from "@/utils/cocohelper.js";
-    import { DrawScene, DistanceMeasure, AreaMeasure } from "bmap-draw";
+    import { DrawScene, DistanceMeasure, AreaMeasure/* , MarkerDraw */ } from "bmap-draw";
 
     import axios from "axios";
     import ajaxRequest from "@/request/index.js";
@@ -59,6 +60,7 @@
     let mapDrawScene = null; //地图绘制场景
     let mapDistanceTool = null; //地图测距工具
     let mapAreaTool = null; //地图测量面积工具
+    let mapMarkerTool = null; //地图添加标记工具
     
     //切换到天地图卫星图层。投影方式默认 EPSG:900913（又称 EPSG:3857）
     const TIAN_DITU_TILE_URL = "https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX=[z]&TILEROW=[y]&TILECOL=[x]&tk=acd52d38214fe26fb2d0149f3ca5e19b";
@@ -317,7 +319,30 @@
     
     //添加标记点
     function onAddMarker(){
+        /* 官方的添加点的功能太辣鸡，弃用
+        if(!mapDrawScene){
+            mapDrawScene = new DrawScene(mapInstance);
+        }
         
+        if(!mapMarkerTool){
+            mapMarkerTool = new MarkerDraw(mapDrawScene, {
+                isOpen: true,
+                isSeries: true,
+                enableDragging: true,
+                baseOpts: {}
+            });
+        } */
+        
+        if(!mapMarkerTool){
+            mapMarkerTool = new myMarkerFlag(mapInstance);
+            
+            mapMarkerTool.addEventListener("add-marker-flag", function(evt){
+                console.log(evt)
+                evt.target._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+            });
+        }
+        
+        mapMarkerTool.open();
     }
     
     //清除地图工具绘制的所有内容
@@ -330,6 +355,23 @@
             if(olList[idx]._config?.isDrawToolOverlay){
                 olList[idx].fire(clickEvt); //触发删除按钮的点击事件
             }
+        }
+    }
+    
+    //改变工具之前触发
+    function onBeforeChangeTool(){
+        if(mapDistanceTool?.isBinded){
+            mapDistanceTool.dblclick();
+            mapDistanceTool.close();
+        }
+        
+        if(mapAreaTool?.isBinded){
+            mapAreaTool.dblclick();
+            mapAreaTool.close();
+        }
+        
+        if(mapMarkerTool){
+            mapMarkerTool.close();
         }
     }
     
@@ -657,6 +699,7 @@
         mapDrawScene = null;
         mapDistanceTool = null;
         mapAreaTool = null;
+        mapMarkerTool = null;
     });
 </script>
 
