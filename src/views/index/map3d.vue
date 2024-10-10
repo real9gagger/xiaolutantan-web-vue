@@ -35,6 +35,7 @@
     import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort, myMarkerFlag } from "@/utils/maphelper.js";
     import { administrativeRegion, canalDisplayMode, mapLayerType, appMainColor } from "@/assets/data/constants.js";
     import { needDebounce } from "@/utils/cocohelper.js";
+    import { setPageTempData } from "@/utils/pagehelper.js";
     import { DrawScene, DistanceMeasure, AreaMeasure/* , MarkerDraw */ } from "bmap-draw";
 
     import axios from "axios";
@@ -284,7 +285,8 @@
             });
             
             mapDistanceTool.addEventListener("measure-length-end", function(evt){
-                mapDistanceTool.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+                //这个 this 指向 mapDistanceTool
+                this.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
             });
         }
         
@@ -310,7 +312,8 @@
             });
             
             mapAreaTool.addEventListener("measure-area-end", function(evt){
-                mapAreaTool.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+                //这个 this 指向 mapAreaTool
+                this.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
             });
         }
         
@@ -337,8 +340,14 @@
             mapMarkerTool = new myMarkerFlag(mapInstance);
             
             mapMarkerTool.addEventListener("add-marker-flag", function(evt){
-                console.log(evt)
                 evt.target._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+            });
+            mapMarkerTool.addEventListener("click-marker-flag", function(evt){
+                console.log(evt);
+            });
+            mapMarkerTool.addEventListener("click-label-text", function(evt){
+                setPageTempData(evt.target);
+                $router.push("/labeltextinputer?lbid=" + evt.target._config.labelID);
             });
         }
         
@@ -359,7 +368,7 @@
     }
     
     //改变工具之前触发
-    function onBeforeChangeTool(){
+    function onBeforeChangeTool(code){
         if(mapDistanceTool?.isBinded){
             mapDistanceTool.dblclick();
             mapDistanceTool.close();
@@ -371,7 +380,7 @@
         }
         
         if(mapMarkerTool){
-            mapMarkerTool.close();
+            mapMarkerTool.close(!code);
         }
     }
     

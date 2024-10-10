@@ -95,6 +95,14 @@ export default [
         }
     },
     {
+    	path: "/labeltextinputer",
+    	name: "修改标记标题",
+    	component: () => import("@/views/index/map3dLabelTextInputer"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/login",
     	name: "用户登录",
     	component: () => import("@/views/login/index"),

@@ -1,6 +1,7 @@
 <template>
     <transition name="mtp-show-out">
         <ul v-if="isVisible" class="fx-r fx-wp mtp-box-container">
+            <li class="wi-f fs-rem6 mg-b-rem5 ta-c tc-66">双击地图可停用绘制工具</li>
             <li class="fx-vm wh-3rem hv-f0 br-rem5 cs-p" @click="onMeasureDistance">
                 <img :src="publicAssets.svgMapRuler" class="mtp-li-pic" />
                 <span class="fs-rem6 tc-66">测距</span>
@@ -67,7 +68,7 @@
         right: 3.5rem;
         top: calc(100% - 23.3rem);
         z-index: 4444;
-        max-width: 600px;
+        max-width: 13rem;
         background-color: #fff;
         padding: 0.5rem;
         border-radius: 0.5rem;

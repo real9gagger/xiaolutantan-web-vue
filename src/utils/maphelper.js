@@ -174,28 +174,56 @@ export function myMarkerFlag(bdmap){
     let timerID = 0;
     
     const ADD_FLAG_EVENT_NAME = "add-marker-flag";
+    const CLICK_FLAG_EVENT_NAME = "click-marker-flag";
+    const CLICK_LABEL_EVENT_NAME = "click-label-text";
     
     const startDrawFlag = function(evt){
         flagNth++;
         
-        const lbl = new BMapGL.Label("标记" + flagNth, {
-            offset: new BMapGL.Size(-1, -26)
+        const lbl = new BMapGL.Label(`<span style="margin-right:5px" title="点击可编辑文本">标记${flagNth}</span><img alt="移除" title="移除" src="images/marker_close_btn.gif" style="cursor:pointer;width:12px;height:12px" />`, {
+            offset: new BMapGL.Size(-1, -26),
+            enableMassClear: true,
+            labelID: flagNth
         });
         const mkr = new BMapGL.Marker(evt.latlng, {
             enableDragging: true,
             draggingCursor: "move",
-            title: "点击拖动标记"
+            title: "按住可拖动标记"
         });
         
         lbl.setStyle({
-           transform: "translate(-50%, -100%)",
-           padding: "1px 5px",
-           cursor: "text"
+            display: "inline-flex",
+            alignItems: "center",
+            transform: "translate(-50%, -100%)",
+            padding: "1px 5px",
+            cursor: "text"
         });
+        lbl.addEventListener("click", function(exo){
+            if(!exo.domEvent){
+                return;
+            }
+            
+            if(exo.domEvent.target.tagName === "IMG"){
+                exo.target.map.removeOverlay(exo.target);
+                exo.target.map.removeOverlay(exo.target._marker);
+            } else {
+                followLabel?.hide();
+                fireEvent(CLICK_LABEL_EVENT_NAME, exo.target);
+            }
+        });
+        
         mkr.setLabel(lbl);
+        mkr.addEventListener("click", function(exo){
+            //不是点击进来的，则移除标记！
+            if(!exo.target){
+                //这个 this 指向 mkr
+                return !this.map.removeOverlay(this);
+            }
+            
+            fireEvent(CLICK_FLAG_EVENT_NAME, exo.target);
+        });
         
         bdmap.addOverlay(mkr);
-        
         fireEvent(ADD_FLAG_EVENT_NAME, mkr);
     };
     
@@ -205,7 +233,7 @@ export function myMarkerFlag(bdmap){
         }
         
         clearTimeout(timerID);
-        timerID = setTimeout(startDrawFlag, 300, evt);
+        timerID = setTimeout(startDrawFlag, 150, evt);
     };
     
     const onMove = function(evt){
@@ -250,6 +278,7 @@ export function myMarkerFlag(bdmap){
             borderRadius: "2px",
             color: "#703a04"
         });
+        followLabel.setZIndex(8);
         
         bdmap.addEventListener("click", onAdd);
         bdmap.addEventListener("dblclick", onClose);
@@ -285,6 +314,10 @@ export function myMarkerFlag(bdmap){
         followLabel = null;
         defCursor = null;
         isOpened = false;
+        
+        if(evt === true){
+            flagNth = 0;
+        }
     };
     
     const addEvent = function(event, listener) {
