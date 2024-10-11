@@ -32,7 +32,7 @@
     import { useStore } from "vuex";
     import { useRouter } from "vue-router";
     import { getUpperSectionLength, combineCanalGeoJSON, getCanalPOIList } from "@/assets/data/canalGeo.js";
-    import { getPolylineColorList, gcj02ToBD09, gcj02ToMapPoint, getLnglatViewPort, myMarkerFlag } from "@/utils/maphelper.js";
+    import { getPolylineColorList, gcj02ToBD09, bd09ToWGS84, gcj02ToMapPoint, getLnglatViewPort, myMarkerFlag } from "@/utils/maphelper.js";
     import { administrativeRegion, canalDisplayMode, mapLayerType, appMainColor } from "@/assets/data/constants.js";
     import { needDebounce } from "@/utils/cocohelper.js";
     import { setPageTempData } from "@/utils/pagehelper.js";
@@ -343,7 +343,21 @@
                 evt.target._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
             });
             mapMarkerTool.addEventListener("click-marker-flag", function(evt){
-                console.log(evt);
+                const mkr = evt.target;
+                const ttt = mkr.getLabel().domElement.innerText;
+                const lll = bd09ToWGS84(mkr.latLng);
+                const lng8 = mkr.latLng.lng.toFixed(8);
+                const lat8 = mkr.latLng.lat.toFixed(8);
+                
+                iwTitle.value = (`${ttt}，经纬度 ${lng8},${lat8}`);
+                iwLnglats.value = [mkr.latLng];
+                
+                //获取经纬度所在海拔
+                ajaxRequest("getElevationByLatlng", { lng: lll[0], lat: lll[1] }).then(exo => {
+                    if(iwLnglats.value){ //如果弹窗还显示
+                        iwTitle.value = (`${ttt}，经纬度 ${lng8},${lat8}，海拔 ${exo.elevation}m`);
+                    }
+                });
             });
             mapMarkerTool.addEventListener("click-label-text", function(evt){
                 setPageTempData(evt.target);
@@ -701,6 +715,12 @@
         } catch (ex){
             console.log("销毁百度地图出错：", ex);
         }
+        
+        //清理标记工具
+        if(mapMarkerTool){
+            mapMarkerTool.clear();
+        }
+        
         mapInstance = null;
         mapWmtsLayer = null;
         mapAreaLayer = null;

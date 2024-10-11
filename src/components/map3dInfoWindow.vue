@@ -1,9 +1,9 @@
 <template>
     <div v-if="isShowing" class="miw-box-container" :class="{'showup': isAnimating}">
         <div class="miw-box-content">
-            <img class="miw-icon-box" :src="publicAssets.iconCurrentPositionCity" />
+            <img class="miw-icon-box" :src="publicAssets.iconCurrentPositionRed" />
             <span class="miw-text-box">{{title}}</span>
-            <img class="miw-icon-box" @click="onPinBtnTap" :src="publicAssets.iconMapPinFill" />
+            <img class="miw-icon-box cs-p" @click="onPinBtnTap" :src="publicAssets.iconMapPinFill" />
         </div>
     </div>
 </template>

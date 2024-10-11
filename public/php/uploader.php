@@ -498,6 +498,40 @@ function get_post_by_id(){
     }
 }
 
+//根据经纬度获取海拔信息
+function get_elevation_by_latlng(){
+    $lat = floatval($_GET['lat']);
+    $lng = floatval($_GET['lng']);
+    
+    if(!$lat || !$lng){
+        ajax_error('参数错误');
+    }
+    
+    $cHttp = curl_init("https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}");
+    
+    curl_setopt($cHttp, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($cHttp, CURLOPT_TIMEOUT, 15);
+    curl_setopt($cHttp, CURLOPT_HEADER, 0); //不要 http header 加快效率
+    curl_setopt($cHttp, CURLOPT_SSL_VERIFYPEER, FALSE); // https 请求不验证证书和 hosts
+    curl_setopt($cHttp, CURLOPT_SSL_VERIFYHOST, FALSE);
+    
+    $response = curl_exec($cHttp);
+    $errormsg = curl_error($cHttp);
+    
+    curl_close($cHttp);
+    
+    if($errormsg){
+        ajax_error($errormsg);
+    } else {
+        $dat = json_decode($response, true);
+        if(count($dat['results'])){
+            ajax_success($dat['results'][0]);
+        } else {
+            ajax_error('此地点暂无海拔信息');
+        }
+    }
+}
+
 if(function_exists('getallheaders')){
     $headers = getallheaders();
     if($headers['Authorization'] !== 'Bearer Xltt-Token'){
@@ -522,6 +556,7 @@ $api_actions = [
     'get_my_post_list',
     'get_post_by_id',
     'generate_wx_signature',
+    'get_elevation_by_latlng',
 ];
 $call_action = $_GET['action'];
 

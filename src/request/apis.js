@@ -18,4 +18,5 @@ export default {
     getUserPostList: "/xlttapi?__RM__=GET&action=get_user_post_list", //获取用户分享的帖子
     getMyPostList: "/xlttapi?__RM__=GET&action=get_my_post_list", //获取我分享的帖子
     getPostById: "/xlttapi?__RM__=GET&action=get_post_by_id", //根据帖子ID获取帖子信息
+    getElevationByLatlng: "/xlttapi?__RM__=GET&action=get_elevation_by_latlng", //根据经纬度获取海拔信息
 }

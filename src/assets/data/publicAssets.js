@@ -43,6 +43,7 @@ const AssetsPathMap = {
     iconQishiHubWhite: "icons/qishi_hub_white.png",
     iconMyLocation: "icons/my_location.png",
     iconCurrentPositionCity: "icons/current_position_city.png",
+    iconCurrentPositionRed: "icons/current_position_red.png",
     iconMapPinFill: "icons/map_pin_fill.png",
     iconSharePictureMarker: "icons/share_picture_marker.png",
     iconSharePictureActiviting: "icons/share_picture_activiting.png",
@@ -98,6 +99,8 @@ const AssetsPathMap = {
     imageMapTypeNormal: "images/map_type_normal.png",
     imageMapTypeSatellite: "images/map_type_satellite.png",
     imageMapTypeTopographic: "images/map_type_topographic.png",
+    imageMarkerCloseBtn: "images/marker_close_btn.gif",
+    imageMarkerFlagRed: "images/marker_flag_red.png",
     
     //SVG图片
     svgLoadingGif: "svgs/loading_gif.svg",

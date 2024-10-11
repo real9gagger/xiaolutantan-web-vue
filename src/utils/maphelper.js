@@ -13,7 +13,7 @@ function getDistanceBetween(lat1, lng1, lat2, lng2) {
         return -1;
     }
     
-	var EARTH_RADIUS = 2 * 6378137.0; //地球直径，单位：米
+	var EARTH_RADIUS = 2 * 6378245.0; //地球直径，单位：米
 	var radLat1 = (lat1 * Math.PI / 180.0); //角度转成弧度
 	var radLat2 = (lat2 * Math.PI / 180.0);
 	var aaaa = (radLat1 - radLat2) / 2;
@@ -23,6 +23,27 @@ function getDistanceBetween(lat1, lng1, lat2, lng2) {
 	return Math.round(cccc * EARTH_RADIUS);
 }
 
+//转纬度专用，参见：https://www.jianshu.com/p/557153c254b7
+function transformLat(lng, lat) {
+    let ret = 0;
+    ret += (-100.0 + 2.0 * lng + 3.0 * lat + 0.2 * lat * lat + 0.1 * lng * lat + 0.2 * Math.sqrt(Math.abs(lng)));
+    ret += (20.0 * Math.sin(6.0 * lng * Math.PI) + 20.0 * Math.sin(2.0 * lng * Math.PI)) * 2.0 / 3.0;
+    ret += (20.0 * Math.sin(lat * Math.PI) + 40.0 * Math.sin(lat / 3.0 * Math.PI)) * 2.0 / 3.0;
+    ret += (160.0 * Math.sin(lat / 12.0 * Math.PI) + 320 * Math.sin(lat * Math.PI / 30.0)) * 2.0 / 3.0;
+    return ret;
+}
+
+//转经度专用，参见：https://www.jianshu.com/p/557153c254b7
+function transformLng(lng, lat) {
+    let ret = 0;
+    ret += (300.0 + lng + 2.0 * lat + 0.1 * lng * lng + 0.1 * lng * lat + 0.1 * Math.sqrt(Math.abs(lng)));
+    ret += (20.0 * Math.sin(6.0 * lng * Math.PI) + 20.0 * Math.sin(2.0 * lng * Math.PI)) * 2.0 / 3.0;
+    ret += (20.0 * Math.sin(lng * Math.PI) + 40.0 * Math.sin(lng / 3.0 * Math.PI)) * 2.0 / 3.0;
+    ret += (150.0 * Math.sin(lng / 12.0 * Math.PI) + 300.0 * Math.sin(lng / 30.0 * Math.PI)) * 2.0 / 3.0;
+    return ret;
+}
+
+//geojson 转百度坐标系
 export function toBMapPoints(arr){
     if(!arr || !arr.length){
         return [];
@@ -51,6 +72,28 @@ export function gcj02ToBD09(lnglat){
     let tempLng = zz * Math.cos(theta) + 0.0065;
     let tempLat = zz * Math.sin(theta) + 0.0060;
     return [tempLng, tempLat];
+}
+
+//GCJ-02 转 WGS-84，参见：https://www.jianshu.com/p/557153c254b7
+export function gcj02ToWGS84(lnglat){
+    let lng = lnglat[0];
+    let lat = lnglat[1];
+    let eee = 0.00669342162296594323; // 扁率
+    let rrr = 6378245.0; //地球半径
+    let dlat = transformLat(lng - 105.0, lat - 35.0);
+    let dlng = transformLng(lng - 105.0, lat - 35.0);
+    let radlat = lat / 180.0 * Math.PI;
+    let magic = 1- eee * Math.pow(Math.sin(radlat), 2);
+    let sqrtmagic = Math.sqrt(magic);
+    let mglng = lng + (dlng * 180.0) / (rrr / sqrtmagic * Math.cos(radlat) * Math.PI);
+    let mglat = lat + (dlat * 180.0) / ((rrr * (1 - eee)) / (magic * sqrtmagic) * Math.PI);
+    
+    return [lng * 2 - mglng, lat * 2 - mglat];
+}
+
+//BD-09 转 WGS-84，参见：https://www.jianshu.com/p/557153c254b7
+export function bd09ToWGS84(pt){
+    return gcj02ToWGS84(bd09ToGCJ02(pt));
 }
 
 //火星坐标系 (GCJ-02) 转百度地图经纬度点
@@ -179,14 +222,18 @@ export function myMarkerFlag(bdmap){
     
     const startDrawFlag = function(evt){
         flagNth++;
-        
-        const lbl = new BMapGL.Label(`<span style="margin-right:5px" title="点击可编辑文本">标记${flagNth}</span><img alt="移除" title="移除" src="images/marker_close_btn.gif" style="cursor:pointer;width:12px;height:12px" />`, {
+
+        const lbl = new BMapGL.Label(`<span style="margin-right:5px" title="点击可编辑文本">标记${flagNth}</span><img alt="X" title="移除" src="images/marker_close_btn.gif" style="cursor:pointer;width:12px;height:12px" />`, {
             offset: new BMapGL.Size(-1, -26),
             enableMassClear: true,
             labelID: flagNth
         });
+        const ico = new BMapGL.Icon("images/marker_flag_red.png", new BMapGL.Size(25, 25), {
+            anchor: new BMapGL.Size(12, 25)
+        });
         const mkr = new BMapGL.Marker(evt.latlng, {
             enableDragging: true,
+            icon: ico,
             draggingCursor: "move",
             title: "按住可拖动标记"
         });
@@ -195,7 +242,7 @@ export function myMarkerFlag(bdmap){
             display: "inline-flex",
             alignItems: "center",
             transform: "translate(-50%, -100%)",
-            padding: "1px 5px",
+            padding: "2px 5px",
             cursor: "text"
         });
         lbl.addEventListener("click", function(exo){
@@ -228,19 +275,21 @@ export function myMarkerFlag(bdmap){
     };
     
     const onAdd = function(evt){
-        if(!isOpened || evt.target.id !== "mask"){//不是点击地图覆盖物才可以添加标记
+        if(!isOpened){
             return;
         }
         
-        clearTimeout(timerID);
-        timerID = setTimeout(startDrawFlag, 150, evt);
+        if(evt.target.id === "mask"){//点击地图覆盖物才可以添加标记
+            clearTimeout(timerID);
+            timerID = setTimeout(startDrawFlag, 150, evt);
+        }
     };
     
     const onMove = function(evt){
         if(!isOpened){
             return;
         }
-        
+
         if(!followLabel.isVisible()){
             followLabel.show();
         }
@@ -269,7 +318,7 @@ export function myMarkerFlag(bdmap){
         }
         
         defCursor = bdmap.getDefaultCursor();
-        followLabel = new BMapGL.Label("单击添加标记，双击结束", { offset: new BMapGL.Size(5, 5) });
+        followLabel = new BMapGL.Label("单击添加标记，双击结束", { offset: new BMapGL.Size(8, 8) });
         followLabel.hide();
         followLabel.setStyle({
             backgroundColor: "#fffbcc",
@@ -322,24 +371,39 @@ export function myMarkerFlag(bdmap){
     
     const addEvent = function(event, listener) {
         if((typeof event === "string") && (typeof listener === "function")){
-            eventListeners[event] = eventListeners[event] || [];
+            if(!eventListeners[event]){
+                eventListeners[event] = [];
+            }
             eventListeners[event].push(listener);
         }
     };
     
     const removeEvent = function(event, listener) {
         if(eventListeners[event]?.length){
-            const idx = eventListeners[event].findIndex(vx => vx===listener);
-            if(idx >= 0){
-                eventListeners[event].splice(idx, 1);
+            if(!listener){
+                eventListeners[event].splice(0);
+            } else {
+                const idx = eventListeners[event].findIndex(vx => vx===listener);
+                if(idx >= 0){
+                    eventListeners[event].splice(idx, 1);
+                }
             }
+        }
+    };
+    
+    const clearAll = function(){
+        onClose(true);
+        
+        for(const key in eventListeners){
+            delete eventListeners[key];
         }
     };
     
     this.open = onOpen;
     this.close = onClose;
+    this.clear = clearAll;
     this.addEventListener = addEvent;
     this.removeEventListener = removeEvent;
-
+    
     return this;
 }
