@@ -219,6 +219,7 @@ export function myMarkerFlag(bdmap){
     const ADD_FLAG_EVENT_NAME = "add-marker-flag";
     const CLICK_FLAG_EVENT_NAME = "click-marker-flag";
     const CLICK_LABEL_EVENT_NAME = "click-label-text";
+    const ADD_END_EVENT_NAME = "add-marker-end";
     
     const startDrawFlag = function(evt){
         flagNth++;
@@ -367,6 +368,8 @@ export function myMarkerFlag(bdmap){
         if(evt === true){
             flagNth = 0;
         }
+        
+        fireEvent(ADD_END_EVENT_NAME, null);
     };
     
     const addEvent = function(event, listener) {

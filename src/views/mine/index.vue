@@ -13,7 +13,7 @@
                 <lulu-bg-bubble />
             </header>
             <ul v-if="postList.length" @touchstart="preventContextMenu">
-                <li v-for="item,index in postList" :key="item.id" class="ps-r pd-rem5 bd-b-f0" @pointerdown="onItemPointerDown(index)" @pointerup="onItemPointerUp(index)" @pointercancel="clearTimer" @pointerleave="clearTimer">
+                <li v-for="item,index in postList" :key="item.id" class="ps-r pd-rem5 bd-b-f0" @pointerdown="onItemPointerDown(index)" @pointerup="onItemPointerUp(index)" @pointercancel="onItemPointerLeave" @pointerleave="onItemPointerLeave">
                     <div class="fx-r ps-r zi-1">
                         <p class="mni-share-pic">
                             <img :src="item.pictureList[0].thumbnailPath" class="hi-f" onerror="onImageLoadingError()" />
@@ -138,7 +138,6 @@
         activeIndex.value = idx;
         
         needDebounce(() => {
-            
             for(const vx of popupButtons){
                 switch(vx.key){
                     case 0x007: vx.hidden = (item.status !== 1); break;
@@ -165,6 +164,10 @@
             $router.push("/map3ddetails?ogpg=USER_CENTER&sid=" + item.id);
         }
         
+        activeIndex.value = -1;
+    }
+    function onItemPointerLeave(){
+        clearTimer(true);
         activeIndex.value = -1;
     }
     function preventContextMenu(evt){

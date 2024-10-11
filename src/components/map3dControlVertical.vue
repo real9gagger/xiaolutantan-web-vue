@@ -10,7 +10,7 @@
             <img class="dp-bk wh-f" :src="!isFS ? publicAssets.iconFullScreen : publicAssets.iconFullScreenExit" />
         </div>
         <div @click="onShowTools" class="mcv-action-box" title="地图工具箱">
-            <img class="dp-bk wh-f" :src="publicAssets.iconMapTools" />
+            <img class="dp-bk wh-f" :class="{'mcv-tool-using': props.isUsingTool}" :src="publicAssets.iconMapTools" />
         </div>
         <div @click="onClickShare" class="mcv-action-box" title="分享此页面">
             <img class="dp-bk wh-f" :class="{'mcv-sharing-ani': isSharing}" :src="publicAssets.iconShareGreen" />
@@ -46,7 +46,7 @@
 </template>
 
 <script setup name="Map3DControlVertical">
-    import { ref, defineEmits, getCurrentInstance, reactive, computed } from "vue";
+    import { ref, defineEmits, defineProps, getCurrentInstance, reactive, computed } from "vue";
     import { useStore } from "vuex";
     import { mapLayerType } from "@/assets/data/constants.js";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -73,6 +73,13 @@
     ]);
     const $instance = getCurrentInstance();
     const $store = useStore();
+    
+    const props = defineProps({
+        isUsingTool: {
+            type: Boolean,
+            default: false
+        }
+    });
     
     function onClickShare(){
         if(navigator.share && window.fetch){
@@ -236,6 +243,10 @@
         from { transform: scale(1) rotateZ(0deg) }
         to { transform: scale(0.75) rotateZ(10deg) }
     }
+    @keyframes mcv-tool-using-kf {/* 正在使用某个工具的动画帧 */
+        0% { transform: rotateZ(0deg) }
+        100% { transform: rotateZ(60deg) }
+    }
 
     .mcv-box-container {
         position: fixed;
@@ -307,5 +318,8 @@
     .mcv-help-item.slideout{
         transform: translateX(0);
         opacity: 1;
+    }
+    .mcv-tool-using{
+        animation: mcv-tool-using-kf 1s ease 0s infinite alternate;
     }
 </style>

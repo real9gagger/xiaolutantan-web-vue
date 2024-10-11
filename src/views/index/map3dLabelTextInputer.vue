@@ -1,7 +1,7 @@
 <template>
     <div class="page-limit-width">
         <div class="content-cage fx-c">
-            <div class="ps-r">
+            <div class="ps-r zi-1">
                 <input 
                     v-model="newText" 
                     :maxlength="limitLength" 
@@ -11,16 +11,17 @@
                     type="text" 
                     class="lti-input-box" 
                     placeholder="请输入内容" />
-                <img class="lti-input-clear" :src="publicAssets.imageMarkerCloseBtn" @click="onClear" alt="清空" />
+                <img class="lti-input-clear" :src="publicAssets.imageMarkerCloseBtn" @click="onClear" alt="清空" title="清空内容" />
                 <span class="lti-input-remaining">{{remainingLength}}</span>
                 <span class="lti-input-arrow"></span>
             </div>
-            <div class="mg-tb-rem5 fx-hc pd-l-1rem">
+            <div class="ps-r zi-1 mg-tb-rem5 fx-hc pd-l-1rem">
                 <img :src="publicAssets.imageMarkerFlagRed" alt="标记图标" />
                 <span class="fx-g1 fs-rem6 ta-r tc-99">按回车键完成输入</span>
             </div>
             <div class="fx-g1"><!-- 占位用 --></div>
-            <button type="button" class="btn-box" @click="onConfirm">完 成</button>
+            <button type="button" class="btn-box ps-r zi-1" @click="onConfirm">完 成</button>
+            <img :src="publicAssets.imageMarkerBaseMap" class="lti-base-pic" alt="标记底图" />
         </div>
     </div>
 </template>
@@ -124,5 +125,15 @@
         border-right: 0.05rem solid #f00;
         border-bottom: 0.05rem solid #f00;
         transform: rotateZ(45deg);
+    }
+    .lti-base-pic{
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        width: 25rem;
+        height: auto;
+        max-width: 100%;
+        mask-image: radial-gradient(circle farthest-side at 0% 0%, #000 0%, transparent 100%);
     }
 </style>

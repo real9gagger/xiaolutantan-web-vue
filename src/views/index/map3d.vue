@@ -12,6 +12,7 @@
             @panoramicview="onPanoramicView"
             @gotoaccount="onGotoMyAccount"
             @togglecallout="buildSharePicture"
+            :is-using-tool="isUsingTool"
         />
         <map3d-tools-popup 
             v-model="isShowMapTools"
@@ -83,6 +84,7 @@
     const zlBoxWidth = ref(0);
     const isShowSharePanel = ref(false);
     const isShowMapTools = ref(false);
+    const isUsingTool = ref(false);
     
     //点击了分享
     function onClickShare(){
@@ -287,6 +289,7 @@
             mapDistanceTool.addEventListener("measure-length-end", function(evt){
                 //这个 this 指向 mapDistanceTool
                 this.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+                isUsingTool.value = false;
             });
         }
         
@@ -314,6 +317,7 @@
             mapAreaTool.addEventListener("measure-area-end", function(evt){
                 //这个 this 指向 mapAreaTool
                 this.closeBtn._config.isDrawToolOverlay = true; //是否是绘制工具画的覆盖物
+                isUsingTool.value = false;
             });
         }
         
@@ -363,6 +367,9 @@
                 setPageTempData(evt.target);
                 $router.push("/labeltextinputer?lbid=" + evt.target._config.labelID);
             });
+            mapMarkerTool.addEventListener("add-marker-end", function(evt){
+                isUsingTool.value = false;
+            });
         }
         
         mapMarkerTool.open();
@@ -396,6 +403,8 @@
         if(mapMarkerTool){
             mapMarkerTool.close(!code);
         }
+        
+        isUsingTool.value = !!code;
     }
     
     //创建百度地图
