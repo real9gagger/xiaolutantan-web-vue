@@ -74,6 +74,7 @@ const AssetsPathMap = {
     iconPanoramicView: "icons/panoramic_view.png",
     iconPictureSourceUrl: "icons/picture_source_url.png",
     iconMapTools: "icons/map_tools.png",
+    iconPlayVideo: "icons/play_video.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

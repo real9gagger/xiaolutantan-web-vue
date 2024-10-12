@@ -78,6 +78,14 @@ export default [
         }
     },
     {
+    	path: "/map3dvideo",
+    	name: "视频详情",
+    	component: () => import("@/views/index/map3dShareVideo"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/map3dpicker",
     	name: "选择地点",
     	component: () => import("@/views/index/map3dPositionPicker"),

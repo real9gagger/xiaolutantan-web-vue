@@ -2,7 +2,7 @@
     <div class="page-limit-width">
         <div class="content-cage">
             <div class="ps-r mg-b-1rem">
-                <textarea v-model="descText" class="msa-textarea-box of-no-sb" rows="3" placeholder="说点什么吧~" :maxlength="MAX_TEXT_LENGTH" @input="onTextAreaInput" />
+                <textarea v-model="descText" class="msa-textarea-box of-no-sb" rows="3" placeholder="有什么有趣的收获~" :maxlength="MAX_TEXT_LENGTH" @input="onTextAreaInput" />
                 <span class="msa-input-remaining">{{inputRemainingLength}}</span>
             </div>
             <div class="mg-b-rem5 bd-t-f0"><!-- 分隔线 --></div>

@@ -244,7 +244,12 @@
         
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos_" + dat.id, dat);
-        $router.push("/map3ddetails?sid=" + dat.id);
+        
+        if(!dat.isVideo){//照片内容
+            $router.push("/map3ddetails?sid=" + dat.id);
+        } else {//视频内容
+            $router.push("/map3dvideo?sid=" + dat.id);
+        }
 
         mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(mapActivitingCallout, false);
         mapActivitingCallout = $instance.refs.mspcBox.setCalloutActiviting(evt.target.div.firstChild, true);
@@ -632,6 +637,7 @@
         }
         
         //2024年7月16日，获取用户分享的照片
+        ///* 【测试用】 */axios.get(publicAssets.sharePicsData).then(res0 => {const res1 = res0.data;
         ajaxRequest("getUserPostList").then(res1 => {
             if(!res1 || !res1.length){
                 return !appToast("还没有用户分享过照片~");

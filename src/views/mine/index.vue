@@ -223,14 +223,14 @@
 
 <style scoped="scoped">
     .mni-user-bg{
-        height: 25%;
+        height: 20%;
         position: relative;
     }
     .mni-user-profile{
         position: absolute;
         left: 0.5rem;
         right: 0.5rem;
-        bottom: 1rem;
+        bottom: 0.5rem;
         z-index: 8;
     }
     .mni-user-avatar{

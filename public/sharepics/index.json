@@ -153,7 +153,42 @@
     			"captureTime": "2024/07/10 14:52:00"
     		}
     	],
-        "status": 0,
+        "status": 1,
+    	"likesCount": 0,
+    	"commentCount": 0,
+    	"shareCount": 0,
+    	"viewCount": 0,
+        "collectCount": 0
+    },
+    {
+    	"id": 50000,
+    	"title": "这是一个测试视频。视频描述了女主人尝试在猫面前表演一系列的突发猝发病，看看猫是如何反应的。猫无法理解女主人的动作，误以为是攻击性的动作，所以猫大法雷霆，攻击女主人，女主人扑倒在地，差点卧床不起！",
+    	"createTime": "2024/10/10 12:50:00",
+    	"authorNickname": "平平",
+    	"authorAvatarUrl": "",
+    	"longitude": 108.956462,
+    	"latitude": 22.279318,
+        "coordinateSystem": "GCJ02",
+    	"locationAddress": "广西壮族自治区钦州市灵山县陆屋镇",
+    	"pictureList": [
+    		{
+                "id": 1,
+    			"description": "时长29秒的测试视频",
+    			"picPath": "sharepics/test_video_1.mp4",
+                "thumbnailPath": "sharepics/test_video_1.jpg",
+                "width": 480,
+    			"height": 854,
+    			"size": 1482013,
+    			"sort": 0,
+    			"longitude": 108.956462,
+    			"latitude": 22.279318,
+                "duration": 29,
+                "mimeType": "video/mp4",
+    			"captureTime": "2024/10/10 12:50:00"
+    		}
+    	],
+        "isVideo": true,
+        "status": 1,
     	"likesCount": 0,
     	"commentCount": 0,
     	"shareCount": 0,
