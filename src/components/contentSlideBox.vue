@@ -26,7 +26,7 @@
 </template>
 
 <script setup name="ContentSlideBox">
-    import { computed, defineProps, defineEmits, ref } from "vue";
+    import { computed, defineProps, defineEmits, ref, watch } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const CONTENT_MAX_LENGTH = 40;
@@ -36,6 +36,7 @@
     const containerHeight = ref(DEFAULT_HEIGHT_PX); //容器的最小高度
     const isMoving = ref(false);
     const isNeedTransition = ref(false);
+    const isHiding = ref(false);
     const nonRVs = { //非响应式变量（non Responsive Variables）
         startTS: 0, //开始触摸时的时间戳（毫秒）
         startCY: 0, //开始触摸时的Y轴位置（毫秒）
@@ -58,9 +59,13 @@
         content: {
             type: String,
             default: "用户名称"
+        },
+        isShrink: { //是否缩起来
+            type: Boolean,
+            default: false
         }
     });
-    const emits = defineEmits(["sliding"]);
+    const emits = defineEmits(["sliding", "hiding"]);
     
     const shortContent = computed(() => {
         if(!props.content){
@@ -80,9 +85,10 @@
     const constainerStyle = computed(() => {
         const colorRGB =  Math.round(255 * (1 - ratioVal.value));
         return {
-            height: containerHeight.value + "px",
+            height: (containerHeight.value + "px"),
             backgroundColor: `rgba(255, 255, 255, ${ratioVal.value})`,
             color: `rgb(${colorRGB}, ${colorRGB}, ${colorRGB})`,
+            transform: `translateY(${isHiding.value ? DEFAULT_HEIGHT_PX : 0}px)`,
             userSelect: (isMoving.value ? "none" : "text"),
             transition: (isNeedTransition.value ? "all 300ms": "none")
         };
@@ -115,6 +121,12 @@
                 transitionable: true
             });
         }
+    }
+    
+    function onHideMoreContent(){
+        isHiding.value = !isHiding.value;
+        isNeedTransition.value = true;
+        emits("hiding", isHiding.value);
     }
     
     function onPointerStart(evt){
@@ -150,7 +162,7 @@
     }
     
     function onPointerEnd(evt){
-        console.log("移动结束…", evt);
+        //console.log("移动结束…", evt);
         if(isMoving.value){
             isMoving.value = false;
             
@@ -185,6 +197,14 @@
     function onTransitionEnd(){
         isNeedTransition.value = false;
     }
+    
+    watch(() => props.isShrink, function(){
+        if(ratioVal.value){
+            onCloseMoreContent();
+        } else {
+            onHideMoreContent();
+        }
+    });
 </script>
 
 <style>

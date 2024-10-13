@@ -2,14 +2,15 @@
     <div class="page-limit-width">
         <template v-if="shareInfos && shareInfos.id">
             <div class="content-cage" style="padding:0;overflow:hidden;background-color:#000">
-                <div class="wi-f fx-vm" :style="videoStyle">
+                <div class="wi-f fx-vm" :style="videoStyle" @click="onVideoClick">
                     <video
                         :src="shareInfos.pictureList[0].picPath"
                         :poster="shareInfos.pictureList[0].thumbnailPath"
+                        id="videoBox"
+                        ref="videoRef"
                         class="msv-video-box"
                         autoplay="autoplay" 
-                        muted="muted" 
-                        controls="controls" />
+                        muted="muted" />
                 </div>
             </div>
             <content-slide-box
@@ -17,7 +18,9 @@
                 :user-nickname="shareInfos.authorNickname"
                 :sub-title="shareInfos.createTime + ' • 拍摄于' + shareInfos.locationAddress + '附近'"
                 :content="shareInfos.title"
+                :is-shrink="isContentShrink"
                 @sliding="onContentSliding"
+                @hiding="onContentHiding"
             />
         </template>
         <template v-else-if="isLoading">
@@ -32,9 +35,10 @@
 </template>
 
 <script setup name="IndexMap3DShareVideo">
-    import { ref, reactive, getCurrentInstance, onActivated, computed } from "vue";
+    import { ref, reactive, getCurrentInstance, onActivated, computed, nextTick } from "vue";
     import { useStore } from "vuex";
     import { useRoute, useRouter } from "vue-router";
+    //import videojs from "video.js";
     import myStorage from "@/utils/mystorage.js";
     import ajaxRequest from "@/request/index.js";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -46,21 +50,46 @@
     const $store = useStore();
     const shareInfos = reactive({});
     const isLoading = ref(true);
+    const isContentShrink = ref(false);
     const videoHeight = ref(window.innerHeight);
     const videoOffset = ref(0);
     const videoTransitionable = ref(false);
+    const videoRef = ref(null);
     
     const videoStyle = computed(() => ({
-        height: videoHeight.value + "px",
-        paddingBottom: videoOffset.value + "px",
-        transition: videoTransitionable.value ? "all 300ms" : "none"
+        height: (videoHeight.value - videoOffset.value) + "px",
+        transition: (videoTransitionable.value ? "all 300ms" : "none")
     }));
     
     function onContentSliding(evt){
         videoHeight.value += evt.delta;
         videoOffset.value = evt.offset;
         videoTransitionable.value = evt.transitionable;
-        console.log(evt);
+    }
+    
+    function onContentHiding(arg){
+        if(arg){
+            videoRef.value.controls = true;
+        } else {
+            videoRef.value.controls = false;
+        }
+    }
+    
+    function onVideoClick(){
+        console.log("lllllllllllllllllllll=====")
+        isContentShrink.value = !isContentShrink.value;
+    }
+    
+    function buildVideoPlayer(){
+        var player = videojs("videoBox", {
+            controls: true,
+            loop: false, 
+            autoplay: true,
+            mute: true
+        }, function(){
+            
+        });
+        console.log(player)
     }
     
     onActivated(() => {
@@ -76,11 +105,13 @@
                 });
             }
             isLoading.value = false;
+            //nextTick(buildVideoPlayer);
         } else {//如果本地没有缓存数据，就到服务器加载！
             ajaxRequest("getPostById", { postId: sid }, true).then(res => {
                 Object.assign(shareInfos, res);
                 myStorage.onceObject("user_sharepic_infos_" + sid, res);
                 isLoading.value = false;
+                //nextTick(buildVideoPlayer);
             }).catch(() => {
                 isLoading.value = false;
             });
