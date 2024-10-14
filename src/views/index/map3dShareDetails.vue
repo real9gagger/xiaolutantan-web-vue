@@ -133,7 +133,6 @@
         align-items: center;
         padding: 0.5rem;
         top: 0;
-        right: 0;
         background-image: linear-gradient(0deg,rgba(255,255,255,0),rgba(255,255,255,0.7));
         transform: translateY(0%);
         transition: transform 300ms;
@@ -152,7 +151,6 @@
     .msd-bottom-box{
         padding: 0.5rem;
         bottom: 0;
-        right: 0;
         min-height: 5rem;
         background-image: linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.7));
         transform: translateY(0%);

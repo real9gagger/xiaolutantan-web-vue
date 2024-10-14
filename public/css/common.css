@@ -114,5 +114,6 @@
     position: fixed;
     z-index: 8;
     max-width: 600px;
+    width: 100%;
     left: max(calc(50vw - 300px), 0px);
 }

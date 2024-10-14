@@ -32,7 +32,7 @@
                 <button type="button" class="btn-box" @click="onSubmit">登 录</button>
             </div>
         </div>
-        <div class="fixed-limit-width po-br-0 pd-rem5 ta-c fs-rem7">
+        <div class="fixed-limit-width po-b-0 pd-rem5 ta-c fs-rem7">
             <p><a class="tc-b0" @click="$router.back">返回上一页</a></p>
             <p class="mg-t-rem5">
                 <a class="dp-ib tc-b0" @click="gotoPrivacyPolicy">法律条款和隐私政策</a>

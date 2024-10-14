@@ -38,7 +38,7 @@
             </div>
             <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>
         </div>
-        <div class="fixed-limit-width po-br-0 pd-1rem">
+        <div class="fixed-limit-width po-b-0 pd-1rem">
             <button v-if="!isPublishing" type="button" class="btn-box" @click="onPublishes">发 布</button>
             <button v-else type="button" class="btn-box ajaxing">正在发布…</button>
         </div>
