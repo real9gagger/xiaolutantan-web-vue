@@ -31,7 +31,9 @@
     
     const CONTENT_MAX_LENGTH = 40;
     const LIMIT_HEIGHT_PX = Math.round(window.innerHeight * 0.75);
-    const DEFAULT_HEIGHT_PX = (8 * window.pxOf1rem);
+    const DEFAULT_HEIGHT_PX = (9.0 * window.pxOf1rem);
+    const CLIP_RECT_HEIGHT = (DEFAULT_HEIGHT_PX - 40); //被裁剪的矩形的高度，需要减去视频控制条高度（像素）
+    const ELASTIC_COEFFICIENT = 0.1;//当滑动到顶部时，再继续滑动时的弹性系数
     
     const containerHeight = ref(DEFAULT_HEIGHT_PX); //容器的最小高度
     const isMoving = ref(false);
@@ -90,6 +92,7 @@
             color: `rgb(${colorRGB}, ${colorRGB}, ${colorRGB})`,
             transform: `translateY(${isHiding.value ? DEFAULT_HEIGHT_PX : 0}px)`,
             userSelect: (isMoving.value ? "none" : "text"),
+            clipPath: (!ratioVal.value ? `polygon(0% 0%, 100% 0%, 100% ${CLIP_RECT_HEIGHT}px, 0% ${CLIP_RECT_HEIGHT}px)` : "none"),
             transition: (isNeedTransition.value ? "all 300ms": "none")
         };
     });
@@ -142,13 +145,14 @@
         //console.log("正在移动…", evt);
         if(isMoving.value){
             const oldVal = containerHeight.value;
+            const newVal = (oldVal - evt.movementY);
             
-            containerHeight.value -= evt.movementY;
-            
-            if(containerHeight.value <= DEFAULT_HEIGHT_PX){
+            if(newVal <= DEFAULT_HEIGHT_PX){
                 containerHeight.value = DEFAULT_HEIGHT_PX;
-            } else if(containerHeight.value >= LIMIT_HEIGHT_PX){
-                containerHeight.value = LIMIT_HEIGHT_PX;
+            } else if(newVal >= LIMIT_HEIGHT_PX){
+                containerHeight.value -= (ELASTIC_COEFFICIENT * evt.movementY);
+            } else {
+                containerHeight.value = newVal;
             }
             
             nonRVs.moveDis += Math.abs(evt.movementY);
@@ -202,7 +206,7 @@
         if(ratioVal.value){
             onCloseMoreContent();
         } else {
-            onHideMoreContent();
+            //onHideMoreContent(); //彻底隐藏内容！
         }
     });
 </script>
@@ -210,7 +214,7 @@
 <style>
     .csb-container{
         bottom: 0;
-        padding: 1rem 0.75rem;
+        padding: 1rem 0.7rem 2.0rem 0.7rem;
         border-radius: 1rem 1rem 0 0;
         overflow: hidden;
         touch-action: pan-x; /* 如果不加这个属性 pointermove 会引起 pointercancel 事件 */

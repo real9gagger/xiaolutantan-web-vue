@@ -162,7 +162,7 @@
     },
     {
     	"id": 50000,
-    	"title": "这是一个测试视频。视频描述了女主人尝试在猫面前表演一系列的突发猝发病，看看猫是如何反应的。猫无法理解女主人的动作，误以为是攻击性的动作，所以猫大法雷霆，攻击女主人，女主人扑倒在地，差点卧床不起！",
+    	"title": "这是一个测试视频。视频描述了女主人尝试在猫面前表演一系列的突发猝发病等紧急情况，看看猫是如何反应的。先是说着火了，然后再装做自己撞墙受伤。猫无法理解女主人的动作，误以为是攻击性的动作，所以猫大法雷霆，大怒，攻击女主人，女主人扑倒在地，差点卧床不起！无奈只能就此摊牌，不玩了。",
     	"createTime": "2024/10/10 12:50:00",
     	"authorNickname": "平平",
     	"authorAvatarUrl": "",
@@ -185,6 +185,41 @@
                 "duration": 29,
                 "mimeType": "video/mp4",
     			"captureTime": "2024/10/10 12:50:00"
+    		}
+    	],
+        "isVideo": true,
+        "status": 1,
+    	"likesCount": 0,
+    	"commentCount": 0,
+    	"shareCount": 0,
+    	"viewCount": 0,
+        "collectCount": 0
+    },
+    {
+    	"id": 60000,
+    	"title": "装逼四眼仔忠告：小心装逼过度！",
+    	"createTime": "2024/10/14 11:40:00",
+    	"authorNickname": "平平",
+    	"authorAvatarUrl": "",
+    	"longitude": 108.616980,
+    	"latitude": 21.901434,
+        "coordinateSystem": "GCJ02",
+    	"locationAddress": "广西壮族自治区钦州市北部湾大学",
+    	"pictureList": [
+    		{
+                "id": 1,
+    			"description": "时长2秒的测试视频",
+    			"picPath": "sharepics/test_video_2.mp4",
+                "thumbnailPath": "sharepics/test_video_2.jpg",
+                "width": 448,
+    			"height": 256,
+    			"size": 173704,
+    			"sort": 0,
+    			"longitude": 108.616980,
+    			"latitude": 21.901434,
+                "duration": 2,
+                "mimeType": "video/mp4",
+    			"captureTime": "2024/10/14 11:40:00"
     		}
     	],
         "isVideo": true,

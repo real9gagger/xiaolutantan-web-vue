@@ -2,16 +2,12 @@
     <div class="page-limit-width">
         <template v-if="shareInfos && shareInfos.id">
             <div class="content-cage" style="padding:0;overflow:hidden;background-color:#000">
-                <div class="wi-f fx-vm" :style="videoStyle" @click="onVideoClick">
-                    <video
-                        :src="shareInfos.pictureList[0].picPath"
-                        :poster="shareInfos.pictureList[0].thumbnailPath"
-                        id="videoBox"
-                        ref="videoRef"
-                        class="msv-video-box"
-                        autoplay="autoplay" 
-                        muted="muted" />
-                </div>
+                <video
+                    :src="shareInfos.pictureList[0].picPath"
+                    :poster="shareInfos.pictureList[0].thumbnailPath"
+                    id="videoBox"
+                    class="msv-video-box video-js"
+                    style="width:100%;height:100%;">浏览器不支持 HTML5 Video</video>
             </div>
             <content-slide-box
                 :user-avatar="shareInfos.authorAvatarUrl"
@@ -20,7 +16,6 @@
                 :content="shareInfos.title"
                 :is-shrink="isContentShrink"
                 @sliding="onContentSliding"
-                @hiding="onContentHiding"
             />
         </template>
         <template v-else-if="isLoading">
@@ -35,15 +30,16 @@
 </template>
 
 <script setup name="IndexMap3DShareVideo">
-    import { ref, reactive, getCurrentInstance, onActivated, computed, nextTick } from "vue";
+    import { ref, reactive, getCurrentInstance, onActivated, onDeactivated, computed, nextTick } from "vue";
     import { useStore } from "vuex";
     import { useRoute, useRouter } from "vue-router";
-    //import videojs from "video.js";
+    import videojs from "video.js";
     import myStorage from "@/utils/mystorage.js";
     import ajaxRequest from "@/request/index.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import dataLostBox from "@/components/dataLostBox.vue";
     import contentSlideBox from "@/components/contentSlideBox.vue";
+    import "video.js/dist/video-js.css";
     
     const $route = useRoute();
     const $router = useRouter();
@@ -51,45 +47,35 @@
     const shareInfos = reactive({});
     const isLoading = ref(true);
     const isContentShrink = ref(false);
-    const videoHeight = ref(window.innerHeight);
-    const videoOffset = ref(0);
-    const videoTransitionable = ref(false);
-    const videoRef = ref(null);
     
-    const videoStyle = computed(() => ({
-        height: (videoHeight.value - videoOffset.value) + "px",
-        transition: (videoTransitionable.value ? "all 300ms" : "none")
-    }));
+    let videoHeight = 0;
+    let videoPlayer = null;
     
     function onContentSliding(evt){
-        videoHeight.value += evt.delta;
-        videoOffset.value = evt.offset;
-        videoTransitionable.value = evt.transitionable;
-    }
-    
-    function onContentHiding(arg){
-        if(arg){
-            videoRef.value.controls = true;
-        } else {
-            videoRef.value.controls = false;
-        }
+        videoHeight += evt.delta;
+        
+        videoPlayer.el().style.height = (videoHeight - evt.offset) + "px";
+        videoPlayer.el().style.transition = (evt.transitionable ? "all 300ms" : "none");
     }
     
     function onVideoClick(){
-        console.log("lllllllllllllllllllll=====")
         isContentShrink.value = !isContentShrink.value;
     }
     
     function buildVideoPlayer(){
-        var player = videojs("videoBox", {
+        window.VIDEOJS_NO_DYNAMIC_STYLE = true; //让 videoJS 不要添加动态样式
+        
+        videoHeight = window.innerHeight;
+        videoPlayer = videojs("videoBox", {
             controls: true,
             loop: false, 
             autoplay: true,
             mute: true
         }, function(){
-            
+            //此处的 this 指向 videoPlayer
+            //console.log(this);
+            this.on("click", onVideoClick);
         });
-        console.log(player)
     }
     
     onActivated(() => {
@@ -105,18 +91,29 @@
                 });
             }
             isLoading.value = false;
-            //nextTick(buildVideoPlayer);
+            nextTick(buildVideoPlayer);
         } else {//如果本地没有缓存数据，就到服务器加载！
             ajaxRequest("getPostById", { postId: sid }, true).then(res => {
                 Object.assign(shareInfos, res);
                 myStorage.onceObject("user_sharepic_infos_" + sid, res);
                 isLoading.value = false;
-                //nextTick(buildVideoPlayer);
+                nextTick(buildVideoPlayer);
             }).catch(() => {
                 isLoading.value = false;
             });
         }
     });
+    
+    onDeactivated(() => {
+        if(videoPlayer){
+            setTimeout(() => {
+                videoPlayer.off("click", onVideoClick);
+                videoPlayer.dispose();
+                videoPlayer = null;
+            }, 500);
+        }
+    });
+    
 </script>
 
 <style scoped="scoped">
