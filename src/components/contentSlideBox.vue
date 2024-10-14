@@ -8,7 +8,7 @@
     @pointerleave="onPointerEnd"
     @transitionend="onTransitionEnd">
         <div class="fx-hc">
-            <img :src="props.userAvatar || publicAssets.iconDefaultUserAvatar" alt="用户头像" class="csb-user-avatar" />
+            <img :src="props.userAvatar || publicAssets.iconDefaultUserAvatar" data-is-avatar="yes" alt="用户头像" class="csb-user-avatar" />
             <p class="mg-l-rem5 fx-g1">
                 <span class="dp-bk fw-b">{{props.userNickname}}</span>
                 <span class="dp-bk fs-rem6 op-8">{{props.subTitle}}</span>
@@ -67,7 +67,7 @@
             default: false
         }
     });
-    const emits = defineEmits(["sliding", "hiding"]);
+    const emits = defineEmits(["sliding", "hiding", "avatarclick"]);
     
     const shortContent = computed(() => {
         if(!props.content){
@@ -179,6 +179,8 @@
             if(nonRVs.moveDis <= 10){//小于一个临界值则判断为点击事件
                 if(evt.target.hasAttribute("data-is-content")){//点击内容才触发
                     onShowMoreContent();
+                } else if(evt.target.hasAttribute("data-is-avatar")){//点击了头像
+                    emits("avatarclick", true);
                 }
             } else {
                 //判断惯性滑动：计算速度

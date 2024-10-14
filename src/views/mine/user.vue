@@ -17,6 +17,7 @@
                         <p class="mnu-share-pic">
                             <img :src="item.pictureList[0].thumbnailPath" class="hi-f" onerror="onImageLoadingError()" />
                             <span v-if="item.pictureList.length > 1" class="mnu-pic-count">+{{item.pictureList.length - 1}}</span>
+                            <img v-if="item.isVideo" :src="publicAssets.iconPlayVideo" alt="视频内容" class="ps-a po-tl-0 wh-f" />
                         </p>
                         <p class="fx-g1 ps-r pd-l-rem5 fx-c">
                             <span class="of-lc1 fw-b">{{item.title}}</span>
@@ -95,7 +96,11 @@
         const item = postList[idx];
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos_" + item.id, item);
-        $router.push("/map3ddetails?ogpg=USER_CENTER&sid=" + item.id);
+        if(!item.isVideo){//照片内容
+            $router.push("/map3ddetails?ogpg=USER_CENTER&sid=" + item.id);
+        } else {//视频内容
+            $router.push("/map3dvideo?ogpg=USER_CENTER&sid=" + item.id);
+        }
     }
     
     onMounted(getPostList);

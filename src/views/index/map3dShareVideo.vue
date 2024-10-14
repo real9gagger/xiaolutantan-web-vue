@@ -16,6 +16,7 @@
                 :content="shareInfos.title"
                 :is-shrink="isContentShrink"
                 @sliding="onContentSliding"
+                @avatarclick="onUserAvatarClick"
             />
         </template>
         <template v-else-if="isLoading">
@@ -30,7 +31,7 @@
 </template>
 
 <script setup name="IndexMap3DShareVideo">
-    import { ref, reactive, getCurrentInstance, onActivated, onDeactivated, computed, nextTick } from "vue";
+    import { ref, reactive, getCurrentInstance, onActivated, onDeactivated, computed, nextTick, onUnmounted } from "vue";
     import { useStore } from "vuex";
     import { useRoute, useRouter } from "vue-router";
     import videojs from "video.js";
@@ -58,24 +59,48 @@
         videoPlayer.el().style.transition = (evt.transitionable ? "all 300ms" : "none");
     }
     
+    function onUserAvatarClick(){
+        if($route.query.ogpg === "USER_CENTER"){
+            $router.back();
+        } else {
+            $router.push("/user?uid=" + encodeURIComponent(shareInfos.authorNickname));
+        }
+    }
+    
     function onVideoClick(){
         isContentShrink.value = !isContentShrink.value;
     }
     
     function buildVideoPlayer(){
-        window.VIDEOJS_NO_DYNAMIC_STYLE = true; //让 videoJS 不要添加动态样式
-        
-        videoHeight = window.innerHeight;
-        videoPlayer = videojs("videoBox", {
-            controls: true,
-            loop: false, 
-            autoplay: true,
-            mute: true
-        }, function(){
-            //此处的 this 指向 videoPlayer
-            //console.log(this);
-            this.on("click", onVideoClick);
-        });
+        if(!videoPlayer){
+            window.VIDEOJS_NO_DYNAMIC_STYLE = true; //让 videoJS 不要添加动态样式
+            videoHeight = window.innerHeight;
+            
+            videoPlayer = videojs("videoBox", {
+                controls: true,
+                loop: false, 
+                autoplay: true,
+                mute: true
+            }, function(){
+                //此处的 this 指向 videoPlayer
+                this.on("click", onVideoClick);
+            });
+            console.log("创建了视频组件...");
+        } else if(videoPlayer.currentSrc().endsWith(shareInfos.pictureList[0].picPath)){
+            videoPlayer.play();
+            console.log("继续播放视频内容...");
+        } else {
+            //参考文档：https://docs.videojs.com/docs/api/player.html#Methodsposter
+            videoPlayer.reset();
+            videoPlayer.src({
+                type: shareInfos.pictureList[0].mimeType,
+                src: shareInfos.pictureList[0].picPath
+            });
+            videoPlayer.poster(shareInfos.pictureList[0].thumbnailPath);
+            videoPlayer.load();
+            videoPlayer.play();
+            console.log("更新了视频内容...");
+        }
     }
     
     onActivated(() => {
@@ -107,13 +132,22 @@
     onDeactivated(() => {
         if(videoPlayer){
             setTimeout(() => {
-                videoPlayer.off("click", onVideoClick);
-                videoPlayer.dispose();
-                videoPlayer = null;
-            }, 500);
+                videoPlayer.pause();
+                console.log("视频已暂停播放...");
+            }, 400);
         }
     });
     
+    onUnmounted(() => {
+        if(videoPlayer){
+            setTimeout(() => {
+                videoPlayer.off("click", onVideoClick);
+                videoPlayer.dispose();
+                videoPlayer = null;
+                console.log("视频内容已销毁...");
+            }, 500);
+        }
+    });
 </script>
 
 <style scoped="scoped">

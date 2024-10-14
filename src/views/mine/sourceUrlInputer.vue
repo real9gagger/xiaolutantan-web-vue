@@ -35,9 +35,14 @@
     function onPaste(){
         try{
             $instance.refs.taBox.focus();
-            if(!document.execCommand("paste")){
-                appToast("粘贴失败");
-            }
+            window.navigator.clipboard.readText().then(txt => {
+                if(txt){
+                    document.execCommand("insertText", false, txt);
+                    appToast("已粘贴", 500);
+                }
+            }).catch(err => {
+                appToast("粘贴失败：" + err.message);
+            });
         } catch(ex){
             appToast("粘贴出错：" + ex.message);
         }
