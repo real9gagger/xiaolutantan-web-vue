@@ -195,6 +195,14 @@ export default [
         }
     },
     {
+    	path: "/externallink",
+    	name: "外部链接",
+    	component: () => import("@/views/help/openExternalLink"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/panoramiclist",
     	name: "全景景点",
     	component: () => import("@/views/canal/panoramicList"),

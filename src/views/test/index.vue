@@ -32,6 +32,7 @@
 
     function checkPageName() {
         let noNameCount = 0;
+        appToast("正在检查...");
         for(const item of routerList){
             if(item.component){
                 item.component().then(res => {
@@ -42,8 +43,13 @@
                 }).catch(console.warn);
             }
         }
-        setTimeout(() => console.log("检查完毕：" + noNameCount + " 个页面有问题。"), 800);
-        appToast("检查结果已打印在控制台...");
+        setTimeout(() => {
+            if(noNameCount){
+                appToast("检查完毕：" + noNameCount + " 个页面有问题。详细信息已打印在控制台", 4000);
+            } else {
+                appToast("检查完毕：暂时没有检查到任何异常", 4000);
+            }
+        }, 2500);
     }
 </script>
 

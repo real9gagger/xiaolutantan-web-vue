@@ -11,20 +11,31 @@
             <img :src="publicAssets.picturePlyhMap" alt="平陆运河地理位置图" class="dp-bk wi-f bd-dd mg-t-1rem" onerror="onImageLoadingError()" />
             <p class="ta-c mg-t-rem25">平陆运河地理位置图</p>
             
+            <img :src="publicAssets.picturePlyhRivers" alt="平陆运河连接者珠江水系和广西沿海河流" class="dp-bk wi-f bd-dd mg-t-1rem" onerror="onImageLoadingError()" />
+            <p class="ta-c mg-t-rem25">平陆运河连接者珠江水系和广西沿海河流</p>
+            
             <img :src="publicAssets.pictureMadaoHinge3" alt="平陆运河展望图" class="dp-bk wi-f bd-dd mg-t-1rem" onerror="onImageLoadingError()" />
             <p class="ta-c mg-t-rem25">平陆运河展望图</p>
             
             <p class="mg-t-1rem tc-99">更新日期：{{lastUpdateTime}}</p>
-            <p class="tc-99">图片来源：平陆运河官网</p>
+            <p class="tc-99" @click="gotoPlyhOfficialWebSite">图片来源：平陆运河官网</p>
         </div>
     </div>
 </template>
 
 <script setup name="HelpAboutCanal">
     import { ref } from "vue";
+    import { useRouter } from "vue-router";
+    
     import publicAssets from "@/assets/data/publicAssets.js";
     
-    const lastUpdateTime = ref("2024年9月1日");
+    const $router = useRouter();
+    const lastUpdateTime = ref("2024年10月16日");
+    
+    //跳转到平陆运河官网
+    function gotoPlyhOfficialWebSite(){
+        $router.push("/externallink?link=" + encodeURIComponent("https://www.plyh.gx.cn"));
+    }
     
     //运河详细分析参见：http://www.360doc.com/content/22/0424/22/22693353_1028130070.shtml
 </script>

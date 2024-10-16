@@ -18,6 +18,7 @@
                             <img :src="item.pictureList[0].thumbnailPath" class="hi-f" onerror="onImageLoadingError()" />
                             <span v-if="item.pictureList.length > 1" class="mnu-pic-count">+{{item.pictureList.length - 1}}</span>
                             <img v-if="item.isVideo" :src="publicAssets.iconPlayVideo" alt="视频内容" class="ps-a po-tl-0 wh-f" />
+                            <span v-if="item.isVideo" class="mnu-pic-count">{{getFriendlyDuration(item.pictureList[0].duration)}}</span>
                         </p>
                         <p class="fx-g1 ps-r pd-l-rem5 fx-c">
                             <span class="of-lc1 fw-b">{{item.title}}</span>
@@ -47,6 +48,7 @@
     import { onMounted, reactive, ref } from "vue";
     import { useRouter, useRoute } from "vue-router";
     import { appWebName } from "@/assets/data/constants.js"
+    import { getFriendlyDuration } from "@/utils/pagehelper.js";
     
     import myStorage from "@/utils/mystorage.js";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -136,11 +138,12 @@
     .mnu-pic-count{
         display: block;
         position: absolute;
-        right: 0.2rem;
+        right: 0.3rem;
         bottom: 0.2rem;
         z-index: 9;
         font-size: 0.6rem;
         color: #fff;
         font-weight: 500;
+        line-height: 1;
     }
 </style>

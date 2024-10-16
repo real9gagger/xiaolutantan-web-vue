@@ -17,6 +17,7 @@ const AssetsPathMap = {
     pictureMadaoHinge3: "sharepics/madao_hinge_3.jpg",
     picturePlyhMap: "sharepics/plyh_map_thumb.jpg",
     picturePlyhSketch: "sharepics/plyh_sketch.jpg",
+    picturePlyhRivers: "sharepics/plyh_rivers.jpg",
     
     //图标
     iconDefaultUserAvatar: "icons/default_user_avatar.png",
@@ -75,6 +76,8 @@ const AssetsPathMap = {
     iconPictureSourceUrl: "icons/picture_source_url.png",
     iconMapTools: "icons/map_tools.png",
     iconPlayVideo: "icons/play_video.png",
+    iconMsgError: "icons/msg_error.png",
+    iconExternalLink: "icons/external_link.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",

@@ -83,6 +83,7 @@ function appToast(msg, duration){
 	}
 }
 
+//提示弹窗
 function alertConfirm(msg, yesText, isAttention){
     return new Promise(function (resolve, reject) {
         let btnText = (yesText || "好");
