@@ -168,6 +168,7 @@
             }
             
             isMovable.value = true;
+            isNeedTransition.value = false;
             nonRVs.moveDis = 0;
             nonRVs.moveLY = nonRVs.startCY;
             nonRVs.startTS = evt.timeStamp;

@@ -71,7 +71,7 @@
         		} else {
         			fs_px1 = (window.innerWidth / 1366) * 20;
         		}
-        		let fs_px2 = Math.round(fs_px1 / 10) * 10;//让它是 10 的倍数：
+        		let fs_px2 = Math.round(fs_px1);//让它是 1 的整数倍：
         		if(fs_px2 < 20){
         			fs_px2 = 20;
         		}

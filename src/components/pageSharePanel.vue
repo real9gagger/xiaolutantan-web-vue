@@ -209,7 +209,7 @@
     }
     .psp-box-dialog{
         width: 100%;
-        max-width: 600px;
+        max-width: var(--container-max-width);
         min-height: 5rem;
         background-color: #fff;
         padding: 1rem;

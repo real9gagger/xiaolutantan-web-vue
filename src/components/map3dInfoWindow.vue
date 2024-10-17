@@ -87,7 +87,7 @@
         border-radius: 0.5rem;
         padding: 0.5rem;
         width: 100%;
-        max-width: 600px;
+        max-width: var(--container-max-width);
         margin: 0 auto;
     }
     .miw-icon-box {

@@ -58,7 +58,7 @@
     }
     .ppx-box-dialog{
         width: 100%;
-        max-width: 600px;
+        max-width: var(--container-max-width);
         background-color: #fff;
         padding: 0;
         border-radius: 1rem;

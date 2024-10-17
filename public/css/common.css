@@ -102,7 +102,7 @@
     background-color: #eee;
 }
 .page-limit-width > .content-cage{
-    max-width: 600px;
+    max-width: var(--container-max-width);
     margin: 0 auto;
     background-color: #fff;
     padding: 1rem;
@@ -113,7 +113,7 @@
 .fixed-limit-width{
     position: fixed;
     z-index: 8;
-    max-width: 600px;
+    max-width: var(--container-max-width);
     width: 100%;
-    left: max(calc(50vw - 300px), 0px);
+    left: max(calc(50vw - var(--container-max-width) / 2), 0px);
 }
