@@ -4,6 +4,8 @@
 //页面临时数据，用于临时保存几十至上百 MB 的数据。
 //这类数据本地存储无法保存，也不建议用 Vuex 保存，只能保存在内存里了！
 let pageTempData = null;
+//浏览器滚动条宽度
+let scrollBarWidth = -1;
 
 //设置临时数据
 export function setPageTempData(dat){
@@ -59,4 +61,47 @@ export function getFriendlyDuration(seconds){
         (mm >= 10 ? "" : "0") + mm + ":" + 
         (ss >= 10 ? "" : "0") + ss
     );
+}
+
+//查找数组中最小值所在的索引（仅对数字数组有效）
+export function arrayFindIndexOfMinValue(arr){
+    if(!arr || !arr.length){
+        return -1;
+    }
+    
+    let lowest = 0;
+    
+    for(let kx = 1; kx < arr.length; kx++){
+        if(arr[kx] < arr[lowest]){
+            lowest = kx;
+        }
+    }
+    
+    return lowest;
+}
+
+//获取浏览器的默认滚动条宽度
+export function getScrollBarWidth() {
+    if(scrollBarWidth >= 0){
+        return scrollBarWidth;
+    }
+
+    let el = document.createElement("div");
+    
+    el.style.position = "fixed";
+    el.style.left = "0";
+    el.style.top = "0";
+    el.style.zIndex = "0";
+    el.style.width = "100px";
+    el.style.height = "100px";
+    el.style.overflow = "scroll";
+    el.style.visibility = "hidden";
+    
+    document.body.appendChild(el);
+    
+    scrollBarWidth = (el.offsetWidth - el.clientWidth) || 0;
+    
+    el.remove();
+    
+    return scrollBarWidth;
 }

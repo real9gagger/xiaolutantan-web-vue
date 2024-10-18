@@ -218,4 +218,12 @@ export default [
             showPageTitle: true
         }
     },
+    {
+    	path: "/waterfallflow",
+    	name: "照片集",
+    	component: () => import("@/views/canal/waterfallFlowList"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
 ];

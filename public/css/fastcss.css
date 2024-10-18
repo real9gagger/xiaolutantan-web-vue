@@ -49,6 +49,7 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
     --bg-share-picture-activiting: url("../icons/share_picture_activiting.png"); /* 必须用相对路径！ */
     --bg-share-picture-visited: url("../icons/share_picture_visited.png"); /* 必须用相对路径！ */
     --bg-add-share-pictures: url("../icons/add_share_pictures.png"); /* 必须用相对路径！ */
+    --bg-skeleton-image: url("../icons/skeleton_image.png"); /* 必须用相对路径！ */
     --bg-map-canal-thumbnail: url("../images/map_canal_thumbnail.png"); /* 必须用相对路径！ */
     --bg-about-us-bg: url("../images/about_us_bg.jpg"); /* 必须用相对路径！ */
 }

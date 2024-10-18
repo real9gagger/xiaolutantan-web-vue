@@ -53,7 +53,6 @@
     const emits = defineEmits(["finished"]); //结束时调用函数
     const qrDataURL = ref(null);
     const isDrawEnd = ref(false);
-    const isMobile = (navigator.userAgent.indexOf("Mobile") >= 0);
     const canvasSize = Math.round(window.pxOf1rem * 10); /* 等于二维码图片的宽高 */
     const rectSize = 20; //像素。二维码中小块的宽高
     const rectRows = Math.ceil(canvasSize / rectSize); //二维码有多少行
@@ -70,7 +69,7 @@
     }
     
     function onShareToWechatFriend(){
-        if(isMobile){
+        if(IS_MOBILE){
             appToast("分享给微信好友失败");
         } else {
             appToast("当前设备不支持此分享方式");
@@ -81,7 +80,7 @@
     }
     
     function onShareToWechatCircle(){
-        if(isMobile){
+        if(IS_MOBILE){
             appToast("分享到微信朋友圈失败");
         } else {
             appToast("当前设备不支持此分享方式");
@@ -92,7 +91,7 @@
     }
     
     function onShareToDouyin(){
-        if(isMobile){
+        if(IS_MOBILE){
             appToast("分享到抖音失败");
         } else {
             appToast("当前设备不支持此分享方式");

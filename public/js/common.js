@@ -1,3 +1,6 @@
+const IS_MOBILE = navigator.userAgent.indexOf("Mobile") >= 0; //是否是移动端
+const IS_H5MODE = (window.innerWidth < 768); //是否是h5模式
+
 //图片加载失败调用的函数
 function onImageLoadingError(){
 	var evt = window.event;
