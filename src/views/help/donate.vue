@@ -1,8 +1,8 @@
 <template>
     <div class="page-limit-width">
-        <div class="content-cage ta-c dnt-bg-box">
+        <div class="content-cage dnt-bg-box">
             <div class="dnt-bg-mask"></div>
-            <div class="ps-a po-f of-a pd-tb-2rem">
+            <div class="ps-r zi-1 pd-tb-2rem">
                 <h4 class="fs-1rem tc-ff">“{{donateWords}}”</h4>
                 
                 <p class="mg-t-2rem mg-b-rem5 fw-b">通过微信捐款 ▼</p>
@@ -29,6 +29,7 @@
         background-position: 0% 0%;
         background-size: 100% auto;
         background-repeat: repeat;
+        text-align: center;
     }
     .dnt-bg-mask{
         position: absolute;

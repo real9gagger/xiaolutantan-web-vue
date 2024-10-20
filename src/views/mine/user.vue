@@ -110,7 +110,7 @@
 
 <style scoped="scoped">
     .mnu-user-bg{
-        height: 25%;
+        height: 20vh;
         position: relative;
     }
     .mnu-user-profile{

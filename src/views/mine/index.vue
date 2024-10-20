@@ -230,7 +230,7 @@
 
 <style scoped="scoped">
     .mni-user-bg{
-        height: 20%;
+        height: 20vh;
         position: relative;
     }
     .mni-user-profile{

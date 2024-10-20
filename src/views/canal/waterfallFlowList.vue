@@ -45,7 +45,7 @@
 <script setup name="CanalWaterfallFlowList">
     import { computed, nextTick, onMounted, reactive, ref } from "vue";
     import { useRouter } from "vue-router";
-    import { arrayFindIndexOfMinValue, getScrollBarWidth } from "@/utils/pagehelper.js";
+    import { arrayFindIndexOfMinValue } from "@/utils/pagehelper.js";
     
     import ajaxRequest from "@/request/index.js";
     import publicAssets from "@/assets/data/publicAssets.js";
@@ -156,7 +156,7 @@
     }
     
     onMounted(() => {
-        const cw = cageRef.value.clientWidth - (IS_MOBILE ? 0 : getScrollBarWidth()); //如果是PC端，需要减去滚动条的宽度
+        const cw = cageRef.value.clientWidth;
         
         columnInfo.count = Math.round(cw / (10 * window.pxOf1rem)); //列数
         columnInfo.width = Math.floor((cw - (columnInfo.count + 1) * COLUMN_GAP) / columnInfo.count); //每列宽度

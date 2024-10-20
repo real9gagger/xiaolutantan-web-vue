@@ -65,7 +65,7 @@
         width: 0,
         offsetTop: 0, //非负数
         offsetLeft: 0, //非负数
-        bestScale: 0, //最佳缩放值
+        bestScale: 2, //最佳缩放值
         coverDirection: 0, //是水平(0x00)还是垂直方向（0xFF）铺满
     });
 

@@ -28,8 +28,8 @@ instance.interceptors.response.use(function (response) {
     const resData = response.data;
     const resCode = (resData.code || 999);
     if (resCode === 200) {
-        if(response.config.cacheKey){
-            apiCaches[response.config.cacheKey] = resData.data;
+        if(response.config.cacheKey && response.request){
+            apiCaches[response.config.cacheKey] = response.request.responseText;
         }
         return (resData.data/* || resData */);
     } else {
@@ -58,7 +58,7 @@ export default function commonRequest(apiName, postData, allowCache){
     const cacheKey = (needMD5 ? md5(apiName + dataString).toString() : "");
     
     if(allowCache && apiCaches[cacheKey]){
-        return Promise.resolve(apiCaches[cacheKey]);
+        return Promise.resolve(JSON.parse(apiCaches[cacheKey]).data);
     } else {
         delete apiCaches[cacheKey];
     }
@@ -112,6 +112,7 @@ export default function commonRequest(apiName, postData, allowCache){
             "Content-Type": methodType[1],
             "Authorization": (accessToken ? `Bearer ${accessToken}` : "")
         },
+        responseType: "json",
         cacheKey: cacheKey,
         data: (!methodType[2] ? postData : undefined),
         params: (!methodType[2] ? undefined : postData)

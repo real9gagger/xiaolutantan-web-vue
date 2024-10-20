@@ -104,14 +104,15 @@
 }
 .page-limit-width{
     background-color: #eee;
+    height: var(--current-window-height);
+    overflow: auto;
 }
 .page-limit-width > .content-cage{
     max-width: var(--container-max-width);
     margin: 0 auto;
     background-color: #fff;
     padding: 1rem;
-    height: var(--current-window-height);
-    overflow: auto;
+    min-height: var(--current-window-height);
     position:relative;
 }
 .fixed-limit-width{

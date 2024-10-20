@@ -1,7 +1,7 @@
 <template>
     <div class="page-limit-width">
         <template v-if="shareInfos && shareInfos.id">
-            <div class="content-cage" style="padding:0;overflow:hidden;background-color:#000">
+            <div class="content-cage" style="padding:0;overflow:hidden;background-color:#000;height:100%">
                 <video
                     :src="shareInfos.pictureList[0].picPath"
                     :poster="shareInfos.pictureList[0].thumbnailPath"

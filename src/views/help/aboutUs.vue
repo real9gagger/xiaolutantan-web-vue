@@ -1,6 +1,6 @@
 <template>
     <div class="page-limit-width">
-        <div class="content-cage ta-c abu-bg-box">
+        <div class="content-cage abu-bg-box">
             <div class="abu-bg-mask"></div>
             <div style="height:10vh"><!-- 占位用 --></div>
             <h4 class="dp-ib ps-r zi-1">
@@ -43,6 +43,7 @@
         background-position: 50% 50%;
         background-size: 100% auto;
         background-repeat: repeat;
+        text-align: center;
     }
     .abu-bg-mask{
         position: absolute;

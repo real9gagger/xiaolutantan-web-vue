@@ -21,7 +21,7 @@
                 @click="toggleHideText"
                 effect="slide"
                 class="content-cage"
-                style="padding:0;overflow:hidden">
+                style="padding:0;overflow:hidden;height:100%">
                 <swiper-slide v-for="item in shareInfos.pictureList" :key="item.id" class="fx-vm">
                     <!-- 2024年7月19日。swiper自带缩放功能，体验不佳，弃用 <div class="swiper-zoom-container">
                         <img :alt="item.description" :src="item.picPath" class="wi-f" />
