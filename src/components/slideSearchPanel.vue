@@ -45,7 +45,7 @@
 </template>
 
 <script setup name="SlideSearchPanel">
-    import { ref, watch, defineProps, defineEmits, onMounted, nextTick, onUnmounted } from "vue";
+    import { ref, watch, defineProps, defineEmits, defineExpose, onMounted, nextTick, onUnmounted } from "vue";
     import { getFriendlyDistance } from "@/utils/maphelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
@@ -272,10 +272,6 @@
                 distance: "0m"
             });
         }
-        
-        if(isGeocoding && evt.addressComponents.city){
-            nonRVs.mapSearcher.setLocation(evt.addressComponents.city);
-        }
     }
     function getPoiListByMapPoint(thePoint){//拖动搜索
         if(!poiList.value || !thePoint){
@@ -287,13 +283,17 @@
         nonRVs.pageIndex = 0; //因为是拖动搜索的，所以需要重置为 0
         nonRVs.mapGeocoder.getLocation(thePoint, searchCompleteCallback, { poiRadius: 1000, numPois: 20 });
     }
+    function initiMapSearcher(bdmap){
+        nonRVs.mapSearcher.setLocation(bdmap);
+    }
     
     watch(() => props.mapCenterPoint, getPoiListByMapPoint);
     onMounted(() => {
-        nonRVs.mapSearcher = new BMapGL.LocalSearch("南宁市", {
+        nonRVs.mapSearcher = new BMapGL.LocalSearch(null, {
             pageCapacity: 20,
             onSearchComplete: searchCompleteCallback
         });
+        
         nonRVs.mapGeocoder = new BMapGL.Geocoder();
         
         nextTick(onPositionMyLocation);
@@ -307,6 +307,10 @@
             nonRVs.mapGeocoder.dispose();
             nonRVs.mapGeocoder = null;
         }
+    });
+    
+    defineExpose({
+        initiMapSearcher
     });
 </script>
 

@@ -9,6 +9,7 @@
             <span class="mpp-pin-shadow" :class="{'scaling': mapPinUpDowning}"><!-- 底部阴影 --></span>
         </div>
         <slide-search-panel 
+            ref="sspRef"
             :map-center-point="mapCenterPoint" 
             @itemselected="onPoiItemSelected" 
             @itemzoomin="onPoiItemZoomIn" 
@@ -29,6 +30,7 @@
     
     const $store = useStore();
     const $router = useRouter();
+    const sspRef = ref(null);
     const mapPinUpDowning = ref(false);
     const mapCenterPoint = ref(null);
     
@@ -53,6 +55,8 @@
         mapInstance.addControl(new BMapGL.ZoomControl({ anchor: BMAP_ANCHOR_TOP_RIGHT, offset: new BMapGL.Size(10, 10) }));//添加缩放控件
         mapInstance.centerAndZoom(new BMapGL.Point(108.95692705, 22.28643878), 10);
         mapInstance.addEventListener("dragend", onMapDragEnd);
+        
+        sspRef.value.initiMapSearcher(mapInstance);
     }
     function onMapDragEnd(evt){
         needDebounce(onGeocoderPoint, 800);

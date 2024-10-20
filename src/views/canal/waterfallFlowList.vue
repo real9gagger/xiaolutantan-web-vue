@@ -3,7 +3,7 @@
         <div ref="cageRef" class="content-cage wfl-content-box">
             <ul id="wflUlDataBox" v-if="dataList.length" class="ps-r">
                 <li v-for="item in dataList" :key="item.id" :style="columnInfo.csstxt" class="wfl-item-box" @click="onItemClick(item)">
-                    <img :src="item.pictureList[0].thumbnailPath" class="dp-bk wi-f" onerror="onImageLoadingError()" />
+                    <img :src="item.pictureList[0].thumbnailPath" class="wfl-item-pic" onerror="onImageLoadingError()" />
                     <p v-if="item.title.length > MAX_TEXT_LENGTH" class="wfl-item-title">{{item.title.substr(0, MAX_TEXT_LENGTH)}}…</p>
                     <p v-else class="wfl-item-title">{{item.title}}</p>
                     <div class="pd-lr-rem25 pd-b-rem5 tc-99 fs-rem6 fx-hc">
@@ -188,6 +188,13 @@
         padding: 0.5rem 0.25rem;
         font-size: 0.7rem;
         font-weight: 500;
+    }
+    .wfl-item-pic{
+        display: block;
+        width: 100%;
+        max-height: 50vh;
+        background-color: #f0f0f0;
+        object-fit: cover;
     }
     .wfl-is-video{
         position: absolute;
