@@ -26,12 +26,10 @@
     import { ref, reactive, defineProps, computed } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
     
-    const MOVE_RATIO = 0.3; //移到超出范围后的粘合墙壁因子，值越小越粘。
-    const INERTIA_STEP = 150; //单指移动放手后的滑动的时间（毫秒）
-    const MAX_SCALE = 8; //双指放大时最大的放大倍数
-    const MAX_SCALE_FINAL = 6; //手指离开屏幕时最终允许的最大放大倍数
-    const MIN_SCALE = 0.8; //双指缩小时最小的缩小倍数
-    const MIN_SCALE_FINAL = 1; //手指离开屏幕时最终允许的最小缩小倍数
+    const MOVE_RATIO = 0.25; //移到超出范围后的粘合墙壁因子，值越小越粘。
+    const INERTIA_STEP = 200; //单指移动放手后的滑动的时间（毫秒）
+    const MAX_SCALE = { CEILING: 8, FINAL: 6 };//双指放大时最大的放大倍数；手指离开屏幕时最终允许的最大放大倍数
+    const MIN_SCALE = { FLOOR: 0.8, FINAL: 1 }; //双指缩小时最小的缩小倍数；手指离开屏幕时最终允许的最小缩小倍数
     const DOUBLE_CLICK_SPAN = 300; //双击时的时间间隔
     const ORIGIN_X = 0.0; //[0 - 1] 之间的数
     const ORIGIN_Y = 0.0; //[0 - 1] 之间的数
@@ -65,13 +63,13 @@
     const imageRect = reactive({//图片矩形信息
         height: 0,
         width: 0,
-        offsetTop: 0, //非正数
-        offsetBottom: 0, //非正数
-        offsetLeft: 0, //非正数
-        offsetRight: 0 //非正数
+        offsetTop: 0, //非负数
+        offsetLeft: 0, //非负数
+        bestScale: 0, //最佳缩放值
+        coverDirection: 0, //是水平(0x00)还是垂直方向（0xFF）铺满
     });
 
-    const maxScaleFinalXY = [0, 0, 0]; //刚好达到 “MAX_SCALE_FINAL” 时的偏移量（第一、二元素标记位置，第三个元素用于标记是否已被设置值）
+    const maxScaleFinalXY = [0, 0, 0]; //刚好达到 “MAX_SCALE.FINAL” 时的偏移量（第一、二元素标记位置，第三个元素用于标记是否已被设置值）
     const moveXY = [0, 0]; //单指移动时的位置，或者双指移动时的双指中心位置
     const moveVelocityXY = [0, 0]; //移到时的速度
     const nonRVs = { //非响应式变量（non Responsive Variables）
@@ -79,20 +77,48 @@
         moveTS: 0, //移动时的时间戳
         startTS: 0, //开始触摸时的时间戳
         canPropagateClickEvent: true, //点击事件是否可以冒泡
+        touchScaleSpeed: 1, //触控缩放速率
     };
     
     const imageStyle = computed(() => ({
         transition: (needTransition.value ? "transform 300ms ease-out 0s" : "none"),
         transformOrigin: `${ORIGIN_X * 100}% ${ORIGIN_Y * 100}%`,
         transform: `translate(${transXY[0]}px, ${transXY[1]}px) scale(${imageScale.value})`,
+        width: (imageRect.width ? `${imageRect.width}px` : "100%"),
+        height: (imageRect.height ? `${imageRect.height}px` : "100%"),
+        objectFit: (imageRect.height ? "" : "contain"),
         cursor: cursorType.value
     }));
-    const scaleOffset = computed(() => (imageScale.value - 1)); //缩放大小偏移量
     const isHandleEvent = computed(() => (imageScale.value !== props.threshold)); //只有缩放不等于1才能控制触控事件，防止和 Swiper 事件冲突
-    const limitMinX = computed(() => Math.round(imageRect.width * ORIGIN_A * scaleOffset.value + imageRect.offsetRight)); //负数（或0），向X轴的左方向滑动时的限制值
-    const limitMaxX = computed(() => Math.round(imageRect.width * ORIGIN_X * scaleOffset.value - imageRect.offsetLeft)); //正数（或0），向X轴的右方向滑动时的限制值
-    const limitMinY = computed(() => Math.round(imageRect.height * ORIGIN_B * scaleOffset.value + imageRect.offsetBottom)); //负数（或0），向Y轴的上方向滑动时的限制值
-    const limitMaxY = computed(() => Math.round(imageRect.height * ORIGIN_Y * scaleOffset.value - imageRect.offsetTop)); //正数（或0），向Y轴的下方向滑动时的限制值
+    const limitArea = computed(() => {
+        const scaleOffset = (imageScale.value - 1);
+        const occupyX = (imageRect.width * scaleOffset / 2);
+        const occupyY = (imageRect.height * scaleOffset / 2);
+        const output = {
+            xL: 0, //X轴左边，向X轴的右方向滑动时的限制值
+            xR: 0, //X轴右边，向X轴的左方向滑动时的限制值
+            yT: 0, //Y轴上边，向Y轴的下方向滑动时的限制值
+            yB: 0, //Y轴下边，向Y轴的上方向滑动时的限制值
+        };
+        
+        if(imageRect.offsetLeft >= occupyX){
+            output.xL = Math.round(imageRect.width * ORIGIN_X * scaleOffset - occupyX);
+            output.xR = Math.round(imageRect.width * ORIGIN_A * scaleOffset + occupyX);
+        } else {
+            output.xL = Math.round(imageRect.width * ORIGIN_X * scaleOffset - imageRect.offsetLeft);
+            output.xR = Math.round(imageRect.width * ORIGIN_A * scaleOffset + imageRect.offsetLeft);
+        }
+        
+        if(imageRect.offsetTop >= occupyY){
+            output.yT = Math.round(imageRect.height * ORIGIN_Y * scaleOffset - occupyY);
+            output.yB = Math.round(imageRect.height * ORIGIN_B * scaleOffset + occupyY);
+        } else {
+            output.yT = Math.round(imageRect.height * ORIGIN_Y * scaleOffset - imageRect.offsetTop);
+            output.yB = Math.round(imageRect.height * ORIGIN_B * scaleOffset + imageRect.offsetTop);
+        }
+
+        return output;
+    });
     
     function getNumberBetween(num, min, max){//介于两个数之间的数
         if(num < min){
@@ -124,16 +150,31 @@
         ];
     }
     function getTransXY(evt){//获取双击时的偏移量
+        const scaleOffset = (1 - imageScale.value);
         if(evt.type === "touchstart"){
-            return [
-                -(evt.touches[0].clientX - evt.target.offsetLeft - imageRect.width * ORIGIN_X) * scaleOffset.value,
-                -(evt.touches[0].clientY - evt.target.offsetTop - imageRect.height * ORIGIN_Y) * scaleOffset.value,
-            ];
+            if(imageRect.coverDirection){//垂直方向铺满
+                return [
+                    (imageRect.width / 2 - imageRect.width * ORIGIN_X) * scaleOffset,
+                    (evt.touches[0].clientY - evt.target.offsetTop - imageRect.height * ORIGIN_Y) * scaleOffset,
+                ];
+            } else {//水平方向铺满
+                return [
+                    (evt.touches[0].clientX - evt.target.offsetLeft - imageRect.width * ORIGIN_X) * scaleOffset,
+                    (imageRect.height / 2 - imageRect.height * ORIGIN_Y) * scaleOffset,
+                ];
+            }
         } else {
-            return [
-                -(evt.offsetX - imageRect.width * ORIGIN_X) * scaleOffset.value,
-                -(evt.offsetY - imageRect.height * ORIGIN_Y) * scaleOffset.value,
-            ];
+            if(imageRect.coverDirection){//垂直方向铺满
+                return [
+                    (imageRect.width / 2 - imageRect.width * ORIGIN_X) * scaleOffset,
+                    (evt.offsetY - imageRect.height * ORIGIN_Y) * scaleOffset,
+                ];
+            } else {//水平方向铺满
+                return [
+                    (evt.offsetX - imageRect.width * ORIGIN_X) * scaleOffset,
+                    (imageRect.height / 2 - imageRect.height * ORIGIN_Y) * scaleOffset,
+                ];
+            }
         }
     }
     function resetXY(arr, xy){//重置设置数组值
@@ -183,13 +224,13 @@
             const disY = (nowXY[1] - moveXY[1]);
             const disTS = Math.max(evt.timeStamp - nonRVs.moveTS, 1);// 不能小于 1，防止除以 0
             
-            if(transXY[0] > 0 || transXY[0] < limitMinX.value){
+            if(transXY[0] >= limitArea.value.xL || transXY[0] <= limitArea.value.xR){
                 transXY[0] += (disX * MOVE_RATIO);
             } else {
                 transXY[0] += (disX);
             }
             
-            if(transXY[1] > 0 || transXY[1] < limitMinY.value){
+            if(transXY[1] >= limitArea.value.yT || transXY[1] <= limitArea.value.yB){
                 transXY[1] += (disY * MOVE_RATIO);
             } else {
                 transXY[1] += (disY);
@@ -205,29 +246,31 @@
             const disPx = getDisPx(evt);
             const pointerCenterXY = getCenterXY(evt);
             const oldScale = imageScale.value;
-            const deltaRatio = (disPx / nonRVs.lastDIS - 1);//大于0放大（双指展开），小于0缩小（双指收缩）
+            const deltaRatio = (disPx / nonRVs.lastDIS - 1) * nonRVs.touchScaleSpeed;//大于0放大（双指展开），小于0缩小（双指收缩）
             const newScale = (oldScale + deltaRatio);
             
             //双指放大时的偏移量（累加）公式参见：https://juejin.cn/post/7020243158529212423
-            if(newScale >= MIN_SCALE && newScale <= MAX_SCALE){
-                const deltaX = (pointerCenterXY[0] - transXY[0]) / oldScale - imageRect.width * ORIGIN_X;
-                const deltaY = (pointerCenterXY[1] - transXY[1]) / oldScale - imageRect.height * ORIGIN_Y;
+            if(newScale >= MIN_SCALE.FLOOR && newScale <= MAX_SCALE.CEILING){
+                //计算方式请查看，鼠标滚轮事件的 offsetX/Y 的计算方式
+                const scaleOffset = (imageScale.value - 1);
+                const deltaX = (pointerCenterXY[0] - transXY[0] + imageRect.width * ORIGIN_X * scaleOffset) / oldScale - imageRect.width * ORIGIN_X;
+                const deltaY = (pointerCenterXY[1] - transXY[1] + imageRect.height * ORIGIN_Y * scaleOffset) / oldScale - imageRect.height * ORIGIN_Y;
                 const oldTrans = [...transXY];
-                
+
                 transXY[0] -= ((deltaRatio * deltaX) - (pointerCenterXY[0] - moveXY[0]));
                 transXY[1] -= ((deltaRatio * deltaY) - (pointerCenterXY[1] - moveXY[1]));
                 
                 //记录这个点的偏移量，后面还原时有用！
-                if(newScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[2]){
-                    maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE_FINAL - oldScale));
-                    maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE_FINAL - oldScale));
+                if(newScale >= MAX_SCALE.FINAL && !maxScaleFinalXY[2]){
+                    maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE.FINAL - oldScale));
+                    maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE.FINAL - oldScale));
                     maxScaleFinalXY[2] = 0x717; //标记为已设置值
                 }
+                
+                imageScale.value = newScale; //根据双指收缩展开或的距离缩放（累加）
+                nonRVs.lastDIS = disPx;
             }
             
-            //根据双指收缩展开或的距离缩放（累加）
-            imageScale.value = getNumberBetween(newScale, MIN_SCALE, MAX_SCALE);
-            nonRVs.lastDIS = disPx;
             resetXY(moveXY, pointerCenterXY);
         }
         
@@ -278,13 +321,13 @@
             
             const disTS = Math.max(evt.timeStamp - nonRVs.moveTS, 1); // 不能小于 1，防止除以 0
             
-            if(transXY[0] > 0 || transXY[0] < limitMinX.value){
+            if(transXY[0] >= limitArea.value.xL || transXY[0] <= limitArea.value.xR){
                 transXY[0] += (evt.movementX * MOVE_RATIO);
             } else {
                 transXY[0] += (evt.movementX);
             }
             
-            if(transXY[1] > 0 || transXY[1] < limitMinY.value){
+            if(transXY[1] >= limitArea.value.yT || transXY[1] <= limitArea.value.yB){
                 transXY[1] += (evt.movementY * MOVE_RATIO);
             } else {
                 transXY[1] += (evt.movementY);
@@ -321,12 +364,23 @@
         evt.preventDefault();
         evt.stopPropagation();
         
-        //滚轮逆时针滚动-放大；滚轮顺时针滚动-缩小
-        const oldScale = imageScale.value;
-        const multiplier = (evt.wheelDelta > 0 ? +MOUSE_WHEEL_SCALE_RATIO: -MOUSE_WHEEL_SCALE_RATIO) * oldScale;
-        const newScale = (oldScale + multiplier);
-        
-        if(newScale >= MIN_SCALE && newScale <= MAX_SCALE){
+        if(imageScale.value >= MIN_SCALE.FLOOR && imageScale.value <= MAX_SCALE.CEILING){
+            //滚轮逆时针滚动-放大；滚轮顺时针滚动-缩小
+            /* 计算公式
+                offsetX = (clientX - offsetLeft - transXY[0] + imageRect.width * ORIGIN_X * (imageScale.value - 1)) / imageScale.value;
+                offsetY = (clientY - offsetTop - transXY[1] + imageRect.height * ORIGIN_Y * (imageScale.value - 1)) / imageScale.value;，
+                
+                可以打印结果出来验证公式对不对
+                console.log(
+                    evt.offsetX, 
+                    (evt.clientX - evt.target.offsetLeft - transXY[0] + imageRect.width * ORIGIN_X * (imageScale.value - 1)) / imageScale.value,
+                    evt.offsetY,
+                    (evt.clientY - evt.target.offsetTop - transXY[1] + imageRect.height * ORIGIN_Y * (imageScale.value - 1)) / imageScale.value
+                );
+            */
+            const oldScale = imageScale.value;
+            const multiplier = (evt.wheelDelta > 0 ? +MOUSE_WHEEL_SCALE_RATIO: -MOUSE_WHEEL_SCALE_RATIO) * oldScale;
+            const newScale = (oldScale + multiplier);
             const deltaX = (evt.offsetX - imageRect.width * ORIGIN_X);
             const deltaY = (evt.offsetY - imageRect.height * ORIGIN_Y);
             const oldTrans = [...transXY];
@@ -336,16 +390,16 @@
             transXY[1] -= (deltaY * multiplier);
             
             //记录缩放到这个点时的偏移量，后面还原时有用！
-            if(newScale >= MAX_SCALE_FINAL && !maxScaleFinalXY[2]){
-                maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE_FINAL - oldScale));
-                maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE_FINAL - oldScale));
+            if(newScale >= MAX_SCALE.FINAL && !maxScaleFinalXY[2]){
+                maxScaleFinalXY[0] = (oldTrans[0] - deltaX * (MAX_SCALE.FINAL - oldScale));
+                maxScaleFinalXY[1] = (oldTrans[1] - deltaY * (MAX_SCALE.FINAL - oldScale));
                 maxScaleFinalXY[2] = 0x717; //标记为已设置值
             }
             
             cursorType.value = (evt.wheelDelta > 0 ? "zoom-in" : "zoom-out");
         }
         
-        needDebounce(actionEndCallback, 300);
+        needDebounce(actionEndCallback, 600);
     }
     function onImgDblClick(evt){
         //console.log("双击…", evt);
@@ -353,7 +407,7 @@
         evt.stopPropagation();
         
         needTransition.value = true;
-        imageScale.value = (imageScale.value !== 1 ? 1 : 2);
+        imageScale.value = (imageScale.value !== 1 ? 1 : imageRect.bestScale);
         cursorType.value = (imageScale.value !== 1 ? "grab" : "pointer");
         resetXY(transXY, getTransXY(evt));
     }
@@ -377,15 +431,37 @@
     function onImgLoad(evt){
         //console.log("图片加载完成…", evt);
         const tg = evt.target;
+        const ratio = (tg.naturalWidth / tg.naturalHeight);
+        const containerHeight = tg.parentNode.clientHeight;
+        const containerWidth = tg.parentNode.clientWidth;
         
-        imageRect.height = tg.height;
-        imageRect.width = tg.width;
-        imageRect.offsetTop = Math.min(tg.offsetTop, 0); //必须小于或等于0
-        imageRect.offsetBottom = Math.min(tg.parentNode.clientHeight - imageRect.height - imageRect.offsetTop, 0);//必须小于或等于0
-        imageRect.offsetLeft =  Math.min(tg.offsetLeft, 0); //必须小于或等于0
-        imageRect.offsetRight = Math.min(tg.parentNode.clientWidth - imageRect.width - imageRect.offsetLeft, 0);//必须小于或等于0;
+        if((containerHeight * ratio) < containerWidth){
+            imageRect.height = containerHeight;
+            imageRect.width = Math.round(containerHeight * ratio);
+            imageRect.offsetTop = 0; //必须大于或等于0
+            imageRect.offsetLeft =  Math.floor((containerWidth - imageRect.width) / 2); //必须大于或等于0
+            imageRect.bestScale = (containerWidth / imageRect.width);
+            imageRect.coverDirection = 0xFF; //垂直方向铺满
+        } else {
+            imageRect.height = Math.round(containerWidth / ratio);
+            imageRect.width = containerWidth;
+            imageRect.offsetTop = Math.floor((containerHeight - imageRect.height) / 2); //必须大于或等于0
+            imageRect.offsetLeft = 0; //必须大于或等于0
+            imageRect.bestScale = (containerHeight / imageRect.height);
+            imageRect.coverDirection = 0x00; //水平方向铺满
+        }
         
-        //console.log(imageRect);
+        //决不能等于1！！！
+        if(imageRect.bestScale === 1){
+            imageRect.bestScale += 0.5;
+        }
+        
+        MAX_SCALE.FINAL = Math.floor(Math.max(tg.naturalWidth / imageRect.width, imageRect.bestScale + 1)); //不能小于最佳缩放值
+        MAX_SCALE.CEILING = (MAX_SCALE.FINAL + 2);
+        
+        nonRVs.touchScaleSpeed = Math.sqrt(MAX_SCALE.FINAL);
+
+        //console.log(imageRect, MAX_SCALE);
     }
     function onPointerHandler(evt){
         //console.log("指针事件…", evt);
@@ -398,36 +474,36 @@
     
     //操作结束后的回调
     function actionEndCallback(){
-        if(imageScale.value < MIN_SCALE_FINAL){//松手后缩放超过最小值自动还原
+        if(imageScale.value < MIN_SCALE.FINAL){//松手后缩放超过最小值自动还原
             needTransition.value = true;
-            imageScale.value = MIN_SCALE_FINAL;
+            imageScale.value = MIN_SCALE.FINAL;
             resetXY(transXY);
-        } else if(imageScale.value > MAX_SCALE_FINAL){//松手后如果缩放超过最大值自动还原
+        } else if(imageScale.value > MAX_SCALE.FINAL){//松手后如果缩放超过最大值自动还原
             needTransition.value = true;
-            imageScale.value = MAX_SCALE_FINAL;
+            imageScale.value = MAX_SCALE.FINAL;
             resetXY(transXY, maxScaleFinalXY);
         }
         
-        if(transXY[0] > limitMaxX.value){//松手后左边自动回位
+        if(transXY[0] > limitArea.value.xL){//松手后左边自动回位
             needTransition.value = true;
-            transXY[0] = limitMaxX.value;
-        } else if(transXY[0] < limitMinX.value){//松手后右边自动回位
+            transXY[0] = limitArea.value.xL;
+        } else if(transXY[0] < limitArea.value.xR){//松手后右边自动回位
             needTransition.value = true;
-            transXY[0] = limitMinX.value;
+            transXY[0] = limitArea.value.xR;
         } else if(Math.abs(moveVelocityXY[0]) >= VELOCITY_THRESHOLD){ //松手后模拟惯性滑动一段距离，数值有负有正
             needTransition.value = true;
-            transXY[0] = getNumberBetween(transXY[0] + moveVelocityXY[0] * INERTIA_STEP, limitMinX.value, limitMaxX.value);
+            transXY[0] = getNumberBetween(transXY[0] + moveVelocityXY[0] * INERTIA_STEP, limitArea.value.xR, limitArea.value.xL);
         }
         
-        if(transXY[1] > limitMaxY.value){//松手后顶部自动回位
+        if(transXY[1] > limitArea.value.yT){//松手后顶部自动回位
             needTransition.value = true;
-            transXY[1] = limitMaxY.value;
-        } else if(transXY[1] < limitMinY.value){//松手后顶部自定回位
+            transXY[1] = limitArea.value.yT;
+        } else if(transXY[1] < limitArea.value.yB){//松手后顶部自定回位
             needTransition.value = true;
-            transXY[1] = limitMinY.value;
+            transXY[1] = limitArea.value.yB;
         } else if(Math.abs(moveVelocityXY[1]) >= VELOCITY_THRESHOLD){//松手后模拟惯性滑动一段距离，数值有负有正
             needTransition.value = true;
-            transXY[1] = getNumberBetween(transXY[1] + moveVelocityXY[1] * INERTIA_STEP, limitMinY.value, limitMaxY.value);
+            transXY[1] = getNumberBetween(transXY[1] + moveVelocityXY[1] * INERTIA_STEP, limitArea.value.yB, limitArea.value.yT);
         }
         
         cursorType.value = (imageScale.value > 1 ? "grab" : "pointer");
@@ -436,8 +512,6 @@
 
 <style>
     .gti-img-box{
-        width: 100%;
-        height: auto;
         user-select: none;
     }
 </style>
