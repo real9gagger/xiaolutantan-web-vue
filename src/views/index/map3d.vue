@@ -2,6 +2,7 @@
     <div class="hi-cwh of-h">
         <div id="IndexMap3DBox" class="wh-f"></div>
         <div class="map3d-zoom-level-box" :style="`min-width:${zlBoxWidth}px`">缩放&nbsp;{{mapZoomLevel}}级</div>
+        <map3d-top-banner @click="onGotoWaterFallFlow" />
         <map3d-control-vertical
             @onshare="onClickShare"
             @onaboutcanal="onGotoAboutCanal"
@@ -47,6 +48,7 @@
     import map3dSharePictureCallout from "@/components/map3dSharePictureCallout.vue";
     import map3dToolsPopup from "@/components/map3dToolsPopup.vue";
     import pageSharePanel from "@/components/pageSharePanel.vue";
+    import map3dTopBanner from "@/components/map3dTopBanner.vue";
     import bdMapStyle from "@/assets/json/bdMapStyle.json";
     import bdMapStyleFor3D from "@/assets/json/bdMapStyleFor3D.json";
     import bdMapStyleForSatellite from "@/assets/json/bdMapStyleForSatellite.json";
@@ -94,6 +96,11 @@
     //转到运河简介
     function onGotoAboutCanal(){
         $router.push("/aboutcanal");
+    }
+    
+    //转到瀑布流页面
+    function onGotoWaterFallFlow(){
+        $router.push("/waterfallflow");
     }
     
     //显示地图工具栏
