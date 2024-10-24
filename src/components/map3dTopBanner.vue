@@ -1,7 +1,7 @@
 <template>
     <div class="mtb-container fx-r tc-ff">
         <div class="hi-f fx-g1 bg-00 mtb-z1-fold-ani" style="transform-origin:100% 50%;transform:rotateY(-5deg);">1234567890987654321</div>
-        <div class="hi-f fx-g1 fx-r mtb-z2-fold-ani" style="transform-origin:0% 50%;transform:rotateY(5deg);perspective:50rem;perspective-origin: 50% 50%;">
+        <div class="hi-f fx-g2 fx-r mtb-z2-fold-ani" style="transform-origin:0% 50%;transform:rotateY(5deg);perspective:50rem;perspective-origin: 50% 50%;">
             <div class="hi-f fx-g1" style="background-color:#f00;">1234567890987654321</div>
             <div class="hi-f fx-g1 mtb-z3-fold-ani" style="background-color:#09f;transform-origin:0% 50%;transform:rotateY(-5deg);">1234567890987654321</div>
         </div>
