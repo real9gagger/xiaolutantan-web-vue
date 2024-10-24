@@ -9,7 +9,7 @@
 </template>
 
 <script setup name="Map3DInfoWindow">
-    import { ref, watch, defineProps } from "vue";
+    import { ref, watch } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const props = defineProps({

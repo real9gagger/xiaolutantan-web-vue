@@ -24,7 +24,6 @@
 </template>
 
 <script setup name="Map3DToolsPopup">
-    import { defineModel, defineEmits } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const emits = defineEmits([

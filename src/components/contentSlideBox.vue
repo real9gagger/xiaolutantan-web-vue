@@ -29,7 +29,7 @@
 </template>
 
 <script setup name="ContentSlideBox">
-    import { computed, defineProps, defineEmits, ref, watch, getCurrentInstance } from "vue";
+    import { computed, ref, watch, getCurrentInstance } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     

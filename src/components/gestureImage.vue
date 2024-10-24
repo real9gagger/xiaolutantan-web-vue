@@ -23,7 +23,7 @@
 </template>
 
 <script setup name="GestureImage">
-    import { ref, reactive, defineProps, computed } from "vue";
+    import { ref, reactive, computed } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
     
     const MOVE_RATIO = 0.25; //移到超出范围后的粘合墙壁因子，值越小越粘。

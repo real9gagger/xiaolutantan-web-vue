@@ -13,7 +13,7 @@
 </template>
 
 <script setup name="Map3DCanalThumbnail">
-    import { nextTick, defineProps, getCurrentInstance, computed, reactive, ref } from "vue";
+    import { nextTick, getCurrentInstance, computed, reactive, ref } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const props = defineProps({

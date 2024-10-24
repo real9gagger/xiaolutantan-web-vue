@@ -8,9 +8,7 @@
     </div>
 </template>
 
-<script setup name="PanoramaLoadingBox">
-    import { defineProps, defineEmits } from "vue";
-    
+<script setup name="PanoramaLoadingBox">    
     const props = defineProps({
         isFadeOut: { //是否渐隐（淡出）
             type: Boolean,

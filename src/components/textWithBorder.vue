@@ -6,7 +6,7 @@
 </template>
 
 <script setup name="TextWithBorder">
-    import { computed, defineProps } from "vue";
+    import { computed } from "vue";
     
     const props = defineProps({
         content: {

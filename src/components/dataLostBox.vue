@@ -7,7 +7,6 @@
 </template>
 
 <script setup name="DataLostBox">
-    import { defineProps } from "vue";
     import { useRouter } from "vue-router";
     import publicAssets from "@/assets/data/publicAssets.js";
     

@@ -27,7 +27,7 @@
 </template>
 
 <script setup name="ProgressCircle">
-    import { defineProps, nextTick, ref, watch } from "vue";
+    import { nextTick, ref, watch } from "vue";
     import { uploadStatusCode } from "@/assets/data/constants.js";
     
     const CIRCLE_STROKE_DASHARRAY = Math.ceil(2 * Math.PI * 30); //值为圆的周长 = 2 * π * 半径，然后向上取整

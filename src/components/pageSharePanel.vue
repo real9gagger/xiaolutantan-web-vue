@@ -40,7 +40,7 @@
 </template>
 
 <script setup name="PageSharePanel">
-    import { defineProps, defineModel, ref, getCurrentInstance, nextTick } from "vue";
+    import { ref, getCurrentInstance, nextTick } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     import qrcode from "qrcode";
     

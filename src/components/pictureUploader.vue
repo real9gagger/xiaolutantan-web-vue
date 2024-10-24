@@ -34,7 +34,7 @@
 </template>
 
 <script setup name="PictureUploader">
-    import { ref, reactive, computed, defineEmits, defineExpose, getCurrentInstance, onMounted, onUnmounted } from "vue";
+    import { ref, reactive, computed, getCurrentInstance, onMounted, onUnmounted } from "vue";
     import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
     import { uploadStatusCode } from "@/assets/data/constants.js";
     import fileUploader from "@/utils/fileuploader.js";

@@ -13,9 +13,7 @@
     </transition>
 </template>
 
-<script setup name="ActionPopup">
-    import { defineProps, defineModel } from "vue";
-    
+<script setup name="ActionPopup">    
     const isVisible = defineModel({
         type: Boolean,
         default: false

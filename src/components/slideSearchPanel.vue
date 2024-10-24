@@ -45,7 +45,7 @@
 </template>
 
 <script setup name="SlideSearchPanel">
-    import { ref, watch, defineProps, defineEmits, defineExpose, onMounted, nextTick, onUnmounted } from "vue";
+    import { ref, watch, onMounted, nextTick, onUnmounted } from "vue";
     import { getFriendlyDistance } from "@/utils/maphelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     

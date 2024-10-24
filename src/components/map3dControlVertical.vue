@@ -46,7 +46,7 @@
 </template>
 
 <script setup name="Map3DControlVertical">
-    import { ref, defineEmits, defineProps, getCurrentInstance, reactive, computed } from "vue";
+    import { ref, getCurrentInstance, reactive, computed } from "vue";
     import { useStore } from "vuex";
     import { mapLayerType } from "@/assets/data/constants.js";
     import publicAssets from "@/assets/data/publicAssets.js";

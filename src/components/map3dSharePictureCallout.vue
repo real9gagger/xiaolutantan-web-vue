@@ -6,7 +6,7 @@
 </template>
 
 <script setup name="Map3DSharePictureCallout">
-    import { ref, defineProps, computed, defineExpose } from "vue";
+    import { ref, computed } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const props = defineProps({
