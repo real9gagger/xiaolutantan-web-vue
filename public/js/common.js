@@ -91,7 +91,7 @@ function alertConfirm(msg, yesText, isAttention){
     return new Promise(function (resolve, reject) {
         let btnText = (yesText || "好");
         let attentionCss = (isAttention ? " attention" : ""); //按钮文字是否为红色
-        let $alertBox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button class="alert-confirm-yes${attentionCss}">${btnText}</button></div></div>`).appendTo(document.body);
+        let $alertBox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button type="button" class="alert-confirm-yes${attentionCss}">${btnText}</button></div></div>`).appendTo(document.body);
         
         $alertBox.on("click", function(evt){
             if(evt.target.classList.contains("alert-confirm-container")){

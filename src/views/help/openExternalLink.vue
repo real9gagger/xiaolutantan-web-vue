@@ -7,7 +7,7 @@
                     <a class="tc-b0" :href="theLink" target="_blank">{{theLink}}&ensp;</a>
                     <img :src="publicAssets.iconExternalLink" @click="onOpenLink" alt="外部链接" class="wh-1em cs-p" />
                 </p>
-                <button class="btn-box mg-t-2rem" @click="onOpenLink">确定打开外部链接</button>
+                <button type="button" class="btn-box mg-t-2rem" @click="onOpenLink">确定打开外部链接</button>
                 <a class="dp-bk mg-t-2rem tc-99 ta-c" @click="onGoBack">返回</a>
             </template>
             <template v-else>
@@ -15,7 +15,7 @@
                     <span class="fx-g1">参数错误，未能识别到有效链接</span>
                     <img :src="publicAssets.iconMsgError" alt="参数错误" class="wh-1rem" />
                 </p>
-                <button class="btn-box mg-t-2rem" @click="onGoBack">返回</button>
+                <button type="button" class="btn-box mg-t-2rem" @click="onGoBack">返回</button>
             </template>
         </div>
     </div>

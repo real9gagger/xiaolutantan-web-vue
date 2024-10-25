@@ -298,6 +298,7 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 .of-hs{overflow-x:auto;overflow-y:hidden} /* horizontal scrollable */
 .of-te{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}/* 文本溢出显示省略号 */
 .of-lc1{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
+.of-lc2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
 .of-no-sb{overflow:auto}
 .of-no-sb::-webkit-scrollbar{display:none}
 

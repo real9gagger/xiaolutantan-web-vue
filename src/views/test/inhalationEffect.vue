@@ -1,7 +1,7 @@
 <template>
     <div>
         <canvas :width="cvWidth" :height="cvHeight" ref="cvBox"></canvas>
-        <button class="tie-btn-box" @click="onRedo">重做</button>
+        <button type="button" class="tie-btn-box" @click="onRedo">重做</button>
     </div>
 </template>
 
