@@ -2,7 +2,7 @@
     <div class="hi-cwh of-h">
         <div id="IndexMap3DBox" class="wh-f"></div>
         <div class="map3d-zoom-level-box" :style="`min-width:${zlBoxWidth}px`">缩放&nbsp;{{mapZoomLevel}}级</div>
-        <map3d-top-banner @click="onGotoWaterFallFlow" />
+        <map3d-top-banner ref="mtbBox" @contentclick="onGotoWaterFallFlow" />
         <map3d-control-vertical
             @onshare="onClickShare"
             @onaboutcanal="onGotoAboutCanal"
@@ -676,6 +676,8 @@
                     }
                 }
             }
+            //初始化顶部内容消息栏
+            $instance.refs.mtbBox.initiData(res1);
         });
     }
     
