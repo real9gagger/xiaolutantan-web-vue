@@ -34,7 +34,7 @@
         if($store.getters.isRouterBack === null){
             done();
         } else {
-            $(elem).on("transitionend", function(){ done() });
+            $(elem).one("transitionend", function(){ done() });
             setTimeout(function(){ elem.style.transform = "translate(0,0)" }, 10);
         }
     }
