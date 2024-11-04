@@ -17,23 +17,26 @@
                     :src="pic.path" 
                     :key="pic.pid"
                     :data-index="pic.pid"
-                    :class="{'hiding': (pic.pid + 1) === thumbList.length}"
-                    @animationend="onBoardAnimationEnd" />
+                    :class="{'hiding': pic.pid >= hidingIndex}"
+                    @transitionend="onBoardTransitionEnd(pic.pid)" />
             </div>
             <div class="mtb-z3-bar" :class="{'folding': isFolding}">
-                <img :src="thumbList[0].path" alt="关闭" class="mtb-moving-pic" />
+                <img alt="滚动图" class="mtb-moving-pic" :src="thumbList[0].path" />
+                <img alt="关闭" :src="publicAssets.iconCloseXGrey" class="wh-1rem ps-a po-t-c hv-op6" style="right:0.4rem" />
             </div>
         </div>
     </div>
 </template>
 
 <script setup name="Map3DTopBanner">
-    import { computed, reactive, ref } from "vue";
+    import { reactive, ref } from "vue";
+    import { needDebounce } from "@/utils/cocohelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const emits = defineEmits(["contentclick"]);
     const activedPicIndex = ref(-1);
     const isFolding = ref(false); //是否正在折叠
+    const hidingIndex = ref(0x88888888);
     const thumbList = reactive([]);
     
     function initiData(data){
@@ -65,6 +68,8 @@
                 break;
             }
         }
+        
+        setTimeout(onBoardTransitionEnd, 1000, 0);
     }
     function onContentClick(evt){
         //for(let ix = 0; ix < thumbList.length; ix++){
@@ -93,14 +98,19 @@
             }
         }
     }
-    function onBoardAnimationEnd(evt){
-        const $elem = $(evt.target);
-        if($elem.data("index") > 0){
-            $elem.prev().addClass("hiding");
+    function onBoardTransitionEnd(idx){
+        if(hidingIndex.value >= thumbList.length){
+            needDebounce(restartBoardTransition, 1000);
         } else {
-            $elem.siblings().addBack().removeClass("hiding");
-            setTimeout(() => $elem.siblings().last().addClass("hiding"), 100);
+            if(idx > 1){
+                hidingIndex.value = (idx - 1);
+            } else {
+                hidingIndex.value = (0x88888888);
+            }
         }
+    }
+    function restartBoardTransition(){
+        hidingIndex.value = (thumbList.length - 1);
     }
     
     defineExpose({
@@ -139,14 +149,6 @@
         }
         to {
             transform: translateY(calc(2.5rem - 100%));
-        }
-    }
-    @keyframes mtb-board-pic-kf{
-        from{
-            opacity: 1;
-        }
-        to {
-            opacity: 0;
         }
     }
     
@@ -188,7 +190,7 @@
         perspective: inherit;
         perspective-origin: inherit;
         position: relative;
-        z-index: 88;
+        z-index: 8;
         overflow: hidden;
     }
     .mtb-z2-bar.folding{
@@ -201,6 +203,8 @@
         flex-basis: 50%;
         background-color: #fff;
         overflow: hidden;
+        position: relative;
+        z-index: 2;
     }
     .mtb-z3-bar.folding{
         animation: mtb-z3-fold-kf 2s ease 1 0s alternate;
@@ -212,6 +216,7 @@
         background-color: #fff;
         overflow: hidden;
         position: relative;
+        z-index: 1;
     }
     
     .mtb-thumb-pic{
@@ -235,8 +240,11 @@
     }
     
     .mtb-moving-pic{
+        display: block;
         width: 100%;
-        animation: mtb-moving-pic-kf 10s ease infinite 0s alternate;
+    }
+    .mtb-moving-pic.moving{
+        animation: mtb-moving-pic-kf 10s ease 2 0s alternate;
     }
     
     .mtb-board-pic{
@@ -247,8 +255,10 @@
         left: 0;
         top: 0;
         z-index: 1;
+        transition: transform 5s ease 5s;
+        transform: translateY(0);
     }
     .mtb-board-pic.hiding{
-        animation: mtb-board-pic-kf 10s ease 1 0s normal forwards;
+        transform: translateY(-100%);
     }
 </style>
