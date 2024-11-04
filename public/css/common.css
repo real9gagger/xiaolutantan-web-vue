@@ -59,7 +59,7 @@
     position: fixed;
     inset: 0;
     z-index: 99999999;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -87,6 +87,7 @@
 .alert-confirm-msg{
     padding: 1.5rem 1rem;
     word-break: break-all;
+    font-size: 0.9rem;
 }
 .alert-confirm-yes{
     display: block;

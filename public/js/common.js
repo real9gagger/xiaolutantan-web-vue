@@ -1,6 +1,22 @@
 const IS_MOBILE = navigator.userAgent.indexOf("Mobile") >= 0; //是否是移动端
 const IS_H5MODE = (window.innerWidth < 768); //是否是h5模式
 
+//适用于不出来 Promise catch 的情况，防止不处理 catch 而报错！
+function globalEmptyShell(){
+    return false;
+}
+
+//字符串的哈希值
+function stringHashCode(str) {
+    let hhh = 0;
+    if(str && typeof(str) === "string"){
+        for(let ii = 0; ii < str.length; ii++){
+            hhh = Math.imul(31, hhh) + (str.charCodeAt(ii) | 0);
+        }
+    }
+    return hhh;
+}
+
 //图片加载失败调用的函数
 function onImageLoadingError(){
 	var evt = window.event;
@@ -91,15 +107,23 @@ function alertConfirm(msg, yesText, isAttention){
     return new Promise(function (resolve, reject) {
         let btnText = (yesText || "好");
         let attentionCss = (isAttention ? " attention" : ""); //按钮文字是否为红色
-        let $alertBox = $(`<div class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button type="button" class="alert-confirm-yes${attentionCss}">${btnText}</button></div></div>`).appendTo(document.body);
+        let hashCode = ("ACBOX" + stringHashCode(msg + btnText + attentionCss));
+        
+        //根据消息内容和按钮文本，确定弹框唯一性，防止重复添加弹框
+        if(document.getElementById(hashCode)){
+            document.getElementById(hashCode).remove();
+            return reject(-1); //负数表示重复的弹框
+        }
+        
+        let $alertBox = $(`<div id="${hashCode}" class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button type="button" class="alert-confirm-yes${attentionCss}">${btnText}</button></div></div>`).appendTo(document.body);
         
         $alertBox.on("click", function(evt){
             if(evt.target.classList.contains("alert-confirm-container")){
                 $(evt.currentTarget).removeClass("showup");
-                reject();
+                reject(0);
             } else if(evt.target.classList.contains("alert-confirm-yes")){
                 $(evt.currentTarget).removeClass("showup");
-                resolve();
+                resolve(1);
             }
         }).on("transitionend", function (evt) {
             if(!evt.currentTarget.classList.contains("showup")){

@@ -48,7 +48,7 @@
     const isScrollable = ref(false); //内容是否可以滚动
     const nonRVs = { //非响应式变量（non Responsive Variables）
         startTS: 0, //开始触摸时的时间戳（毫秒）
-        startCY: 0, //开始触摸时的Y轴位置（毫秒）
+        startCY: 0, //开始触摸时的Y轴位置（像素）
         moveDis: 0, //累计移动的路程
         moveLY: 0, //上次移动的Y轴的位置
         scrollType: 0x00, //0x00 - 已滚动到顶部，0x11 - 不是滚动顶部或者底部，0x22 - 已滚动到底部

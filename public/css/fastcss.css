@@ -36,13 +36,13 @@ input[type=url],
 input[type=week],
 select,textarea{width:100%;outline:0;font-family:inherit;font-size:inherit}
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button{-webkit-appearance: none !important}/* chrome 去掉箭头 */
-input:-webkit-autofill{transition: background-color 3600s ease-in-out 0s}
+input::-webkit-inner-spin-button{-webkit-appearance:none !important}/* chrome 去掉箭头 */
+input:-webkit-autofill{transition:background-color 3600s ease-in-out 0s}
 input[type="number"]{-moz-appearance:textfield /* firefox 去掉箭头 */}
 input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 
 :root{
-	--main-color:#43BA62; /* 主色 */
+	--main-color: #43BA62; /* 主色 */
     --container-max-width: 30rem;
     --bg-close-x-grey: url("../icons/close_x_grey.png"); /* 必须用相对路径！ */
     --bg-share-picture-marker: url("../icons/share_picture_marker.png"); /* 必须用相对路径！ */
@@ -56,14 +56,15 @@ input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none}
 
 .hv-mc:hover{color:var(--main-color)}
 .hv-red:hover{color:red}
-.hv-f0:hover{background-color: #f0f0f0}
+.hv-f0:hover{background-color:#f0f0f0}
+.hv-op6:hover{opacity:0.6}
 
 .us-n{user-select:none}
 
 /* tap */
 .tp-dim:active{background-image:linear-gradient(0deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.1) 100%)}
-.tp-f0:active{background-color: #f0f0f0}
-.tp-ee:active{background-color: #eee}
+.tp-f0:active{background-color:#f0f0f0}
+.tp-ee:active{background-color:#eee}
 .tp-op6:active{opacity:0.6}
 
 /***************************************************** HTML基准字体大小 20 像素 **************************************************************/

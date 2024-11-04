@@ -184,7 +184,7 @@
         alertConfirm("退出登录", "确定").then(() => {
             $store.dispatch("setUserInfo", null);
             $router.back();
-        }).catch(() => 0);
+        }).catch(globalEmptyShell);
     }
     function onPopupAction(key){
         switch(key){
@@ -215,7 +215,7 @@
                         $store.dispatch("setThereAreNewPosts", true);
                         appToast("已删除");
                     });
-                });
+                }).catch(globalEmptyShell);
                 break;
             case 0x100:
                 window.open(postList[activeIndex.value].pictureSourceUrl, "_blank");
