@@ -21,7 +21,7 @@
                     @transitionend="onBoardTransitionEnd(pic.pid)" />
             </div>
             <div class="mtb-z3-bar" :class="{'folding': isFolding}">
-                <img alt="滚动图" class="dp-bk" :src="thumbList[randomIndex].path" />
+                <img alt="滚动图" class="dp-bk mtb-pic-minheight" :src="thumbList[randomIndex].path" />
                 <p class="mtb-z3-mask"><!-- 遮罩层 --></p>
                 <img alt="关闭" :src="publicAssets.iconCloseXGrey" @click.stop="onCloseBar" class="wh-1rem ps-a po-t-c hv-op6" style="right:0.5rem" />
             </div>
@@ -278,5 +278,9 @@
     }
     .mtb-board-pic.hiding{
         transform: translateY(-100%);
+    }
+    
+    .mtb-pic-minheight{
+        min-height: 2.5rem;
     }
 </style>
