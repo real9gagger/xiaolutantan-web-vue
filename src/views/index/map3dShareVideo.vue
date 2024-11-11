@@ -7,9 +7,10 @@
                     :poster="shareInfos.pictureList[0].thumbnailPath"
                     id="videoBox"
                     class="msv-video-box video-js"
-                    style="width:100%;height:100%;">浏览器不支持 HTML5 Video</video>
+                    style="width:100%;height:100%;outline:none">浏览器不支持 HTML5 Video</video>
             </div>
             <content-slide-box
+                ref="csbRef"
                 :user-avatar="shareInfos.authorAvatarUrl"
                 :user-nickname="shareInfos.authorNickname"
                 :sub-title="shareInfos.createTime + ' • 拍摄于' + shareInfos.locationAddress + '附近'"
@@ -48,6 +49,7 @@
     const shareInfos = reactive({});
     const isLoading = ref(true);
     const isContentShrink = ref(false);
+    const csbRef = ref(null);
     
     let videoHeight = 0;
     let videoPlayer = null;
@@ -67,8 +69,12 @@
         }
     }
     
-    function onVideoClick(){
-        isContentShrink.value = !isContentShrink.value;
+    function onVideoClick(evt){
+        //点击视频组件才能生效
+        if(evt.target.tagName === "VIDEO"){
+            isContentShrink.value = !isContentShrink.value;
+            nextTick(() => videoPlayer.userActive(!csbRef.value.checkWhetherHide())); //随便隐藏或显示控制条
+        }
     }
     
     function buildVideoPlayer(){
@@ -76,14 +82,21 @@
             window.VIDEOJS_NO_DYNAMIC_STYLE = true; //让 videoJS 不要添加动态样式
             videoHeight = window.innerHeight;
             
+            //配置项参考：https://gitcode.gitcode.host/docs-cn/video.js-docs-cn/docs/guides/options.html#useractionsclick
             videoPlayer = videojs("videoBox", {
                 controls: true,
                 loop: false, 
                 autoplay: true,
-                mute: true
+                mute: true,
+                inactivityTimeout: 0, //不自动隐藏控制条
+                userActions: { click: false } //禁止点击视频时播放或暂停
             }, function(){
                 //此处的 this 指向 videoPlayer
-                this.on("click", onVideoClick);
+                if(IS_MOBILE){
+                    this.on("touchend", onVideoClick);
+                } else {
+                    this.on("click", onVideoClick);
+                }
             });
             console.log("创建了视频组件...");
         } else if(videoPlayer.currentSrc().endsWith(shareInfos.pictureList[0].picPath)){
@@ -134,7 +147,7 @@
             setTimeout(() => {
                 videoPlayer.pause();
                 console.log("视频已暂停播放...");
-            }, 400);
+            }, 500);
         }
     });
     
@@ -142,6 +155,7 @@
         if(videoPlayer){
             setTimeout(() => {
                 videoPlayer.off("click", onVideoClick);
+                videoPlayer.off("touchend", onVideoClick);
                 videoPlayer.dispose();
                 videoPlayer = null;
                 console.log("视频内容已销毁...");

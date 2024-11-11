@@ -134,7 +134,7 @@
 .skeleton-loading-image{
     position: relative;
 }
-.skeleton-loading-image::before{
+.skeleton-loading-image::after{
     content: "";
     display: block;
     position: absolute;

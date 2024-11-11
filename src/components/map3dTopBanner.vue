@@ -1,5 +1,5 @@
 <template>
-    <div v-if="thumbList.length" class="mtb-container fx-r" :class="{'folding': isFolding}">
+    <div v-if="thumbList.length && isShow" class="mtb-container fx-r" @animationend="onContainerAnimationEnd" :class="{'folding': isFolding}">
         <div class="mtb-z1-bar" :class="{'folding': isFolding}" @mouseleave="onMakeBigger(-1)">
             <p class="ps-a po-tl-0 pd-l-rem2 zi-x1 fs-rem6 tc-p0">[新]</p>
             <img 
@@ -10,8 +10,8 @@
                 :class="pic.css"
                 @click="onMakeBigger(pic.pid)" />
         </div>
-        <div class="mtb-z2-bar" :class="{'folding': isFolding}">
-            <div class="mtb-content-box" @click="onContentClick">
+        <div class="mtb-z2-bar" :class="{'folding': isFolding}" @click="onContentClick">
+            <div class="mtb-content-box">
                 <img
                     v-for="pic in thumbList" alt="黑板报" class="mtb-board-pic"
                     :src="pic.path" 
@@ -21,15 +21,16 @@
                     @transitionend="onBoardTransitionEnd(pic.pid)" />
             </div>
             <div class="mtb-z3-bar" :class="{'folding': isFolding}">
-                <img alt="滚动图" class="mtb-moving-pic" :src="thumbList[0].path" />
-                <img alt="关闭" :src="publicAssets.iconCloseXGrey" class="wh-1rem ps-a po-t-c hv-op6" style="right:0.4rem" />
+                <img alt="滚动图" class="dp-bk" :src="thumbList[randomIndex].path" />
+                <p class="mtb-z3-mask"><!-- 遮罩层 --></p>
+                <img alt="关闭" :src="publicAssets.iconCloseXGrey" @click.stop="onCloseBar" class="wh-1rem ps-a po-t-c hv-op6" style="right:0.5rem" />
             </div>
         </div>
     </div>
 </template>
 
 <script setup name="Map3DTopBanner">
-    import { reactive, ref } from "vue";
+    import { onActivated, reactive, ref } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
@@ -38,6 +39,8 @@
     const isFolding = ref(false); //是否正在折叠
     const hidingIndex = ref(0x88888888);
     const thumbList = reactive([]);
+    const randomIndex = ref(0);
+    const isShow = ref(true);
     
     function initiData(data){
         if(!data || !data.length){
@@ -68,15 +71,11 @@
                 break;
             }
         }
-        
+        randomIndex.value = Math.round(Math.random() * thumbList.length);
         setTimeout(onBoardTransitionEnd, 1000, 0);
     }
     function onContentClick(evt){
-        //for(let ix = 0; ix < thumbList.length; ix++){
-            //thumbList[ix].style.transform = `translate(${20-ix}rem,${20-ix}rem) scale(${(20-ix)*0.5})`;
-        //}
-        isFolding.value = !isFolding.value;
-        //emits("contentclick", evt);
+        emits("contentclick", evt);
     }
     function onMakeBigger(idx){
         if(activedPicIndex.value >= 0){
@@ -113,6 +112,22 @@
         hidingIndex.value = (thumbList.length - 1);
     }
     
+    function onCloseBar(){
+        isFolding.value = !isFolding.value;
+    }
+    
+    
+    function onContainerAnimationEnd(){
+        isShow.value = false;
+    }
+    
+    onActivated(() => {
+        if(thumbList.length){
+            randomIndex.value = Math.round(Math.random() * thumbList.length);
+            setTimeout(onBoardTransitionEnd, 1000, hidingIndex.value);
+        }
+    });
+    
     defineExpose({
         initiData
     });
@@ -143,14 +158,6 @@
             transform: rotateY(-180deg);
         }
     }
-    @keyframes mtb-moving-pic-kf{
-        from{
-            transform: translateY(0%);
-        }
-        to {
-            transform: translateY(calc(2.5rem - 100%));
-        }
-    }
     
     .mtb-container{
         position: fixed;
@@ -175,10 +182,21 @@
         height: 2.5rem;
         position: relative;
         background-color: #fff;
+        z-index: 0;
     }
     .mtb-z1-bar.folding{
         overflow: hidden;
         animation: mtb-z1-fold-kf 2s ease 1 0s alternate;
+    }
+    .mtb-z1-bar::after{
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 4444;
+        border-left: 0.05rem solid #fff;
     }
     
     .mtb-z2-bar{
@@ -209,6 +227,14 @@
     .mtb-z3-bar.folding{
         animation: mtb-z3-fold-kf 2s ease 1 0s alternate;
     }
+    .mtb-z3-bar.folding > .mtb-z3-mask{background-color:rgba(255, 255, 255, 1)}
+    .mtb-z3-mask{
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-color: rgba(255, 255, 255, 0);
+        transition: background-color 500ms ease 500ms;
+    }
     
     .mtb-content-box{
         height: 2.5rem;
@@ -237,14 +263,6 @@
     .mtb-thumb-pic.bigger{
         box-shadow: 0 0 0.5rem 0 #999;
         transform: translate(100%, 150%) scale(3);
-    }
-    
-    .mtb-moving-pic{
-        display: block;
-        width: 100%;
-    }
-    .mtb-moving-pic.moving{
-        animation: mtb-moving-pic-kf 10s ease 2 0s alternate;
     }
     
     .mtb-board-pic{

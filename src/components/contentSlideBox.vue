@@ -65,11 +65,11 @@
         },
         subTitle: {
             type: String,
-            default: "用户名称"
+            default: "子标题"
         },
         content: {
             type: String,
-            default: "用户名称"
+            default: "视频内容"
         },
         isShrink: { //是否缩起来
             type: Boolean,
@@ -114,6 +114,7 @@
             
             containerHeight.value = LIMIT_HEIGHT_PX;
             isNeedTransition.value = true;
+            isHiding.value = false;
             
             emits("sliding", {
                 delta: (oldVal - containerHeight.value),
@@ -132,6 +133,7 @@
             
             containerHeight.value = DEFAULT_HEIGHT_PX;
             isNeedTransition.value = true;
+            isHiding.value = false;
             
             emits("sliding", {
                 delta: (oldVal - containerHeight.value),
@@ -260,12 +262,21 @@
         isNeedTransition.value = false;
     }
     
+    function checkWhetherHide(){
+        //检查是否隐藏
+        return isHiding.value;
+    }
+    
     watch(() => props.isShrink, function(){
         if(ratioVal.value){
             onCloseMoreContent();
         } else {
-            //onHideMoreContent(); //彻底隐藏内容！
+            onHideMoreContent(); //彻底隐藏内容！
         }
+    });
+    
+    defineExpose({
+        checkWhetherHide
     });
 </script>
 
