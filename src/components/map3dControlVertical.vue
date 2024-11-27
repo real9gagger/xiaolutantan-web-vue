@@ -154,7 +154,7 @@
             isPositionning.value = false;
         }, {
             enableHighAccuracy: true, //是否要求浏览器获取最佳效果，同浏览器定位接口参数。默认为false
-            timeout: 15, //超时时间，单位为毫秒。默认为10秒
+            timeout: 20000, //超时时间，单位为毫秒。默认为10秒
             SDKLocation: true, //是否开启SDK辅助定位
         });
     }
