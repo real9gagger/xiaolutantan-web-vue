@@ -5,17 +5,29 @@
             <progress-circle :value="item.uploadProgress" />
         </a>
         <template v-if="dragIndex < 0">
-            <a class="pud-pic-add" :style="addBoxStyle" title="添加照片" @click="onChoosePictures">
-                <span>+{{chooseType - uploadFileList.length}}</span>
-                <input 
+            <a class="pud-pic-add" :style="addBoxStyle.ofPicture" title="添加照片" key="AK47" @click="onChoosePictures">
+                <span>+{{MAX_IMAGE_COUNT - uploadFileList.length}}</span>
+                <input
                     class="op-h" 
                     title="隐藏着的文件选择器"
-                    ref="inputFileBox" 
-                    name="inputFileBox"
+                    ref="inputFileBox1" 
+                    name="inputFileBox1"
                     type="file" 
-                    :accept="chooseType===0x1 ? VIDEO_ACCEPT_TYPE : IMAGE_ACCEPT_TYPE" 
-                    :multiple="chooseType!==0x1"
-                    @change="onChooseChange"
+                    multiple="multiple"
+                    :accept="IMAGE_ACCEPT_TYPE" 
+                    @change="onChooseImageChange"
+                />
+            </a>
+            <a class="pud-pic-add is-video-box" :style="addBoxStyle.ofVideo" title="添加视频" key="AK48" @click="onChooseVideos">
+                <span>+{{MAX_VIDEO_COUNT - uploadFileList.length}}</span>
+                <input
+                    class="op-h" 
+                    title="隐藏着的文件选择器"
+                    ref="inputFileBox2" 
+                    name="inputFileBox2"
+                    type="file" 
+                    :accept="VIDEO_ACCEPT_TYPE" 
+                    @change="onChooseVideoChange"
                 />
             </a>
         </template>
@@ -34,22 +46,24 @@
 </template>
 
 <script setup name="PictureUploader">
-    import { ref, reactive, computed, getCurrentInstance, onMounted, onUnmounted } from "vue";
+    import { ref, reactive, computed, getCurrentInstance, onMounted, onUnmounted, nextTick } from "vue";
     import { needDebounce, clearTimer, isTimerRunning } from "@/utils/cocohelper.js";
     import { uploadStatusCode } from "@/assets/data/constants.js";
     import fileUploader from "@/utils/fileuploader.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import progressCircle from "./progressCircle.vue";
     
-    const IMAGE_ACCEPT_TYPE = ".JPG,.JPEG,.PNG,.BMP,.GIF,.WEBP"; //可接受的图片类型
-    const VIDEO_ACCEPT_TYPE = ".MP4"; //可接受的视频类型
+    const IMAGE_ACCEPT_TYPE = "image/jpeg,image/png,image/webp"; //可接受的图片类型
+    const VIDEO_ACCEPT_TYPE = "video/mp4,video/webm"; //可接受的视频类型
     const PIC_WIDTH_AND_MARGIN = (5.25 * window.pxOf1rem); /* （宽度加上外边距）乘以（1rem有多少像素） */
+    const MAX_IMAGE_COUNT = 0x9;
+    const MAX_VIDEO_COUNT = 0x1;
     
     const $instance = getCurrentInstance();
     const emits = defineEmits(["pictap"]);
     const uploadFileList = reactive([]); //待上传的图片信息
     const dragTransXY = reactive([0, 0]);//第〇、一索引用来保存当前位置
-    const chooseType = ref(0xF); //0xF - 图片，0x1 - 视频。（值表示最多可以上传的文件数量！）
+    const chooseType = ref(0); //图片或视频。（值表示最多可以上传的文件数量！）
     const dragIndex = ref(-1); //当前拖动的图像的索引
     const insertIndex = ref(-1); //图像插入的位置对应的索引
     const isReleaseHand = ref(false); //是否是松开手
@@ -71,9 +85,16 @@
             }
         }
         return {
-            display: (uploadFileList.length >= chooseType.value ? "none": ""),
-            transform: `translate(${tXY[0]}px, ${tXY[1]}px)`,
-            backgroundColor: (isDeleting.value ? "red" : "")
+            ofPicture: {
+                display: ((chooseType.value === MAX_VIDEO_COUNT && uploadFileList.length) || uploadFileList.length >= MAX_IMAGE_COUNT ? "none": ""),
+                transform: `translate(${tXY[0]}px, ${tXY[1]}px)`,
+                backgroundColor: (isDeleting.value ? "red" : "")
+            },
+            ofVideo: {
+                display: ((chooseType.value === MAX_IMAGE_COUNT && uploadFileList.length) || uploadFileList.length >= MAX_VIDEO_COUNT ? "none": ""),
+                transform: `translate(${tXY[0]}px, ${tXY[1]}px)`,
+                backgroundColor: (isDeleting.value ? "red" : "")
+            }
         }
     });
     const pointerXY = [0, 0];
@@ -216,17 +237,21 @@
     }
     
     function onChoosePictures(){
-        chooseType.value = 0xF;
-        $instance.refs.inputFileBox.click();
+        chooseType.value = MAX_IMAGE_COUNT;
+        $instance.refs.inputFileBox1.click();
     }
-    function onChooseChange(evt){
+    function onChooseVideos(){
+        chooseType.value = MAX_VIDEO_COUNT;
+        $instance.refs.inputFileBox2.click();
+    }
+    function onChooseImageChange(evt){
         //console.log(evt)
         const nowTS = Date.now() * 10;
         const maxFileSize = 16777216; //最大16M
         const maxIndex = chooseType.value - 1; //允许的最大索引
         for(const file of evt.target.files){
             if(uploadFileList.length > maxIndex){
-                //appToast(`最多上传数量：${maxIndex}`);
+                appToast(`最多上传数量：${chooseType.value}`);
                 break;
             }
             if(file.size > maxFileSize){
@@ -246,6 +271,15 @@
                 uploadResult: null, //上传成功返回的数据
                 picFile: file //图片文件
             });
+        }
+    }
+    function onChooseVideoChange(evt){
+        console.log(evt);
+        if(evt.target.files.length){
+            const nowTS = Date.now() * 10;
+            const maxFileSize = 16777216; //最大16M
+            const videoUrl = URL.createObjectURL(evt.target.files[0]);
+            console.log(videoUrl)
         }
     }
     function startUpload(){//外部组件调用
@@ -385,6 +419,10 @@
     }
     .pud-pic-add:active{
         background-color: #e0e0e0;
+    }
+    .pud-pic-add.is-video-box{
+        background-image: var(--bg-add-share-videos);
+        margin-left: 0.5rem;
     }
     .pud-pic-delete{
         display: inline-flex;

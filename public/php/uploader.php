@@ -27,7 +27,7 @@ function get_new_name($old_name){
     }
     
     $file_ext = strtolower(substr($old_name, $dot_pos));
-    if(!preg_match("/^\.(jpg|jpeg|png|bmp|gif|webp)$/", $file_ext)){
+    if(!preg_match("/^\.(jpg|jpeg|png|bmp|gif|webp|mp4|webm)$/", $file_ext)){
         return null;
     }
     
@@ -194,7 +194,7 @@ function upload_picture(){
         
         参见：https://stackoverflow.com/questions/8103860/move-uploaded-file-gives-failed-to-open-stream-permission-denied-error
         */
-        ajax_error('上传文件失败：无权读写');
+        ajax_error('上传图片失败：无权读写');
     } else {
         image_rotation($root_dir.$path_original.$new_name);
     }
@@ -264,6 +264,51 @@ function upload_picture(){
         'mimeType'      => $image_info['mime'],
         'captureTime'   => date('Y/m/d H:i:s'), //拍摄时间戳（不准确）
         //'exifData'     => exif_read_data($root_dir.$path_thumbnail.$new_name)
+    );
+    
+    ajax_success($output_data);
+}
+
+//上传一部视频
+function upload_video(){
+    $my_file = $_FILES['my_file'];
+    if(!$my_file){
+        ajax_error('请先上传视频');
+    }
+    
+    $new_name = get_new_name($my_file['name']);
+    if(!$new_name){
+        ajax_error('不支持的视频格式');
+    } else if($_GET['is_test']==1){
+        $new_name = ('test_pic_'.$new_name);
+    }
+    
+    $root_dir = dirname(__DIR__);
+    $path_original = '/sharepics/original/'; //原始图片所在的目录
+    $path_thumbnail = '/sharepics/thumbnail/'; //原始图片的缩略图所在的目录
+    
+    $upload_result = move_uploaded_file($my_file['tmp_name'], $root_dir.$path_original.$new_name);
+    if(!$upload_result){
+        ajax_error('上传视频失败：无权读写');
+    } else {
+        
+    }
+    
+    $output_data = array(
+        'id'            => 1, //只允许上传一部视频，所以ID写死为 1 即可。
+        'description'   => $my_file['name'],
+        'size'          => $my_file['size'],
+        'picPath'       => substr($path_original, 1).$new_name, //不要开头的斜杠
+        'thumbnailPath' => substr($path_thumbnail, 1).$new_name, //不要开头的斜杠
+        'width'         => $image_info[0],
+        'height'        => $image_info[1],
+        'duration'      => 70, //视频时长
+        'sort'          => 0,
+        'longitude'     => 0,
+        'latitude'      => 0,
+        'mimeType'      => $image_info['mime'],
+        'captureTime'   => date('Y/m/d H:i:s'), //拍摄时间戳（不准确）
+        'exifData'      => exif_read_data($root_dir.$path_thumbnail.$new_name)
     );
     
     ajax_success($output_data);
@@ -547,6 +592,7 @@ if(function_exists('getallheaders')){
 //可调用的函数
 $api_actions = [
     'upload_picture',
+    'upload_video',
     'save_share_pics',
     'toggle_my_post_status',
     'delete_my_post',

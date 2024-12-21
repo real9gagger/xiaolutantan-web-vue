@@ -1,5 +1,5 @@
 /*
-    import fileUploder from "@/utils/uploader.js";
+    import fileUploder from "@/utils/fileuploader.js";
 */
 
 import axios from "axios";
@@ -61,6 +61,31 @@ function fn_UploadPicture(picFile){
     });
 }
 
+//（内部函数）上传一部视频的函数
+function fn_UploadVideo(picFile){
+    return new Promise(function(resolve, reject) {
+        const formData = new FormData();
+        formData.append("my_file", picFile);
+        
+        myAbortController = new AbortController();
+        
+        instance.post("/xlttapi?action=upload_video&is_test=" + isTest, formData, { signal: myAbortController.signal }).then(res => {
+            console.log("上传视频结果:::", res);
+            myAbortController = null;
+            if(res.data?.code === 200){
+                resolve(res.data.data);
+            } else {
+                reject(res.data?.msg || "空的响应体");
+            }
+        }).catch(err => {
+            console.error("上传视频出错:::", err);
+            myAbortController = null;
+            reject(err.message);
+        });
+    });
+}
+
+//文件上传器
 function fileUploder(){
 	this.progressTimer = 0; //模拟上传进度的定时器
     this.progressPercentage = 0; //上传进度百分数
@@ -71,9 +96,26 @@ function fileUploder(){
 }
 
 //上传一张图片
-fileUploder.prototype.upload = function(picFile){
+fileUploder.prototype.uploadImage = function(picFile){
     this.progressTimer = setInterval(fn_ProgressInterval, UPLOAD_TRIGGER_INTERVAL, this); //模拟上传进度
     fn_UploadPicture(picFile).then(dat => {
+        clearInterval(this.progressTimer);
+        this.progressPercentage = 100;
+        this.progressTimer = 0;
+        this.progressCallback && this.progressCallback(100, 0);
+        setTimeout(this.successCallback, 200, dat, 0); //延迟一点时间
+    }).catch(msg => {
+        clearInterval(this.progressTimer);
+        this.progressPercentage = 0;
+        this.progressTimer = 0;
+        this.errorCallback && this.errorCallback(msg, 0);
+    });
+}
+
+//上传一部视频
+fileUploder.prototype.uploadVideo = function(picFile){
+    this.progressTimer = setInterval(fn_ProgressInterval, UPLOAD_TRIGGER_INTERVAL, this); //模拟上传进度
+    fn_UploadVideo(picFile).then(dat => {
         clearInterval(this.progressTimer);
         this.progressPercentage = 100;
         this.progressTimer = 0;
