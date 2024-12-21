@@ -195,7 +195,7 @@
                         }
                     return;
                     default: //滑动到顶部时，想滚动内容，则不处理事件
-                        if(movementY < 0){
+                        if(movementY < 0 && ratioVal.value===1){
                             return;
                         }
                     break;

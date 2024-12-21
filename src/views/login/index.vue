@@ -45,7 +45,7 @@
 
 <script setup name="LoginIndex">
     import publicAssets from "@/assets/data/publicAssets.js";
-    import { onUnmounted, ref } from "vue";
+    import { onMounted, onUnmounted, nextTick, ref } from "vue";
     import { useStore } from "vuex";
     import { useRouter, useRoute } from "vue-router";
     
@@ -113,6 +113,7 @@
                 }
             }, 1000);
             appToast("短信验证码已发送");
+            onVcBoxClick();
         }, 500);
     }
     function onSubmit(){
@@ -155,6 +156,10 @@
     function gotoDonatePage(){
         $router.push("/donate");
     }
+    
+    onMounted(() => {
+        nextTick(onPnBoxClick);
+    });
     
     onUnmounted(() => {
         if(waitTimerID){

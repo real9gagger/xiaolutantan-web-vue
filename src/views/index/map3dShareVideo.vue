@@ -32,7 +32,7 @@
 </template>
 
 <script setup name="IndexMap3DShareVideo">
-    import { ref, reactive, getCurrentInstance, onActivated, onDeactivated, computed, nextTick, onUnmounted } from "vue";
+    import { ref, reactive, getCurrentInstance, onActivated, onDeactivated, computed, nextTick, onBeforeUnmount } from "vue";
     import { useStore } from "vuex";
     import { useRoute, useRouter } from "vue-router";
     import videojs from "video.js";
@@ -147,11 +147,11 @@
             setTimeout(() => {
                 videoPlayer.pause();
                 console.log("视频已暂停播放...");
-            }, 500);
+            }, 300);
         }
     });
     
-    onUnmounted(() => {
+    onBeforeUnmount(() => {
         if(videoPlayer){
             setTimeout(() => {
                 videoPlayer.off("click", onVideoClick);

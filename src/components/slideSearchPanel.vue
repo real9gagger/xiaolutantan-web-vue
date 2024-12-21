@@ -281,7 +281,9 @@
         }
         searchKeywords.value = ""; //重置
         nonRVs.pageIndex = 0; //因为是拖动搜索的，所以需要重置为 0
-        nonRVs.mapGeocoder.getLocation(thePoint, searchCompleteCallback, { poiRadius: 1000, numPois: 20 });
+        if(nonRVs.mapGeocoder){//防止退出页面后才定位成功！
+            nonRVs.mapGeocoder.getLocation(thePoint, searchCompleteCallback, { poiRadius: 1000, numPois: 20 });
+        }
     }
     function initiMapSearcher(bdmap){
         nonRVs.mapSearcher.setLocation(bdmap);
