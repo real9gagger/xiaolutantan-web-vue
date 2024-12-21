@@ -42,6 +42,7 @@
                 <img :src="uploadFileList[dragIndex].base64Src" alt="正在拖动的图片" class="wi-f" draggable="false" />
             </div>
         </template>
+        <create-video-snapshot ref="cvsRef" />
     </div>
 </template>
 
@@ -52,6 +53,7 @@
     import fileUploader from "@/utils/fileuploader.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import progressCircle from "./progressCircle.vue";
+    import createVideoSnapshot from "./createVideoSnapshot.vue";
     
     const IMAGE_ACCEPT_TYPE = "image/jpeg,image/png,image/webp"; //可接受的图片类型
     const VIDEO_ACCEPT_TYPE = "video/mp4,video/webm"; //可接受的视频类型
@@ -274,12 +276,27 @@
         }
     }
     function onChooseVideoChange(evt){
-        console.log(evt);
         if(evt.target.files.length){
-            const nowTS = Date.now() * 10;
             const maxFileSize = 16777216; //最大16M
+            if(evt.target.files[0].size > maxFileSize){
+                appToast("视频大小不能超过16M");
+                return;
+            }
+            
             const videoUrl = URL.createObjectURL(evt.target.files[0]);
-            console.log(videoUrl)
+            
+            uploadFileList.push({
+                srcId:  Date.now() * 10,
+                uploadProgress: uploadStatusCode.unactived, //上传进度。小于0表示未在上传，等于0表示等待上传，等于100表示上传成功，等于 -4444 表示上传失败。
+                base64Src: null, //图片的 base64 数据
+                uploadResult: null, //上传成功返回的数据
+                picFile: evt.target.files[0], //图片文件
+                isVideo: true
+            });
+            
+            $instance.refs.cvsRef.startSnapshot(videoUrl).then(urlData => {
+                uploadFileList[0].base64Src = urlData;
+            });
         }
     }
     function startUpload(){//外部组件调用

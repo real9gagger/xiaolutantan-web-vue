@@ -82,6 +82,7 @@ const AssetsPathMap = {
     iconMsgError: "icons/msg_error.png",
     iconExternalLink: "icons/external_link.png",
     iconSkeletonImage: "icons/skeleton_image.png",
+    iconVideoSnapshotFlag: "icons/video_snapshot_flag.png",
     
     //图片
     imageAppLogo: "images/app_logo.png",
