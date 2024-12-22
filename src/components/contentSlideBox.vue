@@ -29,7 +29,7 @@
 </template>
 
 <script setup name="ContentSlideBox">
-    import { computed, ref, watch, getCurrentInstance } from "vue";
+    import { computed, ref, watch, getCurrentInstance, onMounted, onUnmounted } from "vue";
     import { needDebounce } from "@/utils/cocohelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     
@@ -52,6 +52,7 @@
         moveDis: 0, //累计移动的路程
         moveLY: 0, //上次移动的Y轴的位置
         scrollType: 0x00, //0x00 - 已滚动到顶部，0x11 - 不是滚动顶部或者底部，0x22 - 已滚动到底部
+        windowOldHeight: window.innerHeight, //窗体尺寸改变前的高度
     };
     
     const props = defineProps({
@@ -267,12 +268,29 @@
         return isHiding.value;
     }
     
+    function onWindowResized(evt){
+        emits("sliding", {
+            delta: (window.innerHeight - nonRVs.windowOldHeight),
+            offset: Math.round(DEFAULT_HEIGHT_PX * ratioVal.value),
+            transitionable: false
+        });
+        nonRVs.windowOldHeight = window.innerHeight;
+    }
+    
     watch(() => props.isShrink, function(){
         if(ratioVal.value){
             onCloseMoreContent();
         } else {
             onHideMoreContent(); //彻底隐藏内容！
         }
+    });
+    
+    onMounted(() => {
+        window.addEventListener("resize", onWindowResized);
+    });
+    
+    onUnmounted(() => {
+        window.removeEventListener("resize", onWindowResized);
     });
     
     defineExpose({

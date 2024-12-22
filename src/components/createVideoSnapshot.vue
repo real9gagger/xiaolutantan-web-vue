@@ -4,7 +4,8 @@
             :src="videoSrc"
             :width="boxWidth"
             :height="boxHeight"
-            @loadedmetadata="onVideoLoaded" />
+            @loadedmetadata="onVideoLoaded"
+            @canplay="onVideoCanPlay" />
         <img ref="imgRef" class="dp-ib va-m"
             :src="publicAssets.iconVideoSnapshotFlag"
             :width="imgSize"
@@ -40,7 +41,11 @@
     function onVideoLoaded(evt){
         boxHeight.value = Math.floor(boxWidth.value * evt.target.videoHeight / evt.target.videoWidth);
         nonRVs.loadProgress++;
-        evt.target.play();
+    }
+    
+    function onVideoCanPlay(evt){
+        evt.target.play().catch(globalEmptyShell);
+        nonRVs.loadProgress++;
     }
     
     function onImageLoaded(evt){
@@ -49,10 +54,11 @@
     
     function loadCompleteCallback(cb){
         //console.log(nonRVs)
-        if(nonRVs.loadProgress >= 2){
-            nonRVs.loadProgress = 0;
-            nonRVs.tryTimes = 0;
-            clearInterval(nonRVs.timerID);
+        if(nonRVs.loadProgress === 3){
+            console.log("再延迟一点时间…");
+            nonRVs.loadProgress++;
+        } else if(nonRVs.loadProgress >= 4){
+            resetTimerID();
             
             const ctx = canvasRef.value.getContext("2d");
             const startX = (boxWidth.value - imgSize) / 2;
@@ -67,21 +73,25 @@
             cb(canvasRef.value.toDataURL());
             
             videoSrc.value = null;
-        } else if((++nonRVs.tryTimes) >= 30){
-            nonRVs.loadProgress = 0;
-            nonRVs.tryTimes = 0;
-            clearInterval(nonRVs.timerID);
-            cb(null);
-            videoSrc.value = null;
+        } else {
+            if((++nonRVs.tryTimes) >= 30){
+                resetTimerID();
+                cb(null);
+                videoSrc.value = null;
+            }
         }
+    }
+    
+    function resetTimerID(){
+        clearInterval(nonRVs.timerID);
+        nonRVs.loadProgress = 0;
+        nonRVs.tryTimes = 0;
+        nonRVs.timerID = 0;
     }
     
     function startSnapshot(src){ //获取视频截帧（第一帧）
         videoSrc.value = src;
-        nonRVs.loadProgress = 0;
-        nonRVs.tryTimes = 0;
-        clearInterval(nonRVs.timerID);
-        
+        resetTimerID();
         return new Promise(function (resolve) {
             if(videoSrc.value){
                 nonRVs.timerID = setInterval(loadCompleteCallback, 100, resolve);

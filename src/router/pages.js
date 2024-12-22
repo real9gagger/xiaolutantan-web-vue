@@ -103,6 +103,14 @@ export default [
         }
     },
     {
+    	path: "/videopreview",
+    	name: "预览视频",
+    	component: () => import("@/views/index/map3dVideoPreview"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/labeltextinputer",
     	name: "修改标记标题",
     	component: () => import("@/views/index/map3dLabelTextInputer"),
@@ -145,7 +153,7 @@ export default [
     },
     {
     	path: "/shareadd",
-    	name: "分享照片",
+    	name: "分享内容",
     	component: () => import("@/views/mine/shareAdd"),
     	meta: {
             showPageTitle: true,

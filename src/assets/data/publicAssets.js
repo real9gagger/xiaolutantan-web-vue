@@ -111,6 +111,7 @@ const AssetsPathMap = {
     imageMarkerCloseBtn: "images/marker_close_btn.gif",
     imageMarkerFlagRed: "images/marker_flag_red.png",
     imageMarkerBaseMap: "images/marker_base_map.png",
+    imageVideoDarkBg: "images/video_dark_bg.jpg",
     
     //SVG图片
     svgLoadingGif: "svgs/loading_gif.svg",

@@ -41,6 +41,7 @@
 
 <script setup name="PageSharePanel">
     import { ref, getCurrentInstance, nextTick } from "vue";
+    import { copyTextContent } from "@/utils/pagehelper.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import qrcode from "qrcode";
     
@@ -132,35 +133,7 @@
     }
     
     function onCopyLink(){
-        const tempBox = window.document.createElement("textarea"); //创建临时文本框
-        
-        tempBox.style.opacity = 0.0;
-        tempBox.style.position = "fixed";
-        tempBox.style.top = "0px";
-        tempBox.style.left = "0px";
-        tempBox.value = window.location.href;
-        
-        window.document.body.appendChild(tempBox);
-        if (!tempBox.select) {
-            const selection = window.getSelection();
-        	const range = window.document.createRange();
-            range.selectNodeContents(tempBox);
-            selection.removeAllRanges();
-            selection.addRange(range);
-            tempBox.setSelectionRange(0, tempBox.value.length);
-        } else {
-            tempBox.select();
-        }
-        
-        try {
-            window.document.execCommand("copy");
-            appToast("链接已复制");
-        } catch (ex) {
-            appToast("复制链接失败：" + ex.message);
-        } finally {
-            window.document.body.removeChild(tempBox); //删除文本框
-        }
-        
+        copyTextContent(window.location.href);
         isVisible.value = false;
         qrDataURL.value = null;
         emits("finished", 0xFF);

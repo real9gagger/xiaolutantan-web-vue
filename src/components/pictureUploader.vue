@@ -199,7 +199,11 @@
         } else {
             console.log("执行了回调函数，因为无法判断插入哪个位置...");
             if(dragIndex.value < 0 && nonRVs.clickIndex >= 0){//用户一直没有拖动图片，则说明是点击的动作
-                emits("pictap", uploadFileList[nonRVs.clickIndex].base64Src);
+                emits("pictap", 
+                    uploadFileList[nonRVs.clickIndex].isVideo ?
+                    URL.createObjectURL(uploadFileList[nonRVs.clickIndex].picFile) : 
+                    uploadFileList[nonRVs.clickIndex].base64Src
+                );
             }
             onDragBoxTransitionEnd();
         }
@@ -295,6 +299,7 @@
             });
             
             $instance.refs.cvsRef.startSnapshot(videoUrl).then(urlData => {
+                URL.revokeObjectURL(videoUrl);
                 uploadFileList[0].base64Src = urlData;
             });
         }

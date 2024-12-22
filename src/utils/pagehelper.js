@@ -21,13 +21,15 @@ export function getPageTempData(){
 export function toggleFullScreen(){
     const docEl = document.documentElement;
     const isFs = (document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen);
-    if(isFs || (window.innerHeight === window.screen.height)){
+    if(isFs){
         if (docEl.requestFullScreen) {
             document.exitFullScreen();
         } else if (docEl.webkitRequestFullScreen) {
-            document.webkitCancelFullScreen();
+            document.webkitExitFullscreen();
         } else if (docEl.mozRequestFullScreen) {
-            document.mozCancelFullScreen();
+            document.mozExitFullscreen();
+        } else if (docEl.msExitFullScreen) {
+            document.msExitFullScreen();
         } else {
             return true;//仍然是全屏的
         }
@@ -39,7 +41,9 @@ export function toggleFullScreen(){
             docEl.webkitRequestFullScreen();
         } else if (docEl.mozRequestFullScreen) {
             docEl.mozRequestFullScreen();
-        } else {
+        } else if (docEl.msRequestFullScreen) {
+            document.msRequestFullScreen();
+        }  else {
             return false;//仍然不是全屏的
         }
         return true;
@@ -104,4 +108,52 @@ export function getScrollBarWidth() {
     el.remove();
     
     return scrollBarWidth;
+}
+
+//复制文本内容
+export function copyTextContent(txt){
+    if(!txt){
+        return;
+    }
+    
+    const tempBox = window.document.createElement("textarea"); //创建临时文本框
+    
+    tempBox.style.opacity = 0.0;
+    tempBox.style.position = "fixed";
+    tempBox.style.top = "0px";
+    tempBox.style.left = "0px";
+    tempBox.value = txt;
+    
+    window.document.body.appendChild(tempBox);
+    if (!tempBox.select) {
+        const selection = window.getSelection();
+    	const range = window.document.createRange();
+        range.selectNodeContents(tempBox);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        tempBox.setSelectionRange(0, tempBox.value.length);
+    } else {
+        tempBox.select();
+    }
+    
+    try {
+        window.document.execCommand("copy");
+        appToast("已复制");
+    } catch (ex) {
+        appToast("复制失败：" + ex.message);
+    } finally {
+        window.document.body.removeChild(tempBox); //删除文本框
+    }
+}
+
+//让网页的主题色变成黑色（短视频沉浸模式）
+export function makeThemeColorDark(){
+    $("#metaThemeColorTag").attr("content", "#000");
+    document.body.style.backgroundColor = "#000";
+}
+
+//让网页的主题色变成白色
+export function makeThemeColorLight(){
+    $("#metaThemeColorTag").attr("content", "#fff");
+    document.body.style.backgroundColor = null;
 }

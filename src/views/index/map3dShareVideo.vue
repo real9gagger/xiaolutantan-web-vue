@@ -35,6 +35,7 @@
     import { ref, reactive, getCurrentInstance, onActivated, onDeactivated, computed, nextTick, onBeforeUnmount } from "vue";
     import { useStore } from "vuex";
     import { useRoute, useRouter } from "vue-router";
+    import { makeThemeColorDark, makeThemeColorLight } from "@/utils/pagehelper.js";
     import videojs from "video.js";
     import myStorage from "@/utils/mystorage.js";
     import ajaxRequest from "@/request/index.js";
@@ -140,6 +141,7 @@
                 isLoading.value = false;
             });
         }
+        makeThemeColorDark();
     });
     
     onDeactivated(() => {
@@ -161,6 +163,7 @@
                 console.log("视频内容已销毁...");
             }, 500);
         }
+        makeThemeColorLight();
     });
 </script>
 

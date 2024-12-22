@@ -85,7 +85,11 @@
     }
     function gotoImagePreview(arg0){
         setPageTempData(arg0);
-        $router.push("/imagepreview");
+        if(arg0.startsWith("blob:")){
+            $router.push("/videopreview"); //视频预览
+        } else {
+            $router.push("/imagepreview"); //图片预览
+        }
     }
     function onTextAreaInput(evt){
         evt.target.style.height = "20px";
