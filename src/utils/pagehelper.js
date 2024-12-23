@@ -18,9 +18,9 @@ export function getPageTempData(){
 }
 
 //来回切换全屏浏览
-export function toggleFullScreen(){
+export function toggleFullScreen(val){
     const docEl = document.documentElement;
-    const isFs = (document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen);
+    const isFs = ((val===true || val===false) ? (!val) : (document.isFullScreen || document.mozIsFullScreen || document.webkitIsFullScreen || document.msIsFullScreen));
     if(isFs){
         if (docEl.requestFullScreen) {
             document.exitFullScreen();
@@ -28,7 +28,7 @@ export function toggleFullScreen(){
             document.webkitExitFullscreen();
         } else if (docEl.mozRequestFullScreen) {
             document.mozExitFullscreen();
-        } else if (docEl.msExitFullScreen) {
+        } else if (docEl.msRequestFullScreen) {
             document.msExitFullScreen();
         } else {
             return true;//仍然是全屏的
@@ -42,7 +42,7 @@ export function toggleFullScreen(){
         } else if (docEl.mozRequestFullScreen) {
             docEl.mozRequestFullScreen();
         } else if (docEl.msRequestFullScreen) {
-            document.msRequestFullScreen();
+            docEl.msRequestFullScreen();
         }  else {
             return false;//仍然不是全屏的
         }
