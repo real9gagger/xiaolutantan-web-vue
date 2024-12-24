@@ -5,7 +5,7 @@
 import axios from "axios";
 
 const UPLOAD_TRIGGER_INTERVAL = 1000; //模拟上传触发间隔（毫秒）
-
+const IS_TEST = (process.env.NODE_ENV === "production" ? 0 : 1);
 const instance = axios.create({
     baseURL: location.origin,
     timeout: 15000,
@@ -20,7 +20,6 @@ const instance = axios.create({
 
 let myAbortController = null;
 let fileNth = 0; //这是上传的第几个文件
-let isTest = (process.env.NODE_ENV === "production" ? 0 : 1);
 
 //（内部函数）模拟上传进度时，定时器调用的函数
 function fn_ProgressInterval(that){
@@ -45,7 +44,7 @@ function fn_UploadPicture(picFile){
         myAbortController = new AbortController();
         fileNth++;
         
-        instance.post("/xlttapi?action=upload_picture&is_test=" + isTest + "&file_nth=" + fileNth, formData, { signal: myAbortController.signal }).then(res => {
+        instance.post("/xlttapi?action=upload_picture&is_test=" + IS_TEST + "&file_nth=" + fileNth, formData, { signal: myAbortController.signal }).then(res => {
             //console.log("上传文件结果:::", res);
             myAbortController = null;
             if(res.data?.code === 200){
@@ -71,7 +70,7 @@ function fn_UploadVideo(picFile, metaData){
 
         myAbortController = new AbortController();
         
-        instance.post("/xlttapi?action=upload_video&is_test=" + isTest + params, formData, { 
+        instance.post("/xlttapi?action=upload_video&is_test=" + IS_TEST + params, formData, { 
             signal: myAbortController.signal
         }).then(res => {
             //console.log("上传视频结果:::", res);
@@ -231,6 +230,8 @@ fileUploder.prototype.dispose = function(){
     
     this.reset();
     this.abort();
+    
+    fileNth = 0;
     
     return this;
 }

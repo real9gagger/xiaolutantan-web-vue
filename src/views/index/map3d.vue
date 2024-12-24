@@ -661,7 +661,7 @@
             for(const item of res1){
                 if(item.status === 1 && item.pictureList?.length){//有效和有图片的才显示
                     const customOverlay = new BMapGL.CustomOverlay($instance.refs.mspcBox.buildCalloutHTML, {
-                        point: gcj02ToMapPoint([item.longitude, item.latitude]),
+                        point: new BMapGL.Point(item.longitude, item.latitude),
                         properties: item,
                         zIndex: nth++,
                     });

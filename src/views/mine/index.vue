@@ -13,7 +13,7 @@
                 <lulu-bg-bubble />
             </header>
             <ul v-if="postList.length" @touchstart="preventContextMenu">
-                <li v-for="item,index in postList" :key="item.id" class="ps-r pd-rem5 bd-b-f0" @pointerdown="onItemPointerDown(index)" @pointerup="onItemPointerUp(index)" @pointercancel="onItemPointerLeave" @pointerleave="onItemPointerLeave">
+                <li v-for="item,index in postList" :key="item.id" class="ps-r pd-rem5 bd-b-f0 cs-p" @pointerdown="onItemPointerDown(index)" @pointerup="onItemPointerUp(index)" @pointercancel="onItemPointerLeave" @pointerleave="onItemPointerLeave">
                     <div class="fx-r ps-r zi-1">
                         <p class="mni-share-pic">
                             <img :src="item.pictureList[0].thumbnailPath" class="hi-f" onerror="onImageLoadingError()" />

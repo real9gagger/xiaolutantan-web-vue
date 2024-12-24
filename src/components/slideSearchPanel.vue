@@ -204,8 +204,10 @@
             const statusCode = this.getStatus();
             if (statusCode === BMAP_STATUS_SUCCESS) {
                 nonRVs.myLocalPoint = res.point;
-                getPoiListByMapPoint(res.point);
-                emits("itemselected", res.point);
+                if(!poiList.value?.length){
+                    getPoiListByMapPoint(res.point);
+                    emits("itemselected", res.point);
+                }
             } else if (statusCode === BMAP_STATUS_PERMISSION_DENIED) {
                 appToast("定位失败：BMAP_STATUS_PERMISSION_DENIED");
             } else if (statusCode === BMAP_STATUS_TIMEOUT) {
@@ -218,15 +220,17 @@
             if(!nonRVs.myLocalPoint){
                 (new BMapGL.LocalCity()).get(function(exo){
                     nonRVs.myLocalPoint = exo.center;
-                    getPoiListByMapPoint(exo.center);
-                    emits("itemselected", exo.center);
+                    if(!poiList.value?.length){
+                        getPoiListByMapPoint(exo.center);
+                        emits("itemselected", exo.center);
+                    }
                 });
             }
             
             setTimeout(() => (isPositionning.value = false), 1000);
         }, {
             enableHighAccuracy: true, //是否要求浏览器获取最佳效果，同浏览器定位接口参数。默认为false
-            timeout: 20000, //超时时间，单位为毫秒。默认为10秒
+            timeout: 10000, //超时时间，单位为毫秒。默认为10秒
             SDKLocation: true, //是否开启SDK辅助定位
         });
     }
@@ -245,6 +249,7 @@
         }
     }
     function searchCompleteCallback(evt){
+        //console.log("搜索或拖动结果::::", evt);
         const isGeocoding = !!(evt?.surroundingPois); //是否是拖动搜索的
         const resRows = (isGeocoding ? evt?.surroundingPois : evt?._pois) || [];
         const pois = resRows.map(vx => ({
@@ -260,17 +265,16 @@
         if(nonRVs.pageIndex > 1){
             poiList.value.push(...pois);
         } else {
+            if(isGeocoding){//拖动搜索
+                pois.unshift({
+                    uid: "map_center_point_001",
+                    address: evt.address || "暂无详细地址",
+                    title: (evt.content?.poi_desc ? `${evt.content.poi_desc} (地图中心点)` : "地图中心点"),
+                    point: evt.point,
+                    distance: getFriendlyDistance(nonRVs.myLocalPoint, evt.point)
+                });
+            }
             poiList.value = pois;
-        }
-        
-        if(!poiList.value.length && isGeocoding && evt.point){
-            poiList.value.push({
-                uid: 0,
-                address: evt.address || "暂无详细地址",
-                title: "未知地点",
-                point: evt.point,
-                distance: "0m"
-            });
         }
     }
     function getPoiListByMapPoint(thePoint){//拖动搜索

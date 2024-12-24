@@ -22,7 +22,7 @@
             <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoUserPicker">
                 <img :src="publicAssets.iconThePostAuthor" class="wh-1em" />
-                <span class="mg-lr-rem25 tc-66 fx-g1">内容创作者</span>
+                <a class="mg-lr-rem25 tc-66 fx-g1">内容创作者</a>
                 <template v-if="authorName" >
                     <b class="mg-lr-rem5">{{authorName}}</b>
                     <img :src="$store.getters.pickUserAvatarUrl" class="wh-1rem br-h" />
@@ -32,8 +32,8 @@
             <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>
             <div class="fx-hc lh-1x pd-tb-rem5 mg-t-rem5 us-n" @click="gotoSourceUrlInputer">
                 <img :src="publicAssets.iconPictureSourceUrl" class="wh-1em" />
-                <span class="mg-lr-rem25 tc-66 fx-g1">照片来源</span>
-                <span v-if="shortSourceUrl" class="ta-r" target="_blank">{{shortSourceUrl}}…</span>
+                <a class="mg-lr-rem25 tc-66 fx-g1">照片来源</a>
+                <a v-if="shortSourceUrl" class="ta-r" target="_blank">{{shortSourceUrl}}…</a>
                 <img :src="publicAssets.iconArrowRight" class="wh-1em op-6" />
             </div>
             <div class="mg-t-rem5 bd-t-f0"><!-- 分隔线 --></div>

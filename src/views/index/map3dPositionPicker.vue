@@ -1,7 +1,7 @@
 <template>
     <div class="hi-cwh">
         <div id="positionPickerMapBox" class="wi-f" style="height:50%"></div>
-        <div class="mpp-pin-box">
+        <div class="mpp-pin-box" @click="onPinClick" @mousewheel="onMimicMouseWheel">
             <img class="mpp-pin-icon" alt="地图中心点"
                 :src="publicAssets.iconMapPositionPin" 
                 :class="{'updown': mapPinUpDowning}" 
@@ -81,6 +81,16 @@
         $store.dispatch("setPickPlaceInfo", poiInfo);
         $router.back();
     }
+    function onPinClick(){//点击地图中心点图标时
+        mapInstance.setZoom(20);
+    }
+    function onMimicMouseWheel(evt){//模拟地图滚轮缩放效果
+        if(evt.wheelDelta > 0){
+            mapInstance.zoomIn(); //放大一级视图
+        } else {
+            mapInstance.zoomOut(); //缩小一级视图
+        }
+    }
     
     onMounted(() => {
         nextTick(buildBaiduMap);
@@ -119,6 +129,7 @@
         top: 25%;
         transform: translate(-50%, -2.5rem);
         z-index: 88;
+        cursor: pointer;
     }
     .mpp-pin-icon{
         display: block;

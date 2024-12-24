@@ -312,5 +312,6 @@
     .csb-show-more::after{
         content: " 更多";
         color: var(--main-color);
+        cursor: pointer;
     }
 </style>
