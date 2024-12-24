@@ -271,11 +271,23 @@ function upload_picture(){
 
 //上传一部视频
 function upload_video(){
+    $video_duration = intval($_GET['video_duration']);
+	$video_width = intval($_GET['video_width']);
+	$video_height = intval($_GET['video_height']);
+	if(!$video_duration || !$video_width || !$video_height){
+		ajax_error('视频元数据缺失');
+	}
+	
     $my_file = $_FILES['my_file'];
     if(!$my_file){
         ajax_error('请先上传视频');
     }
-    
+	
+	$my_thumb = $_FILES['my_thumb'];
+    if(!$my_file){
+        ajax_error('视频缩略图缺失');
+    }
+	
     $new_name = get_new_name($my_file['name']);
     if(!$new_name){
         ajax_error('不支持的视频格式');
@@ -290,25 +302,29 @@ function upload_video(){
     $upload_result = move_uploaded_file($my_file['tmp_name'], $root_dir.$path_original.$new_name);
     if(!$upload_result){
         ajax_error('上传视频失败：无权读写');
-    } else {
-        
     }
-    
+	
+	$thumb_name = preg_replace("/\.(mp4|webm)$/", '.jpg', $new_name);
+	$upload_result = move_uploaded_file($my_thumb['tmp_name'], $root_dir.$path_thumbnail.$thumb_name);
+	if(!$upload_result){
+        ajax_error('上传缩略图失败：无权读写');
+    }
+	
     $output_data = array(
         'id'            => 1, //只允许上传一部视频，所以ID写死为 1 即可。
         'description'   => $my_file['name'],
         'size'          => $my_file['size'],
         'picPath'       => substr($path_original, 1).$new_name, //不要开头的斜杠
-        'thumbnailPath' => substr($path_thumbnail, 1).$new_name, //不要开头的斜杠
-        'width'         => $image_info[0],
-        'height'        => $image_info[1],
-        'duration'      => 70, //视频时长
+        'thumbnailPath' => substr($path_thumbnail, 1).$thumb_name, //不要开头的斜杠
+        'width'         => $video_width, //视频宽度
+        'height'        => $video_height, //视频高度
+        'duration'      => $video_duration, //视频时长
         'sort'          => 0,
         'longitude'     => 0,
         'latitude'      => 0,
-        'mimeType'      => $image_info['mime'],
+        'mimeType'      => $my_file['type'],
         'captureTime'   => date('Y/m/d H:i:s'), //拍摄时间戳（不准确）
-        'exifData'      => exif_read_data($root_dir.$path_thumbnail.$new_name)
+        //'exifData'      => $my_thumb
     );
     
     ajax_success($output_data);
@@ -343,6 +359,7 @@ function save_share_pics(){
         'locationAddress'   => $posts['locationAddress'],
         'pictureList'       => $posts['pictureList'],
         'pictureSourceUrl'  => $posts['pictureSourceUrl'],
+        'isVideo'			=> !!$posts['pictureList'][0]['duration'],
         'status'            => 1, //1-有效，0-失效
         'likesCount'        => 0, //点赞数量
         'commentCount'      => 0, //评论数量

@@ -62,15 +62,19 @@ function fn_UploadPicture(picFile){
 }
 
 //（内部函数）上传一部视频的函数
-function fn_UploadVideo(picFile){
+function fn_UploadVideo(picFile, metaData){
     return new Promise(function(resolve, reject) {
         const formData = new FormData();
+        const params = (metaData ? `&video_duration=${metaData.videoDuration}&video_width=${metaData.videoWidth}&video_height=${metaData.videoHeight}` : "");
         formData.append("my_file", picFile);
-        
+        formData.append("my_thumb", fn_dataURItoBlob(metaData?.base64Src)); //视频缩略图
+
         myAbortController = new AbortController();
         
-        instance.post("/xlttapi?action=upload_video&is_test=" + isTest, formData, { signal: myAbortController.signal }).then(res => {
-            console.log("上传视频结果:::", res);
+        instance.post("/xlttapi?action=upload_video&is_test=" + isTest + params, formData, { 
+            signal: myAbortController.signal
+        }).then(res => {
+            //console.log("上传视频结果:::", res);
             myAbortController = null;
             if(res.data?.code === 200){
                 resolve(res.data.data);
@@ -78,14 +82,43 @@ function fn_UploadVideo(picFile){
                 reject(res.data?.msg || "空的响应体");
             }
         }).catch(err => {
-            console.error("上传视频出错:::", err);
+            //console.error("上传视频出错:::", err);
             myAbortController = null;
             reject(err.message);
         });
     });
 }
 
-//文件上传器
+//图片 base64URL 转 Blob 类型
+function fn_dataURItoBlob(dataURI) {
+    if(!dataURI){
+        return undefined;
+    }    
+    // convert base64 to raw binary data held in a string
+    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+    const idx = dataURI.indexOf(",");
+    const byteString = atob(dataURI.substr(idx + 1));
+    
+    // separate out the mime component
+    const mimeString = dataURI.substr(0, idx).match(/:(.+?);/)[1];
+    
+    // write the bytes of the string to an ArrayBuffer
+    const ab = new ArrayBuffer(byteString.length);
+    
+    // create a view into the buffer
+    const ia = new Uint8Array(ab);
+    
+    // set the bytes of the buffer to the correct values
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    
+    // write the ArrayBuffer to a blob, and you're done
+    const blob = new Blob([ab], { type: mimeString });
+    return blob;
+}
+
+//文件上传类
 function fileUploder(){
 	this.progressTimer = 0; //模拟上传进度的定时器
     this.progressPercentage = 0; //上传进度百分数
@@ -113,9 +146,9 @@ fileUploder.prototype.uploadImage = function(picFile){
 }
 
 //上传一部视频
-fileUploder.prototype.uploadVideo = function(picFile){
+fileUploder.prototype.uploadVideo = function(picFile, metaData){
     this.progressTimer = setInterval(fn_ProgressInterval, UPLOAD_TRIGGER_INTERVAL, this); //模拟上传进度
-    fn_UploadVideo(picFile).then(dat => {
+    fn_UploadVideo(picFile, metaData).then(dat => {
         clearInterval(this.progressTimer);
         this.progressPercentage = 100;
         this.progressTimer = 0;

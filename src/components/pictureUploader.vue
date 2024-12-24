@@ -3,6 +3,7 @@
         <a v-for="item,index in uploadFileList" :key="item.srcId" class="pud-pic-box" :data-picindex="index" :style="getItemCssStyle(index)">
             <img :src="item.base64Src || publicAssets.imageImgReading" :alt="item.srcId" class="wi-f" draggable="false" />
             <progress-circle :value="item.uploadProgress" />
+            <p v-if="item.isVideo && item.uploadProgress === uploadStatusCode.unactived" class="pud-videoplay-icon"></p>
         </a>
         <template v-if="dragIndex < 0">
             <a class="pud-pic-add" :style="addBoxStyle.ofPicture" title="添加照片" key="AK47" @click="onChoosePictures">
@@ -40,6 +41,7 @@
             </div>
             <div class="pud-pic-box grabbing" :style="dragBoxStyle" @transitionend="onDragBoxTransitionEnd">
                 <img :src="uploadFileList[dragIndex].base64Src" alt="正在拖动的图片" class="wi-f" draggable="false" />
+                <p v-if="uploadFileList[dragIndex].isVideo" class="pud-videoplay-icon"></p>
             </div>
         </template>
         <create-video-snapshot ref="cvsRef" />
@@ -275,7 +277,8 @@
                 uploadProgress: uploadStatusCode.unactived, //上传进度。小于0表示未在上传，等于0表示等待上传，等于100表示上传成功，等于 -4444 表示上传失败。
                 base64Src: null, //图片的 base64 数据
                 uploadResult: null, //上传成功返回的数据
-                picFile: file //图片文件
+                picFile: file, //图片文件
+                isVideo: false
             });
         }
     }
@@ -298,9 +301,9 @@
                 isVideo: true
             });
             
-            $instance.refs.cvsRef.startSnapshot(videoUrl).then(urlData => {
+            $instance.refs.cvsRef.startSnapshot(videoUrl).then(info => {
                 URL.revokeObjectURL(videoUrl);
-                uploadFileList[0].base64Src = urlData;
+                Object.assign(uploadFileList[0], info);
             });
         }
     }
@@ -320,7 +323,7 @@
                     uploadFileList[ix].uploadProgress = uploadStatusCode.waiting;
                 }
             }
-            
+
             if(!waitToUploads.length){
                 return !resolve(uploadFileList.map(vx => vx.uploadResult)); //所有文件都已上传完
             }
@@ -330,7 +333,7 @@
             }).success(function(dat, idx){
                 uploadFileList[indexesList[idx]].uploadResult = dat;
                 if((idx + 1) >= indexesList.length){
-                    if(uploadFileList.every(vx => vx.uploadProgress===uploadStatusCode.success)){ //全部图片都上传成功！
+                    if(uploadFileList.every(vx => vx.uploadProgress===uploadStatusCode.success)){ //全部图片或视频都上传成功！
                         resolve(uploadFileList.map(vx => vx.uploadResult));
                     } else {
                         reject(null);
@@ -341,7 +344,13 @@
                 if((idx + 1) >= indexesList.length){
                     reject(null);
                 }
-            }).queue(waitToUploads);
+            });
+            
+            if(uploadFileList[indexesList[0]].isVideo){//上传视频
+                picFU.uploadVideo(waitToUploads[0], uploadFileList[indexesList[0]]);
+            } else {
+                picFU.queue(waitToUploads);
+            }
         });
     }
     function getFileCount(){//外部组件调用
@@ -458,6 +467,16 @@
         color: #fff;
         font-size: 0.6rem;
         user-select: none;
+    }
+    .pud-videoplay-icon{
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background-color: rgba(0, 0, 0, 0.3);
+        background-position: 50% 50%;
+        background-size: 1.6rem 1.6rem;
+        background-repeat: no-repeat;
+        background-image: var(--bg-video-snapshot-flag);
     }
     .pud-pic-delete.activing{ background-color: #f00; }
     .pud-pic-delete.activing > .openning{ display: inline-block; }
