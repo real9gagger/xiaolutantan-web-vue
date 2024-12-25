@@ -1,5 +1,6 @@
 const IS_MOBILE = navigator.userAgent.indexOf("Mobile") >= 0; //是否是移动端
 const IS_H5MODE = (window.innerWidth < 768); //是否是h5模式
+const IS_WECHAT = navigator.userAgent.indexOf("MicroMessenger") >= 0; //是否是微信内置浏览器
 
 //适用于不处理 Promise catch 的情况，防止不处理 catch 而报错！
 function globalEmptyShell(){
