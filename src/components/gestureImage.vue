@@ -29,7 +29,7 @@
     const MOVE_RATIO = 0.25; //移到超出范围后的粘合墙壁因子，值越小越粘。
     const INERTIA_STEP = 200; //单指移动放手后的滑动的时间（毫秒）
     const MAX_SCALE = { CEILING: 8, FINAL: 6 };//双指放大时最大的放大倍数；手指离开屏幕时最终允许的最大放大倍数
-    const MIN_SCALE = { FLOOR: 0.8, FINAL: 1 }; //双指缩小时最小的缩小倍数；手指离开屏幕时最终允许的最小缩小倍数
+    const MIN_SCALE = { FLOOR: 0.5, FINAL: 1 }; //双指缩小时最小的缩小倍数；手指离开屏幕时最终允许的最小缩小倍数
     const DOUBLE_CLICK_SPAN = 300; //双击时的时间间隔
     const ORIGIN_X = 0.0; //[0 - 1] 之间的数
     const ORIGIN_Y = 0.0; //[0 - 1] 之间的数
@@ -81,7 +81,7 @@
     };
     
     const imageStyle = computed(() => ({
-        transition: (needTransition.value ? "transform 300ms ease-out 0s" : "none"),
+        transition: (needTransition.value ? "transform 200ms ease-out 0s" : "none"),
         transformOrigin: `${ORIGIN_X * 100}% ${ORIGIN_Y * 100}%`,
         transform: `translate(${transXY[0]}px, ${transXY[1]}px) scale(${imageScale.value})`,
         width: (imageRect.width ? `${imageRect.width}px` : "100%"),
@@ -269,6 +269,8 @@
                 
                 imageScale.value = newScale; //根据双指收缩展开或的距离缩放（累加）
                 nonRVs.lastDIS = disPx;
+            } else {
+                navigator.vibrate(10);
             }
             
             resetXY(moveXY, pointerCenterXY);
@@ -457,7 +459,7 @@
         }
         
         MAX_SCALE.FINAL = Math.floor(Math.max(tg.naturalWidth / imageRect.width, imageRect.bestScale + 1)); //不能小于最佳缩放值
-        MAX_SCALE.CEILING = (MAX_SCALE.FINAL + 2);
+        MAX_SCALE.CEILING = (MAX_SCALE.FINAL + 12);
         
         nonRVs.touchScaleSpeed = Math.sqrt(MAX_SCALE.FINAL);
 
@@ -512,6 +514,7 @@
 
 <style>
     .gti-img-box{
+        display: inline-block;
         user-select: none;
     }
 </style>

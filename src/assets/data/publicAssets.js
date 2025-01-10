@@ -50,6 +50,7 @@ const AssetsPathMap = {
     iconSharePictureActiviting: "icons/share_picture_activiting.png",
     iconSharePictureVisited: "icons/share_picture_visited.png",
     iconCloseXGrey: "icons/close_x_grey.png",
+    iconCloseXWhite: "icons/close_x_white.png",
     iconSharePictureRed: "icons/share_picture_red.png",
     iconAddSharePictures: "icons/add_share_pictures.png",
     iconAddSharePicturesGreen: "icons/add_share_pictures_green.png",
@@ -124,6 +125,7 @@ const AssetsPathMap = {
     svgMeasureArea: "svgs/measure_area.svg",
     svgAddMarker: "svgs/add_marker.svg",
     svgClearAll: "svgs/clear_all.svg",
+    svgTripleFold: "svgs/triple_fold.svg",
 };
 
 if(THE_BU){

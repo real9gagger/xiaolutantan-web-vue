@@ -155,7 +155,7 @@
         //console.log("移动开始…", evt);
         const elem = $instance.proxy.$el;
         nonRVs.scrollType = (elem.scrollTop <= 0 ? 0x00 : (Math.ceil(elem.clientHeight + elem.scrollTop) < elem.scrollHeight ? 0x11 : 0x22));
-        if(nonRVs.scrollType !== 0x11){//不是滚动到顶部或者底部时才触发
+        if(nonRVs.scrollType !== 0x11){//滚动到顶部或者底部时才触发
             if(evt.type === "touchstart"){//单个手指触控时才有效
                 if(evt.touches.length === 1){
                     nonRVs.startCY = evt.touches[0].clientY;

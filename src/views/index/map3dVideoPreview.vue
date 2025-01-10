@@ -1,15 +1,12 @@
 <template>
-    <div class="page-limit-width">
-        <div class="content-cage" style="padding:0;overflow:hidden">
-            <video 
-                ref="videoRef"
-                :src="videoUrl"
-                :poster="publicAssets.imageVideoDarkBg"
-                controls="true" 
-                autoplay="true" 
-                muted="true"
-                class="mvp-video-box"></video>
-        </div>
+    <div class="bg-00">
+        <video
+            ref="videoRef"
+            :src="videoUrl"
+            :poster="publicAssets.imageVideoDarkBg"
+            controls="true" 
+            muted="true"
+            class="mvp-video-box"></video>
     </div>
 </template>
 
@@ -28,7 +25,7 @@
     }
     
     onMounted(() => {
-        setTimeout(handleVideoPlay, 100);
+        setTimeout(handleVideoPlay, 400);
     });
     
     onUnmounted(() => {
@@ -43,7 +40,6 @@
         display: block;
         object-fit: contain;
         height: var(--current-window-height);
-        max-width: var(--container-max-width);
         width: 100vw;
         background-color: #000;
     }

@@ -92,7 +92,8 @@
         {
             name: "删除",
             key: 0x009,
-            hidden: false
+            hidden: false,
+            dangerous: true
         }
     ]);
     const nonRVs = { //非响应式变量（non Responsive Variables）

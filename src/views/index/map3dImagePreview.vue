@@ -1,8 +1,6 @@
 <template>
-    <div class="page-limit-width">
-        <div class="content-cage fx-vm" style="padding:0;overflow:hidden;touch-action:none;">
-            <gesture-image alt="预览图片" :src="picUrl || publicAssets.imageImgError" :threshold="0" onerror="onImageLoadingError()" />
-        </div>
+    <div class="bg-00 fx-vm hi-cwh of-h" style="touch-action:none">
+        <gesture-image alt="预览图片" :src="picUrl || publicAssets.imageImgError" :threshold="0" onerror="onImageLoadingError()" />
     </div>
 </template>
 

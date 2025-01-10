@@ -53,18 +53,25 @@ export function toggleFullScreen(val){
 //获取比较友好的视频持续时间
 export function getFriendlyDuration(seconds){
     if(!seconds){
-        return "00:00:00";
+        return "00:00";
     }
     
     const hh = (seconds >= 3600 ? Math.floor(seconds / 3600) : 0);
     const mm = (seconds >= 60 ? Math.floor((seconds / 60) % 60): 0);
     const ss = Math.floor(seconds % 60);
     
-    return (
-        (hh >= 10 ? "" : "0") + hh + ":" + 
-        (mm >= 10 ? "" : "0") + mm + ":" + 
-        (ss >= 10 ? "" : "0") + ss
-    );
+    if(hh > 0){
+        return (
+            (hh >= 10 ? "" : "0") + hh + ":" + 
+            (mm >= 10 ? "" : "0") + mm + ":" + 
+            (ss >= 10 ? "" : "0") + ss
+        );
+    } else {
+        return (
+            (mm >= 10 ? "" : "0") + mm + ":" + 
+            (ss >= 10 ? "" : "0") + ss
+        );
+    }
 }
 
 //查找数组中最小值所在的索引（仅对数字数组有效）
