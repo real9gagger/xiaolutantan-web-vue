@@ -172,7 +172,7 @@
         transform-origin: 100% 50%;
         transform: rotateY(0deg);
         transition: transform 2s ease 0s;
-        flex: 1 0 33.333333333%;
+        flex: 0 0 33.333333333%;
         height: 2.5rem;
         position: relative;
         background-color: #fff;
@@ -202,7 +202,7 @@
         transform-origin: 0% 50%;
         transform: rotateY(0deg);
         transition: transform 2s ease 0s;
-        flex: 2 0 66.66666666%;
+        flex: 0 0 66.66666666%;
         height: 2.5rem;
         perspective: inherit;
         perspective-origin: inherit;

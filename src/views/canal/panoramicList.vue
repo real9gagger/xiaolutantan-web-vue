@@ -1,6 +1,6 @@
 <template>
     <div class="page-limit-width" @click="clearCurrentIndex">
-        <div class="content-cage" style="padding:0.15rem 0 0 0.15rem">
+        <div class="content-cage" style="padding:0.2rem 0 0 0.2rem">
             <ul class="fx-r fx-wp">
                 <li v-for="item,index in panoList" class="pnl-li-item" 
                 :key="item.id" 
@@ -49,8 +49,8 @@
         max-height: 10rem;
         overflow: hidden;
         cursor: pointer;
-        padding-right: 0.15rem;
-        margin-bottom: 0.15rem;
+        padding-right: 0.2rem;
+        margin-bottom: 0.2rem;
         flex-basis: 50%;
     }
     .pnl-li-item:active{

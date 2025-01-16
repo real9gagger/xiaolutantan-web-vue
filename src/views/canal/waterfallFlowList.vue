@@ -1,6 +1,7 @@
 <template>
     <div class="page-limit-width">
         <div ref="cageRef" class="content-cage wfl-content-box">
+            <modern-search-box class="mg-lr-rem3 mg-b-rem2" placeholder="搜索照片集" />
             <ul id="wflUlDataBox" v-if="dataList.length" class="ps-r">
                 <li v-for="item in dataList" :key="item.id" :style="columnInfo.csstxt" class="wfl-item-box" @click="onItemClick(item)">
                     <img :src="item.pictureList[0].thumbnailPath" class="wfl-item-pic" onerror="onImageLoadingError()" />
@@ -50,6 +51,7 @@
     import ajaxRequest from "@/request/index.js";
     import publicAssets from "@/assets/data/publicAssets.js";
     import myStorage from "@/utils/mystorage.js";
+    import modernSearchBox from "@/components/modernSearchBox.vue";
     
     const COLUMN_GAP = 6; //每列的间隙（像素）
     const MAX_TEXT_LENGTH = 50; //显示的最大文本长度
@@ -170,8 +172,8 @@
 
 <style scoped="scoped">
     .wfl-content-box{
-        padding: 0;
-        background-color: #ddd;
+        padding: 0.5rem 0 0.3rem 0;
+        background-color: #e6e6e6;
     }
     .wfl-item-box{
         position: absolute;

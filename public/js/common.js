@@ -117,20 +117,31 @@ function alertConfirm(msg, yesText, isAttention){
         }
         
         let $alertBox = $(`<div id="${hashCode}" class="alert-confirm-container"><div class="alert-confirm-dialog"><p class="alert-confirm-msg">${msg}</p><button type="button" class="alert-confirm-yes${attentionCss}">${btnText}</button></div></div>`).appendTo(document.body);
+        let popStateCallback = function(){
+            if($alertBox.hasClass("showup")){
+                $alertBox.removeClass("showup");
+                reject(-4);
+            }
+        };
         
         $alertBox.on("click", function(evt){
             if(evt.target.classList.contains("alert-confirm-container")){
                 $(evt.currentTarget).removeClass("showup");
+                window.history.back();
                 reject(0);
             } else if(evt.target.classList.contains("alert-confirm-yes")){
                 $(evt.currentTarget).removeClass("showup");
+                window.history.back();
                 resolve(1);
             }
         }).on("transitionend", function (evt) {
-            if(!evt.currentTarget.classList.contains("showup")){
+            if(!evt.currentTarget.classList.contains("showup")){//判断是否是关闭对话框
                 $(evt.currentTarget).remove();
+                window.removeEventListener("popstate", popStateCallback);
             }
         });
+        window.history.pushState(null, null, "#alert_confirm_state"); //确保按返回键时可以关闭对话框
+        window.addEventListener("popstate", popStateCallback);
         
         setTimeout($alertBox.addClass.bind($alertBox), 50, "showup");
     });
