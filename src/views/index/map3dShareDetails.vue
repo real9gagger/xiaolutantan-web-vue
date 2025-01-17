@@ -147,6 +147,7 @@
         width: 2.5rem;
         height: 2.5rem;
         border: 0.1rem solid #fff;
+        cursor: pointer;
     }
     .msd-bottom-box{
         padding: 0.5rem;

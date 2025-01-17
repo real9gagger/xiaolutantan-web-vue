@@ -645,7 +645,7 @@
         
         //2024年7月16日，获取用户分享的照片
         ///* 【测试用】 */axios.get(publicAssets.sharePicsData).then(res0 => {const res1 = res0.data;
-        ajaxRequest("getUserPostList", null, true).then(res1 => {
+        ajaxRequest("getAllPostList", null, true).then(res1 => {
             if(!res1 || !res1.length){
                 return !appToast("还没有用户分享过照片~");
             }

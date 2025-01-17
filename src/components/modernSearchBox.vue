@@ -6,7 +6,7 @@
             @blur="onInputFocusOrBlur" 
             @keyup.enter="onSearch" />
         <span class="msb-search-vline" :class="{'focusing': isSearchFocus}"></span>
-        <span class="pd-lr-rem8" :class="{'tc-mc': isSearchFocus, 'tc-99': !isSearchFocus}" @click="onSearch">搜索</span>
+        <a class="pd-lr-rem8" :class="{'tc-mc': isSearchFocus, 'tc-99': !isSearchFocus}" @click="onSearch">搜索</a>
     </div>
 </template>
 
@@ -45,7 +45,7 @@
 
 <style>
     .msb-search-box{
-        border: 0.1rem solid #ccc;
+        border: 0.1rem solid #fff;
         border-radius: 1rem;
         overflow: hidden;
         transition: all 300ms;

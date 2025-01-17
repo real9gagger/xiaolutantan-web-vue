@@ -308,6 +308,7 @@
         border-radius: 50%;
         width: 2.5rem;
         height: 2.5rem;
+        cursor: pointer;
     }
     .csb-show-more::after{
         content: " 更多";

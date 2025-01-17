@@ -502,7 +502,7 @@ function generate_wx_signature(){
 }
 
 //根据用户ID获取用户发布的帖子
-function get_user_post_by_uid(){
+function get_user_post_list(){
     $userId = $_GET['userId'];
     $output = [];
     
@@ -520,7 +520,7 @@ function get_user_post_by_uid(){
 }
 
 //获取用户分享的帖子
-function get_user_post_list(){
+function get_all_post_list(){
     $dat_list = get_data_set();
     
     //要求：获取 50 条浏览量最高的数据，30条最新发布的数据，20贴点赞最多的数据。需要去重，累计获取100条数据！
@@ -614,8 +614,8 @@ $api_actions = [
     'toggle_my_post_status',
     'delete_my_post',
     'update_post_view_count',
-    'get_user_post_by_uid',
     'get_user_post_list',
+    'get_all_post_list',
     'get_my_post_list',
     'get_post_by_id',
     'generate_wx_signature',

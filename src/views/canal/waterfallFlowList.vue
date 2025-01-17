@@ -1,34 +1,21 @@
 <template>
-    <div class="page-limit-width">
+    <genz-scroll-view 
+    :lower-disabled="true"
+    :lower-immediately="false"
+    class="page-limit-width">
         <div ref="cageRef" class="content-cage wfl-content-box">
             <modern-search-box class="mg-lr-rem3 mg-b-rem2" placeholder="搜索照片集" />
             <ul id="wflUlDataBox" v-if="dataList.length" class="ps-r">
-                <li v-for="item in dataList" :key="item.id" :style="columnInfo.csstxt" class="wfl-item-box" @click="onItemClick(item)">
-                    <img :src="item.pictureList[0].thumbnailPath" class="wfl-item-pic" onerror="onImageLoadingError()" />
-                    <p v-if="item.title.length > MAX_TEXT_LENGTH" class="wfl-item-title">{{item.title.substr(0, MAX_TEXT_LENGTH)}}…</p>
-                    <p v-else class="wfl-item-title">{{item.title}}</p>
-                    <div class="pd-lr-rem25 pd-b-rem5 tc-99 fs-rem6 fx-hc">
-                        <img :src="item.authorAvatarUrl" alt="作者头像" class="wh-1rem br-h" />
-                        <span class="fx-g1">&nbsp;{{item.authorNickname}}</span>
-                        <span>&nbsp;{{item.createTime?.substr(0, 10)}}</span>
-                    </div>
-                    <img v-if="item.isVideo" :src="publicAssets.iconPlayCircle" class="wfl-is-video" alt="视频内容" />
-                </li>
+                <waterfall-flow-list-item v-for="item,index in dataList"
+                    :key="item.id"
+                    :item-info="item"
+                    :item-index="index"
+                    :style="columnInfo.csstxt"
+                    @itemtap="onItemClick"
+                />
             </ul>
-            <ul v-if="isLoading" title="骨架屏" class="ps-r" :style="loadingSkeletonStyles[0].myParentStyle">
-                <li v-for="vx in loadingSkeletonStyles" :key="vx.ssid" :style="vx" class="wfl-item-box fx-c">
-                    <div class="skeleton-loading-ani fx-g1"></div>
-                    <div class="wfl-item-title">
-                        <p class="skeleton-loading-text wi-f"></p>
-                        <p class="skeleton-loading-text wi-col-8"></p>
-                    </div>
-                    <div class="pd-lr-rem25 pd-b-rem5 fs-rem6 fx-r">
-                        <span class="skeleton-loading-avatar br-h"></span>
-                        <span class="skeleton-loading-text mg-l-rem25"></span>
-                        <span class="fx-g1 hi-1rem"></span>
-                        <span class="skeleton-loading-text wi-col-4"></span>
-                    </div>
-                </li>
+            <ul v-if="isLoading" title="骨架屏" class="ps-r" :style="loadingSkeletonUlCss">
+                <waterfall-flow-list-item v-for="item in loadingSkeletonStyles" :key="item.ssid" :style="item" />
             </ul>
             <section v-else-if="errMsg" class="ta-c pd-1rem">
                 <b class="tc-o0">加载出错：</b>
@@ -40,21 +27,19 @@
                 <span v-else class="tc-99">他还没有分享过照片~</span>
             </section>
         </div>
-    </div>
+    </genz-scroll-view>
 </template>
 
 <script setup name="CanalWaterfallFlowList">
     import { computed, nextTick, onMounted, reactive, ref } from "vue";
     import { useRouter } from "vue-router";
     import { arrayFindIndexOfMinValue } from "@/utils/pagehelper.js";
-    
     import ajaxRequest from "@/request/index.js";
-    import publicAssets from "@/assets/data/publicAssets.js";
     import myStorage from "@/utils/mystorage.js";
     import modernSearchBox from "@/components/modernSearchBox.vue";
+    import waterfallFlowListItem from "@/listitems/waterfallFlowListItem.vue";
     
     const COLUMN_GAP = 6; //每列的间隙（像素）
-    const MAX_TEXT_LENGTH = 50; //显示的最大文本长度
     
     const $router = useRouter();
     const dataList = reactive([]);
@@ -63,7 +48,8 @@
     const isNoMore = ref(false); //是否还有更多数据
     const pageIndex = ref(0); //第几页
     const errMsg = ref(null); //加载时的错误文本信息
-    const loadingSkeletonStyles = reactive([{ myParentStyle: null }]); //加载骨架屏的样式
+    const loadingSkeletonUlCss = reactive({}); //骨架屏父节点样式
+    const loadingSkeletonStyles = reactive([]); //加载骨架屏的样式
     const columnInfo = { //列信息
         width: 0, 
         count: 0,
@@ -82,7 +68,7 @@
         
         buildSkeletonScreen();
         
-        ajaxRequest("getUserPostList", null, true).then(res => {
+        ajaxRequest("getAllPostList", null, true).then(res => {
             if(res && res.length){
                 dataList.push(...res);
             }
@@ -106,7 +92,8 @@
         getDataList();
     }
     
-    function onItemClick(item){
+    function onItemClick(idx){
+        const item = dataList[idx];
         //数据量有点大，保存在临时存储里
         myStorage.onceObject("user_sharepic_infos_" + item.id, item);
         if(!item.isVideo){//照片内容
@@ -154,7 +141,7 @@
             temp[nth] += (hhh + COLUMN_GAP);
         }
         
-        loadingSkeletonStyles[0].myParentStyle = ("height:" + Math.max(...temp) + "px");
+        loadingSkeletonUlCss.height = (Math.max(...temp) + "px");
     }
     
     onMounted(() => {
@@ -174,36 +161,5 @@
     .wfl-content-box{
         padding: 0.5rem 0 0.3rem 0;
         background-color: #e6e6e6;
-    }
-    .wfl-item-box{
-        position: absolute;
-        z-index: 1;
-        cursor: pointer;
-        overflow: hidden;
-        background-color: #fff;
-        border-radius: 0.25rem;
-    }
-    .wfl-item-box:active{
-        opacity: 0.6;
-    }
-    .wfl-item-title{
-        padding: 0.5rem 0.25rem;
-        font-size: 0.7rem;
-        font-weight: 500;
-    }
-    .wfl-item-pic{
-        display: block;
-        width: 100%;
-        max-height: 50vh;
-        background-color: #f0f0f0;
-        object-fit: cover;
-    }
-    .wfl-is-video{
-        position: absolute;
-        top: 0.25rem;
-        right: 0.25rem;
-        z-index: 1;
-        width: 1.5rem;
-        height: 1.5rem;
     }
 </style>

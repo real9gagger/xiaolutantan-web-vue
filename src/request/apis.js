@@ -14,8 +14,8 @@ export default {
     deleteMyPost: "/xlttapi?__RM__=POST&action=delete_my_post", //删除我的帖子
     updatePostViewCount: "/xlttapi?__RM__=POST&action=update_post_view_count", //更新帖子查看数量
     generateWxSignature: "/xlttapi?__RM__=POST&action=generate_wx_signature", //生成微信签名
-    getUserPostByUid: "/xlttapi?__RM__=GET&action=get_user_post_by_uid", //根据用户ID获取用户发布的帖子
-    getUserPostList: "/xlttapi?__RM__=GET&action=get_user_post_list", //获取用户分享的帖子
+    getUserPostList: "/xlttapi?__RM__=GET&action=get_user_post_list", //根据用户ID获取用户发布的帖子
+    getAllPostList: "/xlttapi?__RM__=GET&action=get_all_post_list", //获取所有分享的帖子
     getMyPostList: "/xlttapi?__RM__=GET&action=get_my_post_list", //获取我分享的帖子
     getPostById: "/xlttapi?__RM__=GET&action=get_post_by_id", //根据帖子ID获取帖子信息
     getElevationByLatlng: "/xlttapi?__RM__=GET&action=get_elevation_by_latlng", //根据经纬度获取海拔信息
