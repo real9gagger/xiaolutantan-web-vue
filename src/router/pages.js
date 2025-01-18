@@ -3,25 +3,26 @@ export default [
         path: "/:pathMatch(.*)",
         name: "未知页面",
         redirect: "/e404",
-        meta: {}
+        meta: {
+            showPageTitle: true,
+            isBypassEntrance: true
+        }
     },
-	{
-		path: "/", 
-		name: "即将跳转到主页",
-		redirect: "/index",//跳转到主页
-        meta: {}
-	},
     {
     	path: "/error",
     	name: "服务器错误",
     	component: () => import("@/views/error/index"),
-    	meta: {}
+    	meta: {
+            showPageTitle: true
+        }
     },
     {
     	path: "/e404",
     	name: "找不到页面",
     	component: () => import("@/views/error/http404"),
-    	meta: {}
+    	meta: {
+            showPageTitle: true
+        }
     },
     {
     	path: "/test",
@@ -49,16 +50,28 @@ export default [
     },
 	{
 		path: "/index",
+        alias: "/",
 		name: "主页",
 		component: () => import("@/views/index/index"),
-		meta: {}
+		meta: {
+            isBypassEntrance: true
+        }
 	},
+    {
+    	path: "/entrance",
+    	name: "入口",
+    	component: () => import("@/views/index/entrance"),
+    	meta: {
+            isBypassEntrance: true
+        }
+    },
     {
     	path: "/map3d",
     	name: "平陆运河",
     	component: () => import("@/views/index/map3d"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            isBypassEntrance: true
         }
     },
     {
@@ -123,7 +136,8 @@ export default [
     	name: "用户登录",
     	component: () => import("@/views/login/index"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            isBypassEntrance: true
         }
     },
     {
@@ -207,7 +221,8 @@ export default [
     	name: "外部链接",
     	component: () => import("@/views/help/openExternalLink"),
     	meta: {
-            showPageTitle: true
+            showPageTitle: true,
+            isBypassEntrance: true
         }
     },
     {

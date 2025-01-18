@@ -186,7 +186,7 @@
                 }).catch(globalEmptyShell);
                 break;
             case 0x100:
-                window.open(postList[nonRVs.selectItemIndex].pictureSourceUrl, "_blank");
+                $router.push("/externallink?link=" + encodeURIComponent(postList[nonRVs.selectItemIndex].pictureSourceUrl));
                 break;
         }
     }

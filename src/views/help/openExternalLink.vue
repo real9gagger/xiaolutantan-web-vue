@@ -3,12 +3,12 @@
         <div class="content-cage lh-1x8">
             <template v-if="theLink">
                 <p class="oel-link-box">
-                    <span>您将打开外部链接：</span>
+                    <b>您将打开外部链接：</b>
                     <a class="tc-b0" :href="theLink" target="_blank">{{theLink}}&ensp;</a>
                     <img :src="publicAssets.iconExternalLink" @click="onOpenLink" alt="外部链接" class="wh-1em cs-p" />
                 </p>
                 <button type="button" class="btn-box mg-t-2rem" @click="onOpenLink">确定打开外部链接</button>
-                <a class="dp-bk mg-t-2rem tc-99 ta-c" @click="onGoBack">返回</a>
+                <a class="dp-bk ps-a po-blr-0 pd-b-2rem tc-99 ta-c" @click="onGoBack">返回</a>
             </template>
             <template v-else>
                 <p class="oel-link-box fx-hc">

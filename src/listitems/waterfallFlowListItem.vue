@@ -11,7 +11,7 @@
         <img v-if="props.itemInfo.isVideo" :src="publicAssets.iconPlayCircle" class="wfli-is-video" alt="视频内容" />
     </li>
     <li v-else class="wfli-container fx-c" data-desc="骨架屏">
-        <div class="skeleton-loading-ani fx-g1"></div>
+        <div class="skeleton-loading-ani skeleton-loading-image fx-g1"></div>
         <div class="wfli-title">
             <p class="skeleton-loading-text wi-f"></p>
             <p class="skeleton-loading-text wi-col-8 va-m"></p>

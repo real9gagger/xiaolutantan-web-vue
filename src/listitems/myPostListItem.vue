@@ -48,7 +48,7 @@
             default: -1
         }
     });
-    const emits = defineEmits(["itemtap", "longtap"]);
+    const emits = defineEmits(["itemtap", "longtap", "endtap"]);
     const isActived = ref(false);
     const nonRVs = { //非响应式变量（non Responsive Variables）
         pointerDownTS: 0,
@@ -62,24 +62,34 @@
     function onItemTap(){
         emits("itemtap", props.itemIndex);
     }
+    function onEndTap(){
+        emits("endtap", props.itemIndex);
+    }
     function setIsActived(){
         isActived.value = true;
     }
     
     function onItemPointerDown(evt){
-        nonRVs.pointerDownTS = evt.timeStamp;
-        clearTimeout(nonRVs.timerID);
-        nonRVs.timerID = setTimeout(setIsActived, 50);
-        needDebounce(onLongTap, 550);
+        if(evt.button === 0){//点击事件。鼠标左键按下时才有效
+            evt.preventDefault();
+            nonRVs.pointerDownTS = evt.timeStamp;
+            clearTimeout(nonRVs.timerID);
+            nonRVs.timerID = setTimeout(setIsActived, 50);
+            needDebounce(onLongTap, 550);
+        }
     }
     function onItemPointerUp(evt){
-        const delta = (evt.timeStamp - nonRVs.pointerDownTS);
-        
         clearTimeout(nonRVs.timerID);
         clearTimer(true);
-    
-        if(delta < 300 && evt.button === 0){ //点击事件。鼠标左键按下时才有效
-            onItemTap();
+        
+        if(evt.button === 0){
+            evt.preventDefault();
+            const delta = (evt.timeStamp - nonRVs.pointerDownTS);
+            if(delta < 300){ //点击事件。鼠标左键按下时才有效
+                onItemTap();
+            } else { //结束按下事件
+                onEndTap();
+            }
         }
         
         isActived.value = false;
@@ -91,6 +101,7 @@
             clearTimer(true);
             isActived.value = false;
             nonRVs.timerID = 0;
+            onEndTap();
         }
     }
 </script>

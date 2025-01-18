@@ -11,7 +11,7 @@
                         :class="{'dangerous': item.dangerous}"
                         @click="onButtonClick(item.key)">{{item.name}}</button>
                 </template>
-                <button type="button" class="ppx-btn-box" @click="onClose">取消</button>
+                <button type="button" class="ppx-btn-box tc-99" @click="onClose">取消</button>
             </div>
         </div>
     </transition>
@@ -98,7 +98,6 @@
         font-size: 0.8rem;
         padding: 1rem;
         line-height: 1;
-        color: #333;
     }
     .ppx-btn-box.dangerous{color:#f00;}
     .ppx-btn-box:hover,
