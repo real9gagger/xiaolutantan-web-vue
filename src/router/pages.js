@@ -132,6 +132,14 @@ export default [
         }
     },
     {
+    	path: "/search",
+    	name: "搜索",
+    	component: () => import("@/views/index/search"),
+    	meta: {
+            showPageTitle: true
+        }
+    },
+    {
     	path: "/login",
     	name: "用户登录",
     	component: () => import("@/views/login/index"),

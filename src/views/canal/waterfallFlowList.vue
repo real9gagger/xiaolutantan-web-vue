@@ -4,7 +4,7 @@
     :lower-immediately="false"
     class="page-limit-width">
         <div ref="cageRef" class="content-cage wfl-content-box">
-            <modern-search-box class="mg-lr-rem3 mg-b-rem2" placeholder="搜索照片集" />
+            <modern-search-box class="mg-lr-rem3 mg-b-rem2" placeholder="搜索照片集" @inputclick="gotoSearchPage" />
             <ul id="wflUlDataBox" v-if="dataList.length" class="ps-r">
                 <waterfall-flow-list-item v-for="item,index in dataList"
                     :key="item.id"
@@ -36,7 +36,6 @@
     import { arrayFindIndexOfMinValue } from "@/utils/pagehelper.js";
     import ajaxRequest from "@/request/index.js";
     import myStorage from "@/utils/mystorage.js";
-    import modernSearchBox from "@/components/modernSearchBox.vue";
     import waterfallFlowListItem from "@/listitems/waterfallFlowListItem.vue";
     
     const COLUMN_GAP = 6; //每列的间隙（像素）
@@ -144,8 +143,13 @@
         loadingSkeletonUlCss.height = (Math.max(...temp) + "px");
     }
     
+    //转到搜索页
+    function gotoSearchPage(){
+        $router.push("/search");
+    }
+    
     onMounted(() => {
-        const cw = cageRef.value.clientWidth;
+        const cw = $(cageRef.value).width(); //不包括内边距和边框的宽度
         
         columnInfo.count = Math.round(cw / (10 * window.pxOf1rem)); //列数
         columnInfo.width = Math.floor((cw - (columnInfo.count + 1) * COLUMN_GAP) / columnInfo.count); //每列宽度
@@ -159,7 +163,7 @@
 
 <style scoped="scoped">
     .wfl-content-box{
-        padding: 0.5rem 0 0.3rem 0;
+        padding: 0.5rem 0.2rem 0.3rem 0.2rem;
         background-color: #e6e6e6;
     }
 </style>

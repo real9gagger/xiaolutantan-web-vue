@@ -1,7 +1,10 @@
 <template>
     <div class="msb-search-box fx-hc" :class="{'focusing': isSearchFocus}">
         <img :src="isSearchFocus ? publicAssets.iconSearchGreen : publicAssets.iconSearchGrey" alt="搜索" class="wh-1em" />
-        <input v-model="searchText" type="search" class="msb-search-input" :placeholder="props.placeholder" 
+        <input v-model="searchText" type="search" class="msb-search-input" 
+            :placeholder="props.placeholder" 
+            :readonly="props.readonly"
+            @click="onInputClick"
             @focus="onInputFocusOrBlur" 
             @blur="onInputFocusOrBlur" 
             @keyup.enter="onSearch" />
@@ -14,11 +17,15 @@
     import { ref } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
-    const emits = defineEmits(["search"]);
+    const emits = defineEmits(["search", "inputclick"]);
     const props = defineProps({
         placeholder: {
             type: String,
             default: "搜索"
+        },
+        readonly: {
+            type: Boolean,
+            default: true
         },
         isSearching: {
             type: Boolean,
@@ -39,20 +46,28 @@
         }
     }
     function onInputFocusOrBlur(evt){
-        isSearchFocus.value = (evt.type === "focus");
+        if(!props.readonly){
+            isSearchFocus.value = (evt.type === "focus");
+        }
+    }
+    function onInputClick(evt){
+        if(props.readonly){
+            emits("inputclick", evt);
+        }
     }
 </script>
 
 <style>
     .msb-search-box{
-        border: 0.1rem solid #fff;
-        border-radius: 1rem;
+        border: 0.1rem solid rgba(67, 186, 8, 0.5);
+        border-radius: 0.75rem;
         overflow: hidden;
         transition: all 300ms;
         height: 2rem;
         padding-left: 0.8rem;
         background-color: #fff;
         line-height: 1;
+        background-image: linear-gradient(225deg, rgba(67, 186, 8, 0.1) 0%, transparent 25%, transparent 75%, rgba(67, 186, 8, 0.1) 100%);
     }
     .msb-search-box.focusing{
         border-color: var(--main-color);
@@ -61,6 +76,10 @@
         border: 0;
         padding: 0 0.6rem;
         flex: 1;
+        background-color: transparent;
+    }
+    .msb-search-input[readonly]{
+        cursor: pointer;
     }
     .msb-search-vline {
         display: inline-block;
