@@ -1,7 +1,7 @@
 <template>
     <div class="msb-search-box fx-hc" :class="{'focusing': isSearchFocus}">
         <img :src="isSearchFocus ? publicAssets.iconSearchGreen : publicAssets.iconSearchGrey" alt="搜索" class="wh-1em" />
-        <input v-model="searchText" type="search" class="msb-search-input" 
+        <input v-model="searchText" type="search" class="msb-search-input" ref="inputRef"
             :placeholder="props.placeholder" 
             :readonly="props.readonly"
             @click="onInputClick"
@@ -14,7 +14,7 @@
 </template>
 
 <script setup name="ModernSearchBox">
-    import { ref } from "vue";
+    import { nextTick, onMounted, ref } from "vue";
     import publicAssets from "@/assets/data/publicAssets.js";
     
     const emits = defineEmits(["search", "inputclick"]);
@@ -34,11 +34,16 @@
         initiValue: {
             type: String,
             default: ""
+        },
+        autoFocus: {
+            type: Boolean,
+            default: true
         }
     });
     
     const isSearchFocus = ref(false);
     const searchText = ref(props.initiValue || "");
+    const inputRef = ref(null);
     
     function onSearch(){
         if(!props.isSearching){
@@ -55,6 +60,15 @@
             emits("inputclick", evt);
         }
     }
+    function setInputFocus(){
+        inputRef.value?.focus();
+    }
+    
+    onMounted(() => {
+        if(props.autoFocus){
+            nextTick(setInputFocus);
+        }
+    });
 </script>
 
 <style>

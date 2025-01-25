@@ -4,6 +4,7 @@
             <div class="fx-g1 wi-f" @click="onClose"><!-- 点我关闭层 --></div>
             <div class="ppx-box-dialog" :style="getDialogStyle()">
                 <p v-if="props.title" class="ta-c tc-66 mg-1rem lh-1x of-lc1">{{props.title}}</p>
+                <p v-else class="ta-c tc-66 mg-1rem"><slot></slot></p>
                 <template v-for="item in props.buttons">
                     <button type="button" class="ppx-btn-box fw-b"
                         v-if="!item.hidden" 
@@ -18,7 +19,7 @@
 </template>
 
 <script setup name="ActionPopup">
-    import { computed, getCurrentInstance } from "vue";
+    import { getCurrentInstance } from "vue";
     import { getScrollBarWidth } from "@/utils/pagehelper.js";
     
     const isVisible = defineModel({

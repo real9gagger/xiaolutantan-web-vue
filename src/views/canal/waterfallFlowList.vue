@@ -4,7 +4,7 @@
     :lower-immediately="false"
     class="page-limit-width">
         <div ref="cageRef" class="content-cage wfl-content-box">
-            <modern-search-box class="mg-lr-rem3 mg-b-rem2" placeholder="搜索照片集" @inputclick="gotoSearchPage" />
+            <modern-search-box class="mg-lr-rem3 mg-b-rem2" placeholder="搜索照片集" @inputclick="gotoSearchPage" @search="gotoSearchPage" />
             <ul id="wflUlDataBox" v-if="dataList.length" class="ps-r">
                 <waterfall-flow-list-item v-for="item,index in dataList"
                     :key="item.id"
