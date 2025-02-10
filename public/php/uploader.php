@@ -31,7 +31,11 @@ function get_new_name($old_name){
         return null;
     }
     
-    return md5(hrtime(true).$old_name) . $file_ext;
+    if(function_exists('hrtime')){
+        return md5(hrtime(true).$old_name) . $file_ext;
+    } else {
+        return md5(uniqid().$old_name) . $file_ext;
+    }
 }
 
 //旋转用户拍摄的照片
