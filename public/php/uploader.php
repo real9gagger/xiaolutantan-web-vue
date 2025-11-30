@@ -193,8 +193,8 @@ function upload_picture(){
         
         1、  运行PHP命令： <?php echo exec('whoami'); ?> 看看得到的用户名是什么，我得到的是 “apache”。
         2、  打开命令行工具运行两个命令：（“apache”为第一步得到的用户名，“/mnt/web3/xltt_web_vue” 是网站所在的目录）
-                chown -R apache /mnt/web3/xltt_web_vue
-                chmod -R 777 /mnt/web3/xltt_web_vue
+                sudo chown -R apache /mnt/web3/xltt_web_vue
+                sudo chmod -R 777 /mnt/web3/xltt_web_vue
         
         参见：https://stackoverflow.com/questions/8103860/move-uploaded-file-gives-failed-to-open-stream-permission-denied-error
         */
