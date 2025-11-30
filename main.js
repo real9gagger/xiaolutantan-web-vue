@@ -1,3 +1,7 @@
+/*
+  本文件的目的只是想让 Github 识别项目的开发语言，无任何其他用处
+*/
+
 import { createApp } from 'vue';
 import { register as swiperRegister } from 'swiper/swiper-element-bundle';
 import App from './App.vue';
@@ -15,4 +19,5 @@ myApp.component('ModernSearchBox', modernSearchBox); //搜索框
 
 myApp.use(MyRouter);
 myApp.use(VuexStore);
+
 myApp.mount('#xlttapp');
