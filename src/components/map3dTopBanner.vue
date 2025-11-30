@@ -234,6 +234,7 @@
     }
     .mtb-z3-picbox{
         display: block;
+        width: 100%;
         min-height: 2.5rem;
         opacity: 1;
         transition: opacity 500ms ease 500ms;
