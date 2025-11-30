@@ -1,6 +1,6 @@
 # 请切换到 **master** 分支
 
-要查看代码请切换到 master 分支，本分支暂无代码提交记录
+要查看代码请切换到 [master](https://github.com/real9gagger/xiaolutantan-web-vue/tree/master) 分支，本分支暂无代码提交记录
 
 # 平陆运河最新进展
 [产品链接](https://plyh.xyz)
